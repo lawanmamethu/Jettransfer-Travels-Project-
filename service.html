@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services & Gallery – Jettransfer Travels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A7EA4;
+            --primary-dark: #065A7A;
+            --secondary: #F59E0B;
+            --accent: #10B981;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Logo */
+    .logo{
+      font-family:'Sora',sans-serif;
+      font-size:1.3rem;
+      font-weight:800;
+      color:var(--primary);
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      white-space:nowrap;
+    }
+    .logo-img{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      object-fit:cover;
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:0 10px 22px rgba(10,126,164,.15);
+      background:#fff;
+    }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+
+        /* ── Nav Actions container ── */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+/* ── Search ── */
+.nav-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #E2E8F0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+.search-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--bg-light);
+}
+
+.search-box {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 50px;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.4s ease, opacity 0.3s ease;
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+}
+.search-box.open {
+    width: 280px;
+    opacity: 1;
+    pointer-events: all;
+}
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 0.55rem 1rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    width: 100%;
+    background: transparent;
+}
+.search-submit {
+    background: var(--primary);
+    border: none;
+    padding: 0.55rem 1rem;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.search-submit:hover { background: var(--primary-dark); }
+
+/* ── Login / Register ── */
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-login {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.btn-login:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    background: var(--primary);
+    color: white;
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
+    white-space: nowrap;
+}
+.btn-register:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 126, 164, 0.4);
+}
+
+/* ── Admin pill ── */
+.btn-admin {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+    background: linear-gradient(135deg, var(--primary-dark), #043D54);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(6, 90, 122, 0.4);
+    white-space: nowrap;
+}
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(6, 90, 122, 0.5);
+}
+
+/* ── Tighten nav menu font size so it fits ── */
+.nav-menu {
+    gap: 1.6rem;  /* reduce from 2.5rem */
+}
+.nav-menu a {
+    font-size: 0.88rem;  /* reduce from 0.95rem */
+}
+
+/* ── Active link style ── */
+.nav-menu a.active {
+    color: var(--primary);
+}
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* ── Mobile: hide auth & search inside hamburger menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none;
+    }
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    /* Show auth links inside mobile menu */
+    .nav-menu::after {
+        content: '';
+    }
+}
+
+/* ── Show actions inside mobile menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none; /* hide from top bar on mobile */
+    }
+
+    /* Add search + auth at bottom of mobile menu */
+    .nav-menu {
+        padding-bottom: 1.5rem;
+    }
+
+    .mobile-auth {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid #E2E8F0;
+        width: 100%;
+    }
+
+    .mobile-search {
+        display: flex !important;
+        align-items: center;
+        width: 100%;
+        border: 2px solid #E2E8F0;
+        border-radius: 50px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .mobile-search input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.65rem 1.2rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .mobile-search button {
+        background: var(--primary);
+        border: none;
+        padding: 0.65rem 1rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    .mobile-auth-btns {
+        display: flex;
+        gap: 0.8rem;
+        width: 100%;
+    }
+
+    .mobile-auth-btns a {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* Hide mobile-auth on desktop */
+.mobile-auth {
+    display: none;
+}
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(10, 126, 164, 0.4);
+        }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* =====================================================
+           HERO BANNER
+        ===================================================== */
+        .hero {
+            margin-top: 80px;
+            height: 50vh;
+            min-height: 340px;
+            background: linear-gradient(135deg, rgba(10,126,164,.93), rgba(16,185,129,.82));
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 15% 50%, rgba(255,255,255,.1) 0%, transparent 55%),
+                radial-gradient(circle at 85% 30%, rgba(245,158,11,.18) 0%, transparent 50%);
+            animation: bgpulse 8s ease-in-out infinite;
+        }
+        @keyframes bgpulse { 0%,100%{opacity:.5;} 50%{opacity:1;} }
+        .hero-circle { position:absolute; border-radius:50%; opacity:.11; background:white; }
+        .hero-circle.c1 { width:300px; height:300px; top:-70px; right:60px; }
+        .hero-circle.c2 { width:170px; height:170px; bottom:-50px; right:300px; }
+        .hero-circle.c3 { width:110px; height:110px; top:40px; left:38%; }
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            color: white;
+            z-index: 1;
+            animation: fadeInUp .9s ease-out both;
+        }
+        .hero-breadcrumb { font-size:.88rem; opacity:.78; margin-bottom:.8rem; }
+        .hero-breadcrumb a { color:rgba(255,255,255,.75); text-decoration:none; }
+        .hero-breadcrumb a:hover { color:white; }
+        .hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle { font-size:1.15rem; opacity:.92; max-width:560px; font-weight:400; }
+        @keyframes fadeInUp {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* =====================================================
+           SECTION UTILITIES
+        ===================================================== */
+        .section { padding: 5.5rem 2rem; }
+        .section-alt { background: var(--bg-light); }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 3.5rem; }
+        .section-tag {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: .82rem;
+            letter-spacing: 1.5px;
+            margin-bottom: .8rem;
+        }
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: .8rem;
+        }
+        .section-description {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           SERVICES GRID
+        ===================================================== */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .srv-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2.2rem 2rem;
+            box-shadow: var(--shadow-md);
+            transition: transform .38s ease, box-shadow .38s ease, border-color .3s;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            cursor: pointer;
+        }
+        .srv-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(10,126,164,.15);
+        }
+
+        /* Icon circle */
+        .srv-icon {
+            width: 70px; height: 70px;
+            background: var(--primary-light);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.9rem;
+            transition: background .3s, transform .3s;
+            flex-shrink: 0;
+        }
+        .srv-card:hover .srv-icon {
+            background: var(--primary);
+            transform: rotate(-5deg) scale(1.08);
+        }
+
+        .srv-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .srv-desc {
+            color: var(--text-light);
+            font-size: .9rem;
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        .btn-learn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: .9rem;
+            text-decoration: none;
+            border: 2px solid var(--primary);
+            padding: .55rem 1.4rem;
+            border-radius: 50px;
+            transition: all .28s;
+            align-self: flex-start;
+            cursor: pointer;
+            background: transparent;
+            font-family: inherit;
+        }
+        .btn-learn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(3px);
+        }
+
+        /* Process strip */
+        .process-strip {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 3.5rem 2rem;
+            color: white;
+            margin-top: 0;
+        }
+        .process-strip .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            text-align: center;
+        }
+        .proc-item { flex: 1; min-width: 140px; }
+        .proc-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            opacity: .35;
+            line-height: 1;
+            margin-bottom: .3rem;
+        }
+        .proc-item h4 { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.3rem; }
+        .proc-item p { font-size:.85rem; opacity:.82; }
+
+        /* =====================================================
+           GALLERY
+        ===================================================== */
+        .gallery-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .7rem;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+        }
+        .gal-btn {
+            padding: .55rem 1.4rem;
+            border-radius: 50px;
+            border: 2px solid #E2E8F0;
+            background: transparent;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all .25s;
+        }
+        .gal-btn:hover,
+        .gal-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Masonry-style gallery grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 200px;
+            gap: 1rem;
+        }
+        .gal-item {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: opacity .4s, transform .4s;
+        }
+        .gal-item.tall { grid-row: span 2; }
+        .gal-item.wide { grid-column: span 2; }
+
+        .gal-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease;
+            display: block;
+        }
+        .gal-item:hover img { transform: scale(1.08); }
+
+        /* Overlay */
+        .gal-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(6,90,122,.75) 0%, transparent 55%);
+            opacity: 0;
+            transition: opacity .35s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.2rem;
+        }
+        .gal-item:hover .gal-overlay { opacity: 1; }
+        .gal-overlay h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: .2rem;
+        }
+        .gal-overlay span {
+            font-size: .78rem;
+            color: rgba(255,255,255,.8);
+            background: rgba(10,126,164,.5);
+            padding: .18rem .65rem;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        .gal-zoom-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%) scale(0);
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,.92);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            transition: transform .3s ease;
+            color: var(--primary);
+        }
+        .gal-item:hover .gal-zoom-icon { transform: translate(-50%,-50%) scale(1); }
+
+        /* Hidden filter */
+        .gal-item.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(.95);
+        }
+
+        /* =====================================================
+           LIGHTBOX
+        ===================================================== */
+        .lightbox {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(10,23,40,.92);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInUp .3s ease both;
+        }
+        .lightbox.open { display: flex; }
+        .lb-inner {
+            position: relative;
+            max-width: 900px;
+            width: 92%;
+            animation: fadeInUp .35s ease both;
+        }
+        .lb-img {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+        }
+        .lb-caption {
+            color: white;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .lb-close {
+            position: absolute;
+            top: -2.5rem; right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            opacity: .85;
+            transition: opacity .2s;
+        }
+        .lb-close:hover { opacity: 1; }
+        .lb-nav {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,.15);
+            border: none;
+            color: white;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: background .2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .lb-nav:hover { background: rgba(255,255,255,.3); }
+        .lb-prev { left: -3.5rem; }
+        .lb-next { right: -3.5rem; }
+
+        /* =====================================================
+           CTA STRIP
+        ===================================================== */
+        .cta-strip {
+            background: var(--bg-light);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .cta-strip h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .cta-strip p { color: var(--text-light); margin-bottom: 2rem; font-size: 1rem; }
+        .btn-cta {
+            background: var(--primary);
+            color: white;
+            padding: .9rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all .3s;
+            box-shadow: 0 4px 20px rgba(10,126,164,.35);
+            display: inline-block;
+        }
+        .btn-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(10,126,164,.4);
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        .footer-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.15rem;
+            margin-bottom: 1.3rem;
+        }
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255,255,255,.68);
+            text-decoration: none;
+            display: block;
+            margin-bottom: .65rem;
+            font-size: .91rem;
+            transition: color .3s;
+        }
+        .footer-section a:hover { color: var(--secondary); }
+        .social-links { display:flex; gap:.8rem; margin-top:1rem; }
+        .social-link {
+            width:38px; height:38px;
+            background: rgba(255,255,255,.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+            transition: all .3s;
+            font-size: 1rem;
+        }
+        .social-link:hover { background: var(--primary); transform: translateY(-3px); }
+        .footer-bottom {
+            max-width:1400px; margin:0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,.1);
+            text-align: center;
+            color: rgba(255,255,255,.42);
+            font-size: .86rem;
+        }
+
+        /* =====================================================
+           FADE-IN
+        ===================================================== */
+        .fade-in {
+            opacity:0;
+            transform:translateY(26px);
+            transition:opacity .75s ease, transform .75s ease;
+        }
+        .fade-in.visible { opacity:1; transform:translateY(0); }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+        @media (max-width: 1100px) {
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+            .gal-item.wide { grid-column: span 2; }
+        }
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 2.6rem; }
+            .section-title { font-size: 2.2rem; }
+        }
+        @media (max-width: 768px) {
+            .mobile-toggle { display: flex; }
+            .nav-menu {
+                position: fixed;
+                top:80px; left:0; right:0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem; gap: 1.5rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                transition: transform .3s;
+                z-index: 999;
+            }
+            .nav-menu.active { transform: translateX(0); }
+            .hero { height:auto; padding:4.5rem 0; min-height:unset; }
+            .hero h1 { font-size: 2rem; }
+            .section-title { font-size: 1.9rem; }
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 160px;
+            }
+            .gal-item.wide { grid-column: span 2; }
+            .gal-item.tall { grid-row: span 2; }
+            .services-grid { grid-template-columns: 1fr; }
+            .lb-prev { left: -2.5rem; }
+            .lb-next { right: -2.5rem; }
+        }
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-auto-rows: 130px;
+            }
+            .gal-item.wide { grid-column: span 2; }
+            .lb-prev, .lb-next { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ================================================
+         HEADER
+    ================================================= -->
+   <!-- Header -->
+<header class="header" id="header">
+    <nav class="nav-container">
+        <!-- Logo -->
+        <a href="#" class="logo">
+            <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+
+        <!-- Nav Menu -->
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="destination.html">Destinations</a></li>
+            <li><a href="package.html">Packages</a></li>
+            <li><a href="vehiclesEdit.html">Vehicles</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="service.html" class="active">Services & Gallery</a></li>
+
+            <li><a href="contact.html">Contact Us</a></li>
+
+            <!-- Mobile only: search + auth (hidden on desktop via CSS) -->
+<li class="mobile-auth">
+    <div class="mobile-search">
+        <input type="text" placeholder="Search destinations, packages…">
+        <button>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="mobile-auth-btns">
+        <a href="login.html" class="btn-login" style="display:block; padding: 0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
+        <a href="register.html" class="btn-register" style="display:block; padding: 0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
+    </div>
+</li>
+        </ul>
+
+        <!-- Right Side Actions -->
+        <div class="nav-actions">
+            <!-- Search -->
+            <div class="nav-search" id="navSearch">
+                <button class="search-toggle" id="searchToggle" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <div class="search-box" id="searchBox">
+                    <input type="text" placeholder="Search destinations, packages…" id="searchInput">
+                    <button class="search-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login / Register -->
+            <div class="nav-auth">
+                <a href="login.html" class="btn-login">Login</a>
+                <a href="register.html" class="btn-register">Register</a>
+            </div>
+
+        </div>
+
+        <!-- Mobile Toggle -->
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
+
+    <!-- ================================================
+         HERO BANNER
+    ================================================= -->
+    <section class="hero">
+        <div class="hero-circle c1"></div>
+        <div class="hero-circle c2"></div>
+        <div class="hero-circle c3"></div>
+        <div class="hero-content">
+            
+            <h1>Services &amp; Gallery</h1>
+            <p class="hero-subtitle">World-class travel services and a visual journey through the Pearl of the Indian Ocean.</p>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SERVICES SECTION
+    ================================================= -->
+    <section class="section" id="services">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2 class="section-title">Our Story Of Tourism <br>Industry</br></h2>
+                <p class="section-description">Welcome to our journey in the tourism industry, a story driven by passion, innovation, and a deep respect for cultural and natural heritage. Founded by a group of enthusiastic young professionals, our company is dedicated to redefining travel experiences with fresh perspectives and sustainable practices.
+
+
+Our story began with a shared dream: to create travel experiences that are not only enjoyable but also meaningful. We believe that travel should be more than just sightseeing; it should be an opportunity to connect with different cultures, explore natural wonders, and contribute positively to the world. This belief is at the heart of everything we do.
+
+From the outset, we committed to doing things differently. Our team constantly seeks out new and exciting destinations, curating unique itineraries that offer authentic and immersive experiences. We collaborate with local communities to ensure our tours respect and celebrate their traditions, providing our travelers with genuine cultural interactions.
+
+Sustainability is a core principle of our operations. We prioritize eco-friendly practices, from minimizing waste and carbon footprints to supporting conservation efforts. Our nature-friendly approach ensures that the beauty of the destinations we love is preserved for future generations.
+
+Innovation is another key aspect of our story. We embrace cutting-edge technology to enhance our services, offering virtual reality previews, seamless booking systems, and personalized travel planning tools. These advancements make the travel planning process as exciting and effortless as the journey itself.
+
+As we continue to grow, our mission remains clear: to offer exceptional travel experiences that are culturally enriching and environmentally responsible. Join us on this adventure, and let’s explore the world in a way that honors its beauty and diversity.</p>
+            </div>
+            <div class="section-header fade-in">
+                <h2 class="section-title">Our Services</h2>
+            </div>
+
+            <div class="services-grid">
+
+                <!-- 1. Tour Packages -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">🗺</div>
+                    <h3 class="srv-title">Tour Packages</h3>
+                    <p class="srv-desc">Choose from our carefully crafted itineraries covering Sri Lanka's cultural triangle, hill country, beaches, and wildlife — tailored for every traveller type and budget.</p>
+                    <button class="btn-learn" onclick="openServiceModal('Tour Packages','Our tour packages range from 1-day  to 14-day. All packages include professional drivers, comfortable vehicles, and curated experiences at each destination.')">Learn More →</button>
+                </div>
+
+                <!-- 2. Hotel Customization -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">🏨</div>
+                    <h3 class="srv-title">Hotel Customization</h3>
+                    <p class="srv-desc">We partner with 3★ to 5★ properties across the island — from boutique jungle lodges to oceanfront resorts — securing the best rates and exclusive perks for our guests.</p>
+                    <button class="btn-learn" onclick="openServiceModal('Hotel Customization',' Our team will recommend and book the perfect accommodation for your budget and travel style — from heritage bungalows in the hill country to luxury beach villas on the southern coast. The price of the package varies depending on the hotel you choose.')">Learn More →</button>  
+                </div>
+
+                <!-- 3. Airport Transfers  -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">✈️</div>
+                    <h3 class="srv-title">Airport Transfers</h3>
+                    <p class="srv-desc">Seamless pick-up and drop-off at Bandaranaike International Airport (CMB) and Mattala Rajapaksa Airport (HRI), available 24/7 with meet-and-greet service.</p>
+                    <button class="btn-learn" onclick="openServiceModal('Airport Transfers','Our airport transfer service operates 24/7, 365 days a year. A professional driver will meet you at arrivals holding your name board. We monitor your flight in real time, so delays are never a problem.')">Learn More →</button>
+                </div>
+
+                <!-- 4. Vehicle with Driver -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">🚗</div>
+                    <h3 class="srv-title">Vehicle with Driver</h3>
+                    <p class="srv-desc">Hire from our premium fleet — sedans, SUVs, mini vans, and luxury coaches — each paired with a courteous, English-speaking, fully licensed professional driver.</p>
+                    <button class="btn-learn" onclick="openServiceModal('Vehicle with Driver','Our fleet includes sedans (3–4 seats), SUVs (4–5 seats), mini vans (6–8 seats), and luxury coaches (12–15 seats). All vehicles are air-conditioned, GPS-equipped, and maintained to the highest standards. Drivers are background-checked and trained in first aid.')">Learn More →</button> 
+                </div>
+
+                <!-- 5. 24/7 Service -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">🌓</div>
+                    <h3 class="srv-title">24/7 Service</h3>
+                    <p class="srv-desc">We are available around the clock to assist you with bookings, inquiries, and travel support. Our dedicated team ensures a smooth and stress-free experience anytime, day or night.</p>
+                    <button class="btn-learn" onclick="openServiceModal('24/7 Service','Our support team is available 24 hours a day, 7 days a week to assist you with reservations, airport pickups, itinerary changes, and any travel emergencies throughout Sri Lanka.')">Learn More →</button>
+                </div>
+
+                <!-- 6. Tour Guide Services -->
+                <div class="srv-card fade-in">
+                    <div class="srv-icon">🎯</div>
+                    <h3 class="srv-title">Tour Guide Services</h3>
+                    <p class="srv-desc">Our certified, multilingual guides bring each destination to life with in-depth historical knowledge, cultural insights, and access to hidden gems the guidebooks miss.</p>
+                    <button class="btn-learn" onclick="openServiceModal('Tour Guide Services','All our guides are certified by the Sri Lanka Tourism Development Authority (SLTDA). They speak English, Russian, and Hindi. From UNESCO World Heritage sites to rural village experiences, our guides ensure you gain a deep understanding and appreciation of Sri Lanka.')">Learn More →</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Strip -->
+    <div class="process-strip">
+        <div class="container">
+            <div class="proc-item"><div class="proc-num">01</div><h4>Choose Your Service</h4><p>Browse packages or tell us what you need</p></div>
+            <div class="proc-item"><div class="proc-num">02</div><h4>Get a Custom Quote</h4><p>We tailor the price to your exact needs</p></div>
+            <div class="proc-item"><div class="proc-num">03</div><h4>Confirm &amp; Book</h4><p>Secure your booking with a simple deposit</p></div>
+            <div class="proc-item"><div class="proc-num">04</div><h4>Travel &amp; Enjoy</h4><p>We handle everything — you just explore</p></div>
+        </div>
+    </div>
+
+    <!-- ================================================
+         GALLERY SECTION
+    ================================================= -->
+    <section class="section section-alt" id="gallery">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2 class="section-title">The Unforgettable Tour<br>Gallery</br></h2>
+                <p class="section-description">Explore our Tour Gallery to get a glimpse of the breathtaking destinations and unforgettable experiences we offer. From stunning landscapes to vibrant cityscapes, our gallery showcases the highlights of our tours. Get inspired and start planning your next adventure by browsing through captivating photos and videos of past trips.</p>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="gallery-filters fade-in">
+                <button class="gal-btn active" data-cat="all">All</button>
+                <button class="gal-btn" data-cat="beaches">🌊 Beaches</button>
+                <button class="gal-btn" data-cat="hillcountry">🌿 Hill Country</button>
+                <button class="gal-btn" data-cat="cultural">🏛 Cultural Sites</button>
+                <button class="gal-btn" data-cat="wildlife">🐘 Wildlife</button>
+                <button class="gal-btn" data-cat="welcome">🙏 Welcome</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid fade-in" id="galleryGrid">
+
+                <!-- Beaches -->
+                <div class="gal-item tall" data-cat="beaches" data-title="Mirissa Beach" data-url="img/mirissa1.jpeg">
+                    <img src="img/mirissa1.jpeg" alt="Mirissa Beach" loading="lazy">
+                    <div class="gal-overlay"><h4>Mirissa Beach</h4><span>Beaches</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Sigiriya Rock Fortress" data-url="img/sigiriya1.jpeg">
+                    <img src="img/sigiriya1.jpeg" alt="Sigiriya" loading="lazy">
+                    <div class="gal-overlay"><h4>Sigiriya Rock Fortress</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Welcome -->
+                <div class="gal-item" data-cat="welcome" data-title="Welcoming Tourists at The Airport" data-url="img/welcome5.jpeg">
+                    <img src="img/welcome1.jpeg" alt="Welcome" loading="lazy">
+                    <div class="gal-overlay"><h4>Welcome</h4><span>Welcome</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Ruwanweli Maha Seya in Anuradhapura" data-url="img/ruwanwaliseeya1.jpeg">
+                    <img src="img/ruwanwaliseeya1.jpeg" alt="Ruwanweliseya" loading="lazy">
+                    <div class="gal-overlay"><h4>Ruwanweliseya</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Jaya Sri Maha Bodhiya in Anuradhapura" data-url="img/srimahabodiya1.jpeg">
+                    <img src="img/srimahabodiya1.jpeg" alt="Jaya Sri Maha Bodhiya" loading="lazy">
+                    <div class="gal-overlay"><h4>Jaya Sri Maha Bodhiya</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Dewundara Dewalaya in Matara" data-url="img/dewndara1.jpeg">
+                    <img src="img/dewndara1.jpeg" alt="Dewundara Dewalaya" loading="lazy">
+                    <div class="gal-overlay"><h4>Dewundara Dewalaya</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Dewundara Light House at Matara" data-url="img/dewndara2.jpeg">
+                    <img src="img/dewndara2.jpeg" alt="Dewundara Light House" loading="lazy">
+                    <div class="gal-overlay"><h4>Dewundara Light House</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Udawalawe National Park: Elephant Safaris" data-url="img/udawalawa5.jpeg">
+                    <img src="img/udawalawa5.jpeg" alt="Udawalawe National Park" loading="lazy">
+                    <div class="gal-overlay"><h4>Udawalawe National Park</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Dewundara Light House at Matara" data-url="img/dewndara4.jpeg">
+                    <img src="img/dewndara4.jpeg" alt="Dewundara Light House" loading="lazy">
+                    <div class="gal-overlay"><h4>Dewundara Light House</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Hill Country -->
+                <div class="gal-item" data-cat="hillcountry" data-title="The Ambuluwawa Tower" data-url="img/ambuluwawa1.jpeg">
+                    <img src="img/ambuluwawa1.jpeg" alt="Ambuluwawa Tower" loading="lazy">
+                    <div class="gal-overlay"><h4>Ambuluwawa Tower</h4><span>Hill Country</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Hill Country -->
+                <div class="gal-item" data-cat="hillcountry" data-title="The Nine Arch Bridge in Ella" data-url="img/ninearch2.jpeg">
+                    <img src="img/ninearch2.jpeg" alt="Nine Arch Bridge" loading="lazy">
+                    <div class="gal-overlay"><h4>Nine Arch Bridge</h4><span>Hill Country</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                  <!-- Welcome -->
+                <div class="gal-item" data-cat="welcome" data-title="Welcoming Tourists at The Airport" data-url="img/welcome3.jpeg">
+                    <img src="img/welcome3.jpeg" alt="Welcome" loading="lazy">
+                    <div class="gal-overlay"><h4>Welcome</h4><span>Welcome</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Madol Duwa in Koggala" data-url="img/madolduuwa1.jpeg">
+                    <img src="img/madolduuwa1.jpeg" alt="Madol Duwa" loading="lazy">
+                    <div class="gal-overlay"><h4>Madol Duwa Island</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Dewundara Light House at Matara" data-url="img/dewndara3.jpeg">
+                    <img src="img/dewndara3.jpeg" alt="Dewundara Light House" loading="lazy">
+                    <div class="gal-overlay"><h4>Dewundara Light House</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Hill Country -->
+                <div class="gal-item" data-cat="hillcountry" data-title="The Nine Arch Bridge in Ella" data-url="img/ninearch3.jpeg">
+                    <img src="img/ninearch3.jpeg" alt="Nine Arch Bridge" loading="lazy">
+                    <div class="gal-overlay"><h4>Nine Arch Bridge</h4><span>Hill Country</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Sigiriya Rock Fortress" data-url="img/sigiriya2.jpeg">
+                    <img src="img/sigiriya2.jpeg" alt="Sigiriya" loading="lazy">
+                    <div class="gal-overlay"><h4>Sigiriya Rock Fortress</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Welcome -->
+                <div class="gal-item" data-cat="welcome" data-title="Welcoming Tourists at The Airport" data-url="img/welcome2.jpeg">
+                    <img src="img/welcome2.jpeg" alt="Welcome" loading="lazy">
+                    <div class="gal-overlay"><h4>Welcome</h4><span>Welcome</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Madu River in Galle" data-url="img/madugaga1.jpeg">
+                    <img src="img/madugaga1.jpeg" alt="Madu River" loading="lazy">
+                    <div class="gal-overlay"><h4>Madu River</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Hill Country -->
+                <div class="gal-item" data-cat="hillcountry" data-title="Adisham Bungalow in Haputale" data-url="img/adishambungalow1.jpeg">
+                    <img src="img/adishambungalow1.jpeg" alt="Adisham Bungalow" loading="lazy">
+                    <div class="gal-overlay"><h4>Adisham Bungalow</h4><span>Hill Country</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Ruwanweli Maha Seya in Anuradhapura" data-url="img/ruwanwaliseeya2.jpeg">
+                    <img src="img/ruwanwaliseeya2.jpeg" alt="Ruwanweliseya" loading="lazy">
+                    <div class="gal-overlay"><h4>Ruwanweliseya</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Udawalawe National Park" data-url="img/udawalawa1.jpeg">
+                    <img src="img/udawalawa1.jpeg" alt="Udawalawe National Park" loading="lazy">
+                    <div class="gal-overlay"><h4>Udawalawe National Park</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Welcome -->
+                <div class="gal-item" data-cat="welcome" data-title="Welcoming Tourists at The Airport" data-url="img/welcome4.jpeg">
+                    <img src="img/welcome4.jpeg" alt="Welcome" loading="lazy">
+                    <div class="gal-overlay"><h4>Welcome</h4><span>Welcome</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Beaches -->
+                <div class="gal-item tall" data-cat="beaches" data-title="Mirissa Beach" data-url="img/mirissa2.jpeg">
+                    <img src="img/mirissa2.jpeg" alt="Mirissa Beach" loading="lazy">
+                    <div class="gal-overlay"><h4>Mirissa Beach</h4><span>Beaches</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Udawalawe National Park: Elephant Safaris" data-url="img/udawalawa2.jpeg">
+                    <img src="img/udawalawa2.jpeg" alt="Udawalawe National Park" loading="lazy">
+                    <div class="gal-overlay"><h4>Udawalawe National Park</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Welcome -->
+                <div class="gal-item" data-cat="welcome" data-title="Welcoming Tourists at The Airport" data-url="img/welcome1.jpeg">
+                    <img src="img/welcome1.jpeg" alt="Welcome" loading="lazy">
+                    <div class="gal-overlay"><h4>Welcome</h4><span>Welcome</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                 <!-- Beaches -->
+                <div class="gal-item tall" data-cat="beaches" data-title="Paravi Dupatha Matara: Visit Paravi Duwa Temple" data-url="img/paravidupatha1.jpeg">
+                    <img src="img/paravidupatha1.jpeg" alt="Matara Paravi Duwa Beach" loading="lazy">
+                    <div class="gal-overlay"><h4>Matara Paravi Duwa Beach</h4><span>Beaches</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Cultural -->
+                <div class="gal-item" data-cat="cultural" data-title="Sigiriya Rock Fortress" data-url="img/sigiriya3.jpeg">
+                    <img src="img/sigiriya3.jpeg" alt="Sigiriya" loading="lazy">
+                    <div class="gal-overlay"><h4>Sigiriya Rock Fortress</h4><span>Cultural Sites</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Udawalawe National Park" data-url="img/udawalawa3.jpeg">
+                    <img src="img/udawalawa3.jpeg" alt="Udawalawe National Park" loading="lazy">
+                    <div class="gal-overlay"><h4>Udawalawe National Park</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Wildlife -->
+                <div class="gal-item wide" data-cat="wildlife" data-title="Udawalawe National Park" data-url="img/udawalawa4.jpeg">
+                    <img src="img/udawalawa4.jpeg" alt="Udawalawe National Park" loading="lazy">
+                    <div class="gal-overlay"><h4>Udawalawe National Park</h4><span>Wildlife</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+                <!-- Hill Country -->
+                <div class="gal-item" data-cat="hillcountry" data-title="The Nine Arch Bridge in Ella" data-url="img/ninearch1.jpeg">
+                    <img src="img/ninearch1.jpeg" alt="Nine Arch Bridge" loading="lazy">
+                    <div class="gal-overlay"><h4>Nine Arch Bridge</h4><span>Hill Country</span></div>
+                    <div class="gal-zoom-icon">🔍</div>
+                </div>
+
+            </div><!-- /gallery-grid -->
+        </div>
+    </section>
+
+    <!-- ================================================
+         CTA STRIP
+    ================================================= -->
+    <div class="cta-strip">
+        <div class="container" style="text-align:center;">
+            <h2 class="section-title" style="margin-bottom:.8rem;">Ready to Start Your Journey?</h2>
+            <p class="section-description" style="margin-bottom:2rem;">Let our travel experts craft your perfect Sri Lanka experience — completely personalised, hassle-free.</p>
+            <a href="contact.html" class="btn-cta">Book Your Trip Now</a>
+        </div>
+    </div>
+
+    <!-- ================================================
+         FOOTER
+    ================================================= -->
+     <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Jettransfer Travels</h3>
+                <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
+                <div class="social-links">
+                    <img src="img/insta.jpeg" alt="Instagram logo" class="social-link"></a>
+                    <img src="img/fb.jpeg" alt="Facebook logo" class="social-link"></a>
+                    <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="destination.html">Destinations</a>
+            <a href="package.html">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
+            <a href="service.html">Services</a>
+            <a href="service.html">Gallery</a>
+        </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>📞 +94 72 403 0499</p>
+                <p>📧 jettransfer@outlook.com</p>
+                <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+            </div>
+            <div class="footer-section">
+                <h3>Business Hours</h3>
+                <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+                <p>Saturday: 10:00 AM - 6:00 PM</p>
+                <p>Sunday: 10:00 AM - 6:00 PM</p>
+                <p style="margin-top: 1rem; color: var(--secondary);">24/7 Emergency Support Available</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+        </div>
+    </footer>
+
+
+    <!-- ================================================
+         SERVICE DETAIL MODAL
+    ================================================= -->
+    <div id="serviceModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,.6); z-index:9998; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:20px; padding:2.5rem; max-width:500px; width:92%; box-shadow:0 20px 60px rgba(0,0,0,.3); position:relative; animation:fadeInUp .35s ease both;">
+            <button onclick="closeServiceModal()" style="position:absolute;top:1rem;right:1.2rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#64748B;line-height:1;">✕</button>
+            <div style="width:56px;height:56px;background:#E0F4FB;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:1rem;" id="modalIcon">🗺</div>
+            <h2 style="font-family:'Sora',sans-serif;color:#0A7EA4;margin-bottom:1rem;font-size:1.5rem;" id="svcModalTitle">Service</h2>
+            <p style="color:#64748B;line-height:1.75;font-size:.95rem;" id="svcModalDesc"></p>
+            <div style="margin-top:1.8rem;display:flex;gap:1rem;">
+                <a href="#contact" onclick="closeServiceModal()" style="background:#0A7EA4;color:white;padding:.75rem 1.8rem;border-radius:50px;text-decoration:none;font-weight:700;font-size:.9rem;transition:background .3s;box-shadow:0 4px 15px rgba(10,126,164,.3);" onmouseover="this.style.background='#065A7A'" onmouseout="this.style.background='#0A7EA4'">Enquire Now</a>
+                <button onclick="closeServiceModal()" style="background:none;border:2px solid #E2E8F0;color:#64748B;padding:.75rem 1.8rem;border-radius:50px;font-family:inherit;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .3s;" onmouseover="this.style.borderColor='#0A7EA4';this.style.color='#0A7EA4'" onmouseout="this.style.borderColor='#E2E8F0';this.style.color='#64748B'">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================
+         LIGHTBOX
+    ================================================= -->
+    <div class="lightbox" id="lightbox">
+        <div class="lb-inner">
+            <button class="lb-close" onclick="closeLightbox()">✕</button>
+            <button class="lb-nav lb-prev" onclick="lbNav(-1)">‹</button>
+            <button class="lb-nav lb-next" onclick="lbNav(1)">›</button>
+            <img src="" alt="" class="lb-img" id="lbImg">
+            <p class="lb-caption" id="lbCaption"></p>
+        </div>
+    </div>
+
+    <!-- ================================================
+         JAVASCRIPT
+    ================================================= -->
+    <script>
+        /* ---- Mobile Menu ---- */
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navMenu = document.getElementById('navMenu');
+        mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+        document.querySelectorAll('.nav-menu a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('active')));
+
+        /* ---- Header scroll ---- */
+        window.addEventListener('scroll', () =>
+            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 80)
+        );
+
+        /* ---- Fade-in observer ---- */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting)
+                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
+            });
+        }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        /* ---- Smooth scroll ---- */
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                const t = document.querySelector(this.getAttribute('href'));
+                if (t) {
+                    e.preventDefault();
+                    window.scrollTo({ top: t.getBoundingClientRect().top + window.pageYOffset - 80, behavior:'smooth' });
+                }
+            });
+        });
+
+        /* =====================================================
+           SERVICE MODAL
+        ===================================================== */
+        const svcIcons = {
+            'Tour Packages': '🗺',
+            'Hotel Customization': '🏨',
+            'Airport Transfers': '✈️',
+            'Vehicle with Driver': '🚗',
+            '24/7 Service': '🌓',
+            'Tour Guide Services': '🎯'
+        };
+        function openServiceModal(title, desc) {
+            document.getElementById('svcModalTitle').textContent = title;
+            document.getElementById('svcModalDesc').textContent = desc;
+            document.getElementById('modalIcon').textContent = svcIcons[title] || '🌐';
+            const m = document.getElementById('serviceModal');
+            m.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeServiceModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        document.getElementById('serviceModal').addEventListener('click', function(e) {
+            if (e.target === this) closeServiceModal();
+        });
+
+        /* =====================================================
+           GALLERY FILTER
+        ===================================================== */
+        const galItems = Array.from(document.querySelectorAll('.gal-item'));
+        const galBtns  = document.querySelectorAll('.gal-btn');
+
+        galBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                galBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const cat = btn.dataset.cat;
+                galItems.forEach(item => {
+                    if (cat === 'all' || item.dataset.cat === cat) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        /* =====================================================
+           LIGHTBOX
+        ===================================================== */
+        let lbIndex = 0;
+        let lbVisible = [];
+
+        function buildVisible() {
+            lbVisible = galItems.filter(item => !item.classList.contains('hidden'));
+        }
+
+        galItems.forEach(item => {
+            item.addEventListener('click', () => {
+                buildVisible();
+                lbIndex = lbVisible.indexOf(item);
+                openLb();
+            });
+        });
+
+        function openLb() {
+            const item = lbVisible[lbIndex];
+            document.getElementById('lbImg').src    = item.dataset.url;
+            document.getElementById('lbImg').alt    = item.dataset.title;
+            document.getElementById('lbCaption').textContent = item.dataset.title;
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function lbNav(dir) {
+            lbIndex = (lbIndex + dir + lbVisible.length) % lbVisible.length;
+            openLb();
+        }
+
+        /* Close lightbox on backdrop */
+        document.getElementById('lightbox').addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('lb-inner') || e.target.classList.contains('lb-img')) {
+                if (e.target !== document.getElementById('lbImg')) closeLightbox();
+            }
+            if (e.target === this) closeLightbox();
+        });
+
+        /* Keyboard navigation */
+        document.addEventListener('keydown', e => {
+            if (!document.getElementById('lightbox').classList.contains('open')) return;
+            if (e.key === 'ArrowRight') lbNav(1);
+            if (e.key === 'ArrowLeft')  lbNav(-1);
+            if (e.key === 'Escape')     closeLightbox();
+        });
+
+         // Search toggle
+const searchToggle = document.getElementById('searchToggle');
+const searchBox = document.getElementById('searchBox');
+const searchInput = document.getElementById('searchInput');
+
+if (searchToggle) {
+    searchToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        searchBox.classList.toggle('open');
+        if (searchBox.classList.contains('open')) {
+            setTimeout(() => searchInput.focus(), 300);
+        }
+    });
+}
+
+// Close search when clicking outside
+document.addEventListener('click', (e) => {
+    if (!document.getElementById('navSearch').contains(e.target)) {
+        if (searchBox) searchBox.classList.remove('open');
+    }
+});
+
+// Active nav link on scroll
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
+    });
+    document.querySelectorAll('.nav-menu a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+});
+    </script>
+</body>
+</html>

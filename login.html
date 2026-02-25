@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Jettransfer Travels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A7EA4;
+            --primary-dark: #065A7A;
+            --secondary: #F59E0B;
+            --accent: #10B981;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: var(--bg-light);
+        }
+
+        /* Header & Navigation */
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Logo */
+    .logo{
+      font-family:'Sora',sans-serif;
+      font-size:1.3rem;
+      font-weight:800;
+      color:var(--primary);
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      white-space:nowrap;
+    }
+    .logo-img{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      object-fit:cover;
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:0 10px 22px rgba(10,126,164,.15);
+      background:#fff;
+    }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+
+        /* ── Nav Actions container ── */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+/* ── Search ── */
+.nav-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #E2E8F0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+.search-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--bg-light);
+}
+
+.search-box {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 50px;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.4s ease, opacity 0.3s ease;
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+}
+.search-box.open {
+    width: 280px;
+    opacity: 1;
+    pointer-events: all;
+}
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 0.55rem 1rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    width: 100%;
+    background: transparent;
+}
+.search-submit {
+    background: var(--primary);
+    border: none;
+    padding: 0.55rem 1rem;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.search-submit:hover { background: var(--primary-dark); }
+
+/* ── Login / Register ── */
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-login {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.btn-login:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    background: var(--primary);
+    color: white;
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
+    white-space: nowrap;
+}
+.btn-register:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 126, 164, 0.4);
+}
+
+/* ── Admin pill ── */
+.btn-admin {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+    background: linear-gradient(135deg, var(--primary-dark), #043D54);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(6, 90, 122, 0.4);
+    white-space: nowrap;
+}
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(6, 90, 122, 0.5);
+}
+
+/* ── Tighten nav menu font size so it fits ── */
+.nav-menu {
+    gap: 1.6rem;  /* reduce from 2.5rem */
+}
+.nav-menu a {
+    font-size: 0.88rem;  /* reduce from 0.95rem */
+}
+
+/* ── Active link style ── */
+.nav-menu a.active {
+    color: var(--primary);
+}
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* ── Mobile: hide auth & search inside hamburger menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none;
+    }
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    /* Show auth links inside mobile menu */
+    .nav-menu::after {
+        content: '';
+    }
+}
+
+/* ── Show actions inside mobile menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none; /* hide from top bar on mobile */
+    }
+
+    /* Add search + auth at bottom of mobile menu */
+    .nav-menu {
+        padding-bottom: 1.5rem;
+    }
+
+    .mobile-auth {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid #E2E8F0;
+        width: 100%;
+    }
+
+    .mobile-search {
+        display: flex !important;
+        align-items: center;
+        width: 100%;
+        border: 2px solid #E2E8F0;
+        border-radius: 50px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .mobile-search input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.65rem 1.2rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .mobile-search button {
+        background: var(--primary);
+        border: none;
+        padding: 0.65rem 1rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    .mobile-auth-btns {
+        display: flex;
+        gap: 0.8rem;
+        width: 100%;
+    }
+
+    .mobile-auth-btns a {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* Hide mobile-auth on desktop */
+.mobile-auth {
+    display: none;
+}
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(10, 126, 164, 0.4);
+        }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, rgba(10, 126, 164, 0.05), rgba(16, 185, 129, 0.05));
+            text-align: center;
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .page-description {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Login Form Section */
+        .login-section {
+            max-width: 500px;
+            margin: 3rem auto 5rem;
+            padding: 0 2rem;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 50px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 126, 164, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .forgot-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .btn-login-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-login-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(10, 126, 164, 0.4);
+        }
+
+        .register-prompt {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .register-prompt a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 0.3rem;
+        }
+
+        .register-prompt a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            object-fit: cover;
+            overflow: hidden;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-menu.active {
+                transform: translateX(0);
+            }
+
+            .page-title {
+                font-size: 2.2rem;
+            }
+
+            .login-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header (exact same as original) -->
+<header class="header" id="header">
+    <nav class="nav-container">
+        <!-- Logo -->
+        <a href="index.html" class="logo">
+            <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+
+        <!-- Nav Menu -->
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="destination.html">Destinations</a></li>
+            <li><a href="package.html">Packages</a></li>
+            <li><a href="vehicles.html">Vehicles</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="service.html">Services & Gallery</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+
+            <!-- Mobile only: search + auth -->
+            <li class="mobile-auth">
+                <div class="mobile-search">
+                    <input type="text" placeholder="Search destinations, packages…">
+                    <button>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                </div>
+                <div class="mobile-auth-btns">
+                    <a href="login.html" class="btn-login" style="display:block; padding: 0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
+                    <a href="register.html" class="btn-register" style="display:block; padding: 0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Right Side Actions -->
+        <div class="nav-actions">
+            <!-- Search -->
+            <div class="nav-search" id="navSearch">
+                <button class="search-toggle" id="searchToggle" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <div class="search-box" id="searchBox">
+                    <input type="text" placeholder="Search destinations, packages…" id="searchInput">
+                    <button class="search-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login / Register -->
+            <div class="nav-auth">
+                <a href="login.html" class="btn-login">Login</a>
+                <a href="register.html" class="btn-register">Register</a>
+            </div>
+        </div>
+
+        <!-- Mobile Toggle -->
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
+
+<!-- Page Header -->
+<section class="page-header">
+    <h1 class="page-title">Welcome Back</h1>
+    <p class="page-description">Sign in to your account to manage your bookings and preferences</p>
+</section>
+
+<!-- Login Form Section -->
+<section class="login-section">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Login</h2>
+            <p>Enter your credentials to access your account</p>
+        </div>
+
+        <form action="#" method="post">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-row">
+                <label class="remember-checkbox">
+                    <input type="checkbox" checked> Remember me
+                </label>
+                <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login-submit">Sign In</button>
+
+            <div class="register-prompt">
+                Don't have an account? <a href="register.html">Register here</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Footer (exact same as original) -->
+<footer class="footer" id="contact">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Jettransfer Travels</h3>
+            <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
+            <div class="social-links">
+                <img src="images/insta1.webp" alt="Instagram logo" class="social-link">
+                <img src="images/fb.avif" alt="Facebook logo" class="social-link">
+                <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link">
+            </div>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="destination.html">Destinations</a>
+            <a href="package.html">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
+            <a href="service.html">Services & Gallery</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>📞 +94 72 403 0499</p>
+            <p>📧 jettransfer@outlook.com</p>
+            <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+        </div>
+        <div class="footer-section">
+            <h3>Business Hours</h3>
+            <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+            <p>Saturday: 10:00 AM - 6:00 PM</p>
+            <p>Sunday: 10:00 AM - 6:00 PM</p>
+            <p style="margin-top: 1rem; color: var(--secondary);">24/7 Emergency Support Available</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+    </div>
+</footer>
+
+<script>
+    // Mobile menu toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navMenu = document.getElementById('navMenu');
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        });
+    });
+
+    // Header scroll effect
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // Search toggle - using unique variable names
+    const searchToggleBtn = document.getElementById('searchToggle');
+    const searchBoxDiv = document.getElementById('searchBox');
+    const searchInputField = document.getElementById('searchInput');
+
+    if (searchToggleBtn) {
+        searchToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (searchBoxDiv) {
+                searchBoxDiv.classList.toggle('open');
+                if (searchBoxDiv.classList.contains('open') && searchInputField) {
+                    setTimeout(() => searchInputField.focus(), 300);
+                }
+            }
+        });
+    }
+
+    // Close search when clicking outside
+    document.addEventListener('click', (e) => {
+        const navSearch = document.getElementById('navSearch');
+        if (navSearch && !navSearch.contains(e.target)) {
+            if (searchBoxDiv) {
+                searchBoxDiv.classList.remove('open');
+            }
+        }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+</body>
+</html>

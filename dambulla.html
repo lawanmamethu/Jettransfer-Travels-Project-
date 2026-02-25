@@ -38,6 +38,12 @@
         }
 
         /* Header & Navigation */
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
         .header {
             position: fixed;
             top: 0;
@@ -63,28 +69,27 @@
             align-items: center;
         }
 
-        .logo {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
+        /* Logo */
+    .logo{
+      font-family:'Sora',sans-serif;
+      font-size:1.3rem;
+      font-weight:800;
+      color:var(--primary);
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      white-space:nowrap;
+    }
+    .logo-img{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      object-fit:cover;
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:0 10px 22px rgba(10,126,164,.15);
+      background:#fff;
+    }
 
         .nav-menu {
             display: flex;
@@ -121,16 +126,249 @@
             color: var(--primary);
         }
 
-        .login-btn {
-            background: var(--primary);
-            color: white;
-            padding: 0.7rem 1.8rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(10, 126, 164, 0.3);
-        }
+        /* ── Nav Actions container ── */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+/* ── Search ── */
+.nav-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #E2E8F0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+.search-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--bg-light);
+}
+
+.search-box {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 50px;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.4s ease, opacity 0.3s ease;
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+}
+.search-box.open {
+    width: 280px;
+    opacity: 1;
+    pointer-events: all;
+}
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 0.55rem 1rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    width: 100%;
+    background: transparent;
+}
+.search-submit {
+    background: var(--primary);
+    border: none;
+    padding: 0.55rem 1rem;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.search-submit:hover { background: var(--primary-dark); }
+
+/* ── Login / Register ── */
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-login {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.btn-login:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    background: var(--primary);
+    color: white;
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
+    white-space: nowrap;
+}
+.btn-register:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 126, 164, 0.4);
+}
+
+/* ── Admin pill ── */
+.btn-admin {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+    background: linear-gradient(135deg, var(--primary-dark), #043D54);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(6, 90, 122, 0.4);
+    white-space: nowrap;
+}
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(6, 90, 122, 0.5);
+}
+
+/* ── Tighten nav menu font size so it fits ── */
+.nav-menu {
+    gap: 1.6rem;  /* reduce from 2.5rem */
+}
+.nav-menu a {
+    font-size: 0.88rem;  /* reduce from 0.95rem */
+}
+
+/* ── Active link style ── */
+.nav-menu a.active {
+    color: var(--primary);
+}
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* ── Mobile: hide auth & search inside hamburger menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none;
+    }
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    /* Show auth links inside mobile menu */
+    .nav-menu::after {
+        content: '';
+    }
+}
+
+/* ── Show actions inside mobile menu ── */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none; /* hide from top bar on mobile */
+    }
+
+    /* Add search + auth at bottom of mobile menu */
+    .nav-menu {
+        padding-bottom: 1.5rem;
+    }
+
+    .mobile-auth {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid #E2E8F0;
+        width: 100%;
+    }
+
+    .mobile-search {
+        display: flex !important;
+        align-items: center;
+        width: 100%;
+        border: 2px solid #E2E8F0;
+        border-radius: 50px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .mobile-search input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.65rem 1.2rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .mobile-search button {
+        background: var(--primary);
+        border: none;
+        padding: 0.65rem 1rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    .mobile-auth-btns {
+        display: flex;
+        gap: 0.8rem;
+        width: 100%;
+    }
+
+    .mobile-auth-btns a {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* Hide mobile-auth on desktop */
+.mobile-auth {
+    display: none;
+}
 
         .login-btn:hover {
             background: var(--primary-dark);
@@ -630,31 +868,70 @@
 
 <body>
 
-<!-- NAVIGATION -->
-    <header class="header" id="header">
-        <nav class="nav-container">
-            <a href="#" class="logo">
-                <span class="logo-icon">✈</span>
-                Jettransfer
-            </a>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="destination.html">Destinations</a></li>
-                <li><a href="#packages">Tour Packages</a></li>
-                <li><a href="#vehicles">Vehicles</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#contact">Contact Us</a></li>
-                <li><a href="#login" class="login-btn">Login</a></li>
-            </ul>
-            <div class="mobile-toggle" id="mobileToggle">
-                <span></span>
-                <span></span>
-                <span></span>
+<!-- Header -->
+<header class="header" id="header">
+    <nav class="nav-container">
+        <!-- Logo -->
+        <a href="#" class="logo">
+            <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+
+        <!-- Nav Menu -->
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="destination.html">Destinations</a></li>
+            <li><a href="package.html">Packages</a></li>
+            <li><a href="vehicles.html">Vehicles</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="service.html">Services & Gallery</a></li>
+          
+            <li><a href="contact.html">Contact Us</a></li>
+
+            <!-- Mobile only: search + auth (hidden on desktop via CSS) -->
+<li class="mobile-auth">
+    <div class="mobile-search">
+        <input type="text" placeholder="Search destinations, packages…">
+        <button>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="mobile-auth-btns">
+        <a href="#login" class="btn-login" style="display:block; padding: 0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
+        <a href="#register" class="btn-register" style="display:block; padding: 0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
+    </div>
+</li>
+        </ul>
+
+        <!-- Right Side Actions -->
+        <div class="nav-actions">
+            <!-- Search -->
+            <div class="nav-search" id="navSearch">
+                <button class="search-toggle" id="searchToggle" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <div class="search-box" id="searchBox">
+                    <input type="text" placeholder="Search destinations, packages…" id="searchInput">
+                    <button class="search-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                </div>
             </div>
-        </nav>
-    </header>
+
+            <!-- Login / Register -->
+            <div class="nav-auth">
+                <a href="login.html" class="btn-login">Login</a>
+                <a href="register.html" class="btn-register">Register</a>
+            </div>
+
+        </div>
+
+        <!-- Mobile Toggle -->
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
 
 <!-- HERO -->
 <section class="hero">
@@ -739,20 +1016,19 @@
                 <h3>Jettransfer Travels</h3>
                 <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
                 <div class="social-links">
-                    <a href="#" class="social-link">📘</a>
-                    <a href="#" class="social-link">📸</a>
-                    <a href="#" class="social-link">🐦</a>
-                    <a href="#" class="social-link">📺</a>
+                    <img src="images/insta1.webp" alt="Instagram logo" class="social-link"></a>
+                    <img src="images/fb.avif" alt="Facebook logo" class="social-link"></a>
+                    <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link"></a>
                 </div>
             </div>
             <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="destination.html">Destinations</a>
-                <a href="#packages">Tour Packages</a>
-                <a href="vehicles.html">Our Vehicles</a>
-                <a href="#about">About Us</a>
-                <a href="#gallery">Gallery</a>
-            </div>
+            <h3>Quick Links</h3>
+            <a href="destination.html">Destinations</a>
+            <a href="package.html">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
+            <a href="service.html">Services</a>
+            <a href="service.html">Gallery</a>
+        </div>
             <div class="footer-section">
                 <h3>Contact Us</h3>
                 <p>📞 +94 72 403 0499</p>
@@ -826,6 +1102,39 @@
                 }
             });
         });
+
+         // Search toggle
+const searchToggle = document.getElementById('searchToggle');
+const searchBox = document.getElementById('searchBox');
+const searchInput = document.getElementById('searchInput');
+
+searchToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    searchBox.classList.toggle('open');
+    if (searchBox.classList.contains('open')) {
+        setTimeout(() => searchInput.focus(), 300);
+    }
+});
+
+// Close search when clicking outside
+document.addEventListener('click', (e) => {
+    if (!document.getElementById('navSearch').contains(e.target)) {
+        searchBox.classList.remove('open');
+    }
+});
+
+// Active nav link on scroll
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
+    });
+    document.querySelectorAll('.nav-menu a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+});
     </script>
 
 </body>
