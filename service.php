@@ -1,7 +1,4 @@
 <?php
-// ============================================================
-//  service.php — Services & Gallery (Dynamic from DB)
-// ============================================================
 $conn = new mysqli('localhost', 'root', '', 'jettransfer');
 if (!$conn->connect_error) {
     $conn->set_charset('utf8mb4');
