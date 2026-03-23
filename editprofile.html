@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Jettransfer Travels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A7EA4;
+            --primary-dark: #065A7A;
+            --secondary: #F59E0B;
+            --accent: #10B981;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --error: #EF4444;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Manrope',sans-serif;color:var(--text-dark);line-height:1.6;overflow-x:hidden;background:var(--bg-light);}
+
+        /* ── HEADER (identical to profile.html) ── */
+        .header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);box-shadow:var(--shadow-sm);z-index:1000;transition:all 0.3s ease;}
+        .header.scrolled{box-shadow:var(--shadow-md);}
+        .nav-container{max-width:1400px;margin:0 auto;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+        .logo{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:.6rem;white-space:nowrap;}
+        .logo-img{width:42px;height:42px;border-radius:12px;object-fit:cover;border:1px solid rgba(2,6,23,.10);box-shadow:0 10px 22px rgba(10,126,164,.15);background:#fff;}
+        .nav-menu{display:flex;list-style:none;gap:1.6rem;align-items:center;}
+        .nav-menu a{color:var(--text-dark);text-decoration:none;font-weight:500;font-size:0.88rem;transition:color 0.3s ease;position:relative;}
+        .nav-menu a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:2px;background:var(--primary);transition:width 0.3s ease;}
+        .nav-menu a:hover::after,.nav-menu a.active::after{width:100%;}
+        .nav-menu a:hover,.nav-menu a.active{color:var(--primary);}
+        .nav-actions{display:flex;align-items:center;gap:0.6rem;flex-shrink:0;}
+        .nav-search{position:relative;display:flex;align-items:center;}
+        .search-toggle{width:38px;height:38px;border-radius:50%;border:2px solid #E2E8F0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dark);transition:all 0.3s ease;}
+        .search-toggle:hover{border-color:var(--primary);color:var(--primary);background:var(--bg-light);}
+        .search-box{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;background:white;border:2px solid var(--primary);border-radius:50px;overflow:hidden;width:0;opacity:0;pointer-events:none;transition:width 0.4s ease,opacity 0.3s ease;box-shadow:var(--shadow-md);z-index:10;}
+        .search-box.open{width:280px;opacity:1;pointer-events:all;}
+        .search-box input{border:none;outline:none;padding:0.55rem 1rem;font-family:'Manrope',sans-serif;font-size:0.88rem;color:var(--text-dark);width:100%;background:transparent;}
+        .search-submit{background:var(--primary);border:none;padding:0.55rem 1rem;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.3s;flex-shrink:0;}
+        .search-submit:hover{background:var(--primary-dark);}
+        .nav-auth{display:flex;align-items:center;gap:0.4rem;}
+        .btn-login{padding:0.5rem 1.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;color:var(--primary);border:2px solid var(--primary);transition:all 0.3s ease;white-space:nowrap;}
+        .btn-login:hover{background:var(--primary);color:white;transform:translateY(-2px);}
+        .btn-register{padding:0.5rem 1.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;background:var(--primary);color:white;border:2px solid var(--primary);transition:all 0.3s ease;box-shadow:0 4px 12px rgba(10,126,164,0.3);white-space:nowrap;}
+        .btn-register:hover{background:var(--primary-dark);border-color:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 18px rgba(10,126,164,0.4);}
+        .mobile-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;}
+        .mobile-toggle span{width:25px;height:3px;background:var(--text-dark);transition:all 0.3s ease;border-radius:2px;}
+        .mobile-auth{display:none;}
+
+        /* ── PAGE HEADER ── */
+        .page-header{margin-top:80px;padding:3rem 2rem 2rem;background:linear-gradient(135deg,rgba(10,126,164,0.05),rgba(16,185,129,0.05));text-align:center;}
+        .page-title{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:800;color:var(--text-dark);margin-bottom:0.5rem;animation:fadeInUp 0.8s ease;}
+        .page-description{font-size:1.1rem;color:var(--text-light);max-width:700px;margin:0 auto;animation:fadeInUp 0.8s ease 0.2s both;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+        /* ── EDIT LAYOUT ── */
+        .edit-section{max-width:1200px;margin:3rem auto 5rem;padding:0 2rem;}
+        .edit-grid{display:grid;grid-template-columns:320px 1fr;gap:2rem;}
+
+        /* ── SIDEBAR (identical style to profile.html) ── */
+        .profile-sidebar{background:var(--white);border-radius:30px;box-shadow:var(--shadow-md);padding:2rem;height:fit-content;animation:fadeInUp 0.8s ease 0.2s both;}
+        .profile-avatar{text-align:center;margin-bottom:1.5rem;}
+        .avatar-wrapper{position:relative;width:120px;height:120px;margin:0 auto 1rem;}
+        .avatar-image{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:3rem;color:white;font-weight:600;box-shadow:0 10px 25px rgba(10,126,164,0.3);overflow:hidden;background-size:cover;background-position:center;}
+        .avatar-upload-btn{position:absolute;bottom:4px;right:4px;width:34px;height:34px;background:var(--primary);border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+        .avatar-upload-btn:hover{background:var(--primary-dark);transform:scale(1.1);}
+        #avatarFileInput{display:none;}
+        .profile-name{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text-dark);margin-bottom:0.3rem;}
+        .profile-email{color:var(--text-light);font-size:0.9rem;margin-bottom:1rem;}
+        .profile-stats{display:flex;justify-content:center;gap:1.5rem;padding:1rem 0;border-top:2px solid var(--bg-light);border-bottom:2px solid var(--bg-light);margin-bottom:1.5rem;}
+        .stat-item{text-align:center;}
+        .stat-value{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:700;color:var(--primary);line-height:1.2;}
+        .stat-label{font-size:0.8rem;color:var(--text-light);}
+        .profile-menu{list-style:none;}
+        .profile-menu li{margin-bottom:0.5rem;}
+        .profile-menu a{display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1rem;border-radius:12px;color:var(--text-dark);text-decoration:none;font-weight:500;transition:all 0.3s ease;}
+        .profile-menu a:hover{background:var(--bg-light);color:var(--primary);}
+        .profile-menu a.active{background:var(--primary);color:white;}
+        .menu-icon{font-size:1.2rem;}
+
+        /* ── EDIT FORM CARD ── */
+        .edit-card{background:var(--white);border-radius:30px;box-shadow:var(--shadow-md);padding:2.5rem;animation:fadeInUp 0.8s ease 0.3s both;}
+        .content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--bg-light);}
+        .content-title{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;color:var(--text-dark);}
+        .btn-back{padding:0.6rem 1.5rem;background:transparent;color:var(--text-light);border:2px solid #E2E8F0;border-radius:50px;font-weight:600;font-size:0.9rem;text-decoration:none;display:inline-block;transition:all 0.3s ease;}
+        .btn-back:hover{border-color:var(--primary);color:var(--primary);}
+
+        /* Form sections */
+        .form-section{margin-bottom:2rem;}
+        .form-section-title{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text-dark);margin-bottom:1.2rem;padding-bottom:0.6rem;border-bottom:1px solid var(--bg-light);}
+        .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+        .form-group{display:flex;flex-direction:column;gap:0.4rem;}
+        .form-group.span-2{grid-column:span 2;}
+        label{font-size:0.8rem;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;}
+        input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="password"],select,textarea{width:100%;padding:0.75rem 1rem;border:2px solid #E2E8F0;border-radius:12px;font-family:'Manrope',sans-serif;font-size:0.95rem;color:var(--text-dark);background:var(--white);transition:border-color 0.3s ease,box-shadow 0.3s ease;outline:none;}
+        input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(10,126,164,0.08);}
+        input.error{border-color:var(--error);}
+        input.error:focus{box-shadow:0 0 0 4px rgba(239,68,68,0.08);}
+        .field-error{font-size:0.78rem;color:var(--error);display:none;}
+        .field-error.visible{display:block;}
+        textarea{resize:vertical;min-height:90px;}
+        select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;}
+
+        /* Password */
+        .password-wrapper{position:relative;}
+        .password-wrapper input{padding-right:3rem;}
+        .password-toggle{position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-light);display:flex;align-items:center;transition:color 0.2s;}
+        .password-toggle:hover{color:var(--primary);}
+        .password-strength{margin-top:0.5rem;}
+        .strength-bar{height:4px;border-radius:4px;background:#E2E8F0;overflow:hidden;margin-bottom:0.3rem;}
+        .strength-fill{height:100%;border-radius:4px;width:0%;transition:width 0.4s ease,background 0.4s ease;}
+        .strength-text{font-size:0.76rem;color:var(--text-light);}
+
+        .divider{border:none;border-top:2px solid var(--bg-light);margin:2rem 0;}
+
+        /* Action buttons */
+        .form-actions{display:flex;justify-content:flex-end;gap:1rem;padding-top:1rem;}
+        .btn-cancel{padding:0.7rem 1.8rem;border-radius:50px;border:2px solid #E2E8F0;background:transparent;color:var(--text-light);font-family:'Manrope',sans-serif;font-weight:600;font-size:0.95rem;cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.3s ease;}
+        .btn-cancel:hover{border-color:var(--text-light);color:var(--text-dark);}
+        .btn-save{padding:0.7rem 2rem;border-radius:50px;border:none;background:var(--primary);color:white;font-family:'Manrope',sans-serif;font-weight:600;font-size:0.95rem;cursor:pointer;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(10,126,164,0.3);display:inline-flex;align-items:center;gap:0.5rem;}
+        .btn-save:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 18px rgba(10,126,164,0.4);}
+        .btn-save:disabled{opacity:0.7;cursor:not-allowed;transform:none;}
+        .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+        .btn-save.loading .spinner{display:block;}
+        .btn-save.loading .btn-text{display:none;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+
+        /* Toast */
+        .toast{position:fixed;bottom:2rem;right:2rem;background:var(--text-dark);color:white;padding:1rem 1.5rem;border-radius:16px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:0.8rem;font-weight:600;transform:translateY(120px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);z-index:9999;}
+        .toast.show{transform:translateY(0);opacity:1;}
+
+        /* ── FOOTER (identical to profile.html) ── */
+        .footer{background:var(--text-dark);color:white;padding:4rem 2rem 2rem;width:100%;}
+        .footer-content{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:3rem;margin-bottom:3rem;}
+        .footer-section h3{font-family:'Sora',sans-serif;font-size:1.3rem;margin-bottom:1.5rem;color:white;}
+        .footer-section p,.footer-section a{color:rgba(255,255,255,0.7);text-decoration:none;display:block;margin-bottom:0.8rem;transition:color 0.3s ease;}
+        .footer-section a:hover{color:var(--secondary);}
+        .social-links{display:flex;gap:1rem;margin-top:1rem;}
+        .social-link{width:40px;height:40px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;object-fit:cover;overflow:hidden;}
+        .social-link:hover{background:var(--primary);transform:translateY(-3px);}
+        .footer-bottom{max-width:1400px;margin:0 auto;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);text-align:center;color:rgba(255,255,255,0.5);}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:968px){.edit-grid{grid-template-columns:1fr;}}
+        @media(max-width:768px){
+            .mobile-toggle{display:flex;}
+            .nav-actions{display:none;}
+            .nav-menu{position:fixed;top:80px;left:0;right:0;background:white;flex-direction:column;padding:2rem;gap:1.5rem;box-shadow:var(--shadow-lg);transform:translateX(-100%);transition:transform 0.3s ease;}
+            .nav-menu.active{transform:translateX(0);}
+            .mobile-auth{display:flex !important;flex-direction:column;align-items:center;gap:0.8rem;padding-top:1.2rem;border-top:1px solid #E2E8F0;width:100%;}
+            .mobile-search{display:flex !important;align-items:center;width:100%;border:2px solid #E2E8F0;border-radius:50px;overflow:hidden;background:white;}
+            .mobile-search input{flex:1;border:none;outline:none;padding:0.65rem 1.2rem;font-family:'Manrope',sans-serif;font-size:0.9rem;color:var(--text-dark);}
+            .mobile-search button{background:var(--primary);border:none;padding:0.65rem 1rem;color:white;cursor:pointer;display:flex;align-items:center;}
+            .mobile-auth-btns{display:flex;gap:0.8rem;width:100%;}
+            .mobile-auth-btns a{flex:1;text-align:center;}
+            .page-title{font-size:2.2rem;}
+            .form-grid{grid-template-columns:1fr;}
+            .form-group.span-2{grid-column:span 1;}
+            .form-actions{flex-direction:column-reverse;}
+            .btn-cancel,.btn-save{width:100%;justify-content:center;text-align:center;}
+            .toast{left:1rem;right:1rem;}
+        }
+    </style>
+</head>
+<body>
+
+<header class="header" id="header">
+    <nav class="nav-container">
+        <a href="index.html" class="logo">
+            <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.php">Home</a></li>
+            <li><a href="destination.php">Destinations</a></li>
+            <li><a href="package.php">Packages</a></li>
+            <li><a href="vehicles.php">Vehicles</a></li>
+            <li><a href="service.php">Services &amp; Gallery</a></li>
+            <li><a href="contact.php">Contact Us</a></li>
+            <li><a href="aboutus.php">About Us</a></li>
+            <li><a href="profile.php">Profile</a></li>
+            
+            <li class="mobile-auth">
+                <div class="mobile-search">
+                    <input type="text" placeholder="Search destinations, packages…">
+                    <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+                </div>
+                <div class="mobile-auth-btns">
+                    <a href="login.php" class="btn-login" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
+                    <a href="register.php" class="btn-register" style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
+                </div>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            <div class="nav-search" id="navSearch">
+                <button class="search-toggle" id="searchToggle" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+                <div class="search-box" id="searchBox">
+                    <input type="text" placeholder="Search destinations, packages…" id="searchInput">
+                    <button class="search-submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+                </div>
+            </div>
+            <div class="nav-auth">
+                <a href="login.php" class="btn-login">Login</a>
+                <a href="register.php" class="btn-register">Register</a>
+            </div>
+        </div>
+        <div class="mobile-toggle" id="mobileToggle"><span></span><span></span><span></span></div>
+    </nav>
+</header>
+
+<section class="page-header">
+    <h1 class="page-title">Edit Profile</h1>
+    <p class="page-description">Update your personal information and keep your account details current</p>
+</section>
+
+<section class="edit-section">
+    <div class="edit-grid">
+
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <div class="profile-avatar">
+                <div class="avatar-wrapper">
+                    <div class="avatar-image" id="avatarDisplay">AR</div>
+                    <button class="avatar-upload-btn" id="avatarUploadBtn" title="Change photo" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </button>
+                    <input type="file" id="avatarFileInput" accept="image/*">
+                </div>
+                <h2 class="profile-name" id="sidebarName">Aarav Rohit</h2>
+                <p class="profile-email" id="sidebarEmail">aarav.rohit1990@gmail.com</p>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Bookings</div></div>
+                <div class="stat-item"><div class="stat-value">2</div><div class="stat-label">Reviews</div></div>
+                <div class="stat-item"><div class="stat-value">1</div><div class="stat-label">Years</div></div>
+            </div>
+            <ul class="profile-menu">
+                <li><a href="profile.php"><span class="menu-icon">👤</span> Personal Info</a></li>
+                <li><a href="profile.php" onclick="sessionStorage.setItem('profileTab','bookings');"><span class="menu-icon">📅</span> My Bookings</a></li>
+                <li><a href="profile.php" onclick="sessionStorage.setItem('profileTab','preferences');"><span class="menu-icon">⚙️</span> Preferences</a></li>
+                <li><a href="profile.php" onclick="sessionStorage.setItem('profileTab','security');"><span class="menu-icon">🔒</span> Security</a></li>
+                <li><a href="editprofile.php" class="active"><span class="menu-icon">✏️</span> Edit Profile</a></li>
+                <li><a href="#" style="color:#EF4444;" onclick="return false;"><span class="menu-icon">🚪</span> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Edit Form -->
+        <div class="edit-card">
+            <div class="content-header">
+                <h2 class="content-title">Edit Information</h2>
+                <a href="profile.php" class="btn-back">← Back to Profile</a>
+            </div>
+
+            <form id="editProfileForm" novalidate>
+
+                <!-- Personal Details -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Personal Details</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" value="Aarav" placeholder="Enter first name" required>
+                            <span class="field-error" id="firstNameError">First name is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" value="Rohit" placeholder="Enter last name" required>
+                            <span class="field-error" id="lastNameError">Last name is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" value="aarav.rohit1990@gmail.com" placeholder="Enter email" required>
+                            <span class="field-error" id="emailError">Please enter a valid email.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" value="+94 77 123 4567" placeholder="+XX XX XXX XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" value="1990-03-15">
+                        </div>
+                        <div class="form-group">
+                            <label for="nationality">Nationality</label>
+                            <select id="nationality" name="nationality">
+                                <option value="">Select nationality</option>
+                                <option value="Indian" selected>Indian</option>
+                                <option value="Sri Lankan">Sri Lankan</option>
+                                <option value="British">British</option>
+                                <option value="Australian">Australian</option>
+                                <option value="American">American</option>
+                                <option value="German">German</option>
+                                <option value="French">French</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Address -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Address</h3>
+                    <div class="form-grid">
+                        <div class="form-group span-2">
+                            <label for="address">Street Address</label>
+                            <input type="text" id="address" name="address" value="Gandhi Nagar, J/8 D.s. Road" placeholder="Enter street address">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" placeholder="Enter city">
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country">
+                                <option value="">Select country</option>
+                                <option value="India" selected>India</option>
+                                <option value="Sri Lanka">Sri Lanka</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Australia">Australia</option>
+                                <option value="United States">United States</option>
+                                <option value="Germany">Germany</option>
+                                <option value="France">France</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Change Password -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Change Password <span style="font-size:0.8rem;font-weight:400;color:var(--text-light);">(leave blank to keep current)</span></h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="currentPassword" placeholder="Enter current password">
+                                <button type="button" class="password-toggle" data-target="currentPassword"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="newPassword" placeholder="Enter new password">
+                                <button type="button" class="password-toggle" data-target="newPassword"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength" style="display:none;">
+                                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                                <span class="strength-text" id="strengthText"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                                <button type="button" class="password-toggle" data-target="confirmPassword"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                            <span class="field-error" id="confirmPasswordError">Passwords do not match.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="form-actions">
+                    <a href="profile.php" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-save" id="saveBtn">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Save Changes</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" id="contact">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Jettransfer Travels</h3>
+            <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
+            <div class="social-links">
+                <img src="images/insta1.webp" alt="Instagram" class="social-link">
+                <img src="images/fb.avif" alt="Facebook" class="social-link">
+                <img src="images/tiktok.webp" alt="TikTok" class="social-link">
+            </div>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="destination.php">Destinations</a>
+            <a href="package.php">Tour Packages</a>
+            <a href="vehicles.php">Our Vehicles</a>
+            <a href="service.php">Services &amp; Gallery</a>
+            <a href="contact.php">Contact Us</a>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>📞 +94 72 403 0499</p>
+            <p>📧 jettransfer@outlook.com</p>
+            <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+        </div>
+        <div class="footer-section">
+            <h3>Business Hours</h3>
+            <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+            <p>Saturday: 10:00 AM - 6:00 PM</p>
+            <p>Sunday: 10:00 AM - 6:00 PM</p>
+            <p style="margin-top:1rem;color:var(--secondary);">24/7 Emergency Support Available</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast">
+    <span style="font-size:1.3rem;">✅</span>
+    <span>Profile updated successfully!</span>
+</div>
+
+<script>
+    /* ── Pre-fill form from localStorage ── */
+    (function preloadForm() {
+        const saved = localStorage.getItem('jettransfer_profile');
+        if (!saved) return;
+        const d = JSON.parse(saved);
+        if (d.firstName)   document.getElementById('firstName').value   = d.firstName;
+        if (d.lastName)    document.getElementById('lastName').value    = d.lastName;
+        if (d.email)       document.getElementById('email').value       = d.email;
+        if (d.phone)       document.getElementById('phone').value       = d.phone;
+        if (d.dob)         document.getElementById('dob').value         = d.dob;
+        if (d.nationality) document.getElementById('nationality').value = d.nationality;
+        if (d.address)     document.getElementById('address').value     = d.address;
+        if (d.city)        document.getElementById('city').value        = d.city;
+        if (d.country)     document.getElementById('country').value     = d.country;
+
+        // Restore avatar
+        if (d.avatarSrc && d.avatarSrc !== 'null') {
+            const av = document.getElementById('avatarDisplay');
+            av.textContent = '';
+            av.style.background = 'none';
+            av.style.backgroundImage = 'url(' + d.avatarSrc + ')';
+            av.style.backgroundSize = 'cover';
+            av.style.backgroundPosition = 'center';
+        }
+
+        // Sidebar preview
+        const full = [d.firstName, d.lastName].filter(Boolean).join(' ');
+        if (full)    document.getElementById('sidebarName').textContent  = full;
+        if (d.email) document.getElementById('sidebarEmail').textContent = d.email;
+    })();
+
+    /* ── Avatar upload ── */
+    const avatarDisplay   = document.getElementById('avatarDisplay');
+    const avatarFileInput = document.getElementById('avatarFileInput');
+    document.getElementById('avatarUploadBtn').addEventListener('click', () => avatarFileInput.click());
+    avatarFileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            avatarDisplay.textContent = '';
+            avatarDisplay.style.background = 'none';
+            avatarDisplay.style.backgroundImage = 'url(' + ev.target.result + ')';
+            avatarDisplay.style.backgroundSize = 'cover';
+            avatarDisplay.style.backgroundPosition = 'center';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    /* ── Live sidebar preview ── */
+    function updateSidebar() {
+        const fn = document.getElementById('firstName').value.trim();
+        const ln = document.getElementById('lastName').value.trim();
+        document.getElementById('sidebarName').textContent  = [fn, ln].filter(Boolean).join(' ') || 'Your Name';
+        document.getElementById('sidebarEmail').textContent = document.getElementById('email').value.trim() || 'your@email.com';
+    }
+    document.getElementById('firstName').addEventListener('input', updateSidebar);
+    document.getElementById('lastName').addEventListener('input', updateSidebar);
+    document.getElementById('email').addEventListener('input', updateSidebar);
+
+    /* ── Password show/hide ── */
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const inp = document.getElementById(btn.dataset.target);
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+            btn.querySelector('.eye-icon').style.opacity = inp.type === 'text' ? '0.4' : '1';
+        });
+    });
+
+    /* ── Password strength ── */
+    document.getElementById('newPassword').addEventListener('input', function() {
+        const val = this.value;
+        const el = document.getElementById('passwordStrength');
+        if (!val) { el.style.display = 'none'; return; }
+        el.style.display = 'block';
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        const levels = [
+            {pct:25, color:'#EF4444', label:'Weak'},
+            {pct:50, color:'#F59E0B', label:'Fair'},
+            {pct:75, color:'#0A7EA4', label:'Good'},
+            {pct:100,color:'#10B981', label:'Strong'},
+        ];
+        const lv = levels[score-1] || levels[0];
+        const fill = document.getElementById('strengthFill');
+        fill.style.width = lv.pct + '%';
+        fill.style.background = lv.color;
+        const txt = document.getElementById('strengthText');
+        txt.textContent = lv.label;
+        txt.style.color = lv.color;
+    });
+
+    /* ── Form validation & save ── */
+    const form    = document.getElementById('editProfileForm');
+    const saveBtn = document.getElementById('saveBtn');
+
+    function showErr(id, msg) { const e = document.getElementById(id); if(e){e.textContent=msg;e.classList.add('visible');} }
+    function clearErr(id)      { const e = document.getElementById(id); if(e) e.classList.remove('visible'); }
+    function markErr(el, on)   { el.classList.toggle('error', on); }
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        let valid = true;
+        const fn  = document.getElementById('firstName');
+        const ln  = document.getElementById('lastName');
+        const em  = document.getElementById('email');
+        const np  = document.getElementById('newPassword');
+        const cp  = document.getElementById('confirmPassword');
+
+        clearErr('firstNameError');   markErr(fn, false);
+        clearErr('lastNameError');    markErr(ln, false);
+        clearErr('emailError');       markErr(em, false);
+        clearErr('confirmPasswordError'); markErr(cp, false);
+
+        if (!fn.value.trim()) { showErr('firstNameError','First name is required.'); markErr(fn,true); valid=false; }
+        if (!ln.value.trim()) { showErr('lastNameError','Last name is required.');   markErr(ln,true); valid=false; }
+        if (!em.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value)) { showErr('emailError','Please enter a valid email.'); markErr(em,true); valid=false; }
+        if (np.value && np.value !== cp.value) { showErr('confirmPasswordError','Passwords do not match.'); markErr(cp,true); valid=false; }
+
+        if (!valid) return;
+
+        saveBtn.classList.add('loading');
+        saveBtn.disabled = true;
+
+        setTimeout(() => {
+            // Build avatar src safely
+            let avatarSrc = null;
+            const bgImg = avatarDisplay.style.backgroundImage;
+            if (bgImg && bgImg !== 'none' && bgImg !== '') {
+                avatarSrc = bgImg.slice(4, -1).replace(/"/g, '');
+            }
+
+            const profileData = {
+                firstName:   fn.value.trim(),
+                lastName:    ln.value.trim(),
+                email:       em.value.trim(),
+                phone:       document.getElementById('phone').value.trim(),
+                dob:         document.getElementById('dob').value,
+                nationality: document.getElementById('nationality').value,
+                address:     document.getElementById('address').value.trim(),
+                city:        document.getElementById('city').value.trim(),
+                country:     document.getElementById('country').value,
+                avatarSrc:   avatarSrc
+            };
+            localStorage.setItem('jettransfer_profile', JSON.stringify(profileData));
+
+            saveBtn.classList.remove('loading');
+            saveBtn.disabled = false;
+
+            // Show toast then redirect
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { window.location.href = 'profile.html'; }, 1800);
+        }, 1200);
+    });
+
+    /* ── Mobile menu ── */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('active');
+    });
+    document.querySelectorAll('.nav-menu a').forEach(a => {
+        a.addEventListener('click', () => document.getElementById('navMenu').classList.remove('active'));
+    });
+
+    /* ── Header scroll ── */
+    window.addEventListener('scroll', () => {
+        document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    /* ── Search toggle ── */
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBox    = document.getElementById('searchBox');
+    const searchInput  = document.getElementById('searchInput');
+    searchToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        searchBox.classList.toggle('open');
+        if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
+    });
+    document.addEventListener('click', e => {
+        if (!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open');
+    });
+</script>
+</body>
+</html>

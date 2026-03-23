@@ -17,1167 +17,322 @@
             --text-light: #64748B;
             --bg-light: #F8FAFC;
             --white: #FFFFFF;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Manrope', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-            background: var(--bg-light);
-        }
-
-        /* Header & Navigation */
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: contain;
-        }
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .header.scrolled {
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Logo */
-    .logo{
-      font-family:'Sora',sans-serif;
-      font-size:1.3rem;
-      font-weight:800;
-      color:var(--primary);
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      gap:.6rem;
-      white-space:nowrap;
-    }
-    .logo-img{
-      width:42px;
-      height:42px;
-      border-radius:12px;
-      object-fit:cover;
-      border:1px solid rgba(2,6,23,.10);
-      box-shadow:0 10px 22px rgba(10,126,164,.15);
-      background:#fff;
-    }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2.5rem;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu a:hover::after {
-            width: 100%;
-        }
-
-        .nav-menu a:hover {
-            color: var(--primary);
-        }
-
-        /* ── Nav Actions container ── */
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex-shrink: 0;
-}
-
-/* ── Search ── */
-.nav-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-toggle {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 2px solid #E2E8F0;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--text-dark);
-    transition: all 0.3s ease;
-}
-.search-toggle:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--bg-light);
-}
-
-.search-box {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    background: white;
-    border: 2px solid var(--primary);
-    border-radius: 50px;
-    overflow: hidden;
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: width 0.4s ease, opacity 0.3s ease;
-    box-shadow: var(--shadow-md);
-    z-index: 10;
-}
-.search-box.open {
-    width: 280px;
-    opacity: 1;
-    pointer-events: all;
-}
-.search-box input {
-    border: none;
-    outline: none;
-    padding: 0.55rem 1rem;
-    font-family: 'Manrope', sans-serif;
-    font-size: 0.88rem;
-    color: var(--text-dark);
-    width: 100%;
-    background: transparent;
-}
-.search-submit {
-    background: var(--primary);
-    border: none;
-    padding: 0.55rem 1rem;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-    flex-shrink: 0;
-}
-.search-submit:hover { background: var(--primary-dark); }
-
-/* ── Login / Register ── */
-.nav-auth {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.btn-login {
-    padding: 0.5rem 1.2rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-.btn-login:hover {
-    background: var(--primary);
-    color: white;
-    transform: translateY(-2px);
-}
-
-.btn-register {
-    padding: 0.5rem 1.2rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.88rem;
-    background: var(--primary);
-    color: white;
-    border: 2px solid var(--primary);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
-    white-space: nowrap;
-}
-.btn-register:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(10, 126, 164, 0.4);
-}
-
-/* ── Admin pill ── */
-.btn-admin {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.5rem 1.1rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.82rem;
-    background: linear-gradient(135deg, var(--primary-dark), #043D54);
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(6, 90, 122, 0.4);
-    white-space: nowrap;
-}
-.btn-admin:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(6, 90, 122, 0.5);
-}
-
-/* ── Tighten nav menu font size so it fits ── */
-.nav-menu {
-    gap: 1.6rem;  /* reduce from 2.5rem */
-}
-.nav-menu a {
-    font-size: 0.88rem;  /* reduce from 0.95rem */
-}
-
-/* ── Active link style ── */
-.nav-menu a.active {
-    color: var(--primary);
-}
-.nav-menu a.active::after {
-    width: 100%;
-}
-
-/* ── Mobile: hide auth & search inside hamburger menu ── */
-@media (max-width: 768px) {
-    .nav-actions {
-        display: none;
-    }
-    .nav-menu {
-        gap: 1.5rem;
-    }
-    /* Show auth links inside mobile menu */
-    .nav-menu::after {
-        content: '';
-    }
-}
-
-/* ── Show actions inside mobile menu ── */
-@media (max-width: 768px) {
-    .nav-actions {
-        display: none; /* hide from top bar on mobile */
-    }
-
-    /* Add search + auth at bottom of mobile menu */
-    .nav-menu {
-        padding-bottom: 1.5rem;
-    }
-
-    .mobile-auth {
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.8rem;
-        padding-top: 1.2rem;
-        border-top: 1px solid #E2E8F0;
-        width: 100%;
-    }
-
-    .mobile-search {
-        display: flex !important;
-        align-items: center;
-        width: 100%;
-        border: 2px solid #E2E8F0;
-        border-radius: 50px;
-        overflow: hidden;
-        background: white;
-    }
-
-    .mobile-search input {
-        flex: 1;
-        border: none;
-        outline: none;
-        padding: 0.65rem 1.2rem;
-        font-family: 'Manrope', sans-serif;
-        font-size: 0.9rem;
-        color: var(--text-dark);
-    }
-
-    .mobile-search button {
-        background: var(--primary);
-        border: none;
-        padding: 0.65rem 1rem;
-        color: white;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    .mobile-auth-btns {
-        display: flex;
-        gap: 0.8rem;
-        width: 100%;
-    }
-
-    .mobile-auth-btns a {
-        flex: 1;
-        text-align: center;
-    }
-}
-
-/* Hide mobile-auth on desktop */
-.mobile-auth {
-    display: none;
-}
-
-        .login-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(10, 126, 164, 0.4);
-        }
-
-        .mobile-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .mobile-toggle span {
-            width: 25px;
-            height: 3px;
-            background: var(--text-dark);
-            transition: all 0.3s ease;
-            border-radius: 2px;
-        }
-
-        /* Page Header */
-        .page-header {
-            margin-top: 80px;
-            padding: 3rem 2rem 2rem;
-            background: linear-gradient(135deg, rgba(10, 126, 164, 0.05), rgba(16, 185, 129, 0.05));
-            text-align: center;
-        }
-
-        .page-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .page-description {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            max-width: 700px;
-            margin: 0 auto;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Profile Section */
-        .profile-section {
-            max-width: 1200px;
-            margin: 3rem auto 5rem;
-            padding: 0 2rem;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 2rem;
-        }
-
-        /* Profile Sidebar */
-        .profile-sidebar {
-            background: var(--white);
-            border-radius: 30px;
-            box-shadow: var(--shadow-md);
-            padding: 2rem;
-            height: fit-content;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        .profile-avatar {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .avatar-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(10, 126, 164, 0.3);
-        }
-
-        .profile-name {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.3rem;
-        }
-
-        .profile-email {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            padding: 1rem 0;
-            border-top: 2px solid var(--bg-light);
-            border-bottom: 2px solid var(--bg-light);
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            line-height: 1.2;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-
-        .profile-menu {
-            list-style: none;
-        }
-
-        .profile-menu li {
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-menu a {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .profile-menu a:hover,
-        .profile-menu a.active {
-            background: var(--bg-light);
-            color: var(--primary);
-        }
-
-        .profile-menu a.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .menu-icon {
-            font-size: 1.2rem;
-        }
-
-        /* Profile Content */
-        .profile-content {
-            background: var(--white);
-            border-radius: 30px;
-            box-shadow: var(--shadow-md);
-            padding: 2.5rem;
-            animation: fadeInUp 0.8s ease 0.3s both;
-        }
-
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--bg-light);
-        }
-
-        .content-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .btn-edit {
-            padding: 0.6rem 1.5rem;
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn-edit:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-item {
-            background: var(--bg-light);
-            padding: 1.2rem;
-            border-radius: 16px;
-        }
-
-        .info-label {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        /* Bookings List */
-        .bookings-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .booking-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem;
-            background: var(--bg-light);
-            border-radius: 16px;
-            transition: transform 0.3s ease;
-        }
-
-        .booking-card:hover {
-            transform: translateX(5px);
-        }
-
-        .booking-info h4 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .booking-meta {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .booking-status {
-            padding: 0.3rem 1rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-confirmed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-pending {
-            background: #fed7aa;
-            color: #92400e;
-        }
-
-        .status-completed {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .booking-price {
-            font-weight: 700;
-            color: var(--primary);
-        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Manrope',sans-serif;color:var(--text-dark);line-height:1.6;overflow-x:hidden;background:var(--bg-light);}
+
+        /* ── HEADER ── */
+        .header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);box-shadow:var(--shadow-sm);z-index:1000;transition:all 0.3s ease;}
+        .header.scrolled{box-shadow:var(--shadow-md);}
+        .nav-container{max-width:1400px;margin:0 auto;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+        .logo{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:.6rem;white-space:nowrap;}
+        .logo-img{width:42px;height:42px;border-radius:12px;object-fit:cover;border:1px solid rgba(2,6,23,.10);box-shadow:0 10px 22px rgba(10,126,164,.15);background:#fff;}
+        .nav-menu{display:flex;list-style:none;gap:1.6rem;align-items:center;}
+        .nav-menu a{color:var(--text-dark);text-decoration:none;font-weight:500;font-size:0.88rem;transition:color 0.3s ease;position:relative;}
+        .nav-menu a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:2px;background:var(--primary);transition:width 0.3s ease;}
+        .nav-menu a:hover::after,.nav-menu a.active::after{width:100%;}
+        .nav-menu a:hover,.nav-menu a.active{color:var(--primary);}
+        .nav-actions{display:flex;align-items:center;gap:0.6rem;flex-shrink:0;}
+        .nav-search{position:relative;display:flex;align-items:center;}
+        .search-toggle{width:38px;height:38px;border-radius:50%;border:2px solid #E2E8F0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dark);transition:all 0.3s ease;}
+        .search-toggle:hover{border-color:var(--primary);color:var(--primary);background:var(--bg-light);}
+        .search-box{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;background:white;border:2px solid var(--primary);border-radius:50px;overflow:hidden;width:0;opacity:0;pointer-events:none;transition:width 0.4s ease,opacity 0.3s ease;box-shadow:var(--shadow-md);z-index:10;}
+        .search-box.open{width:280px;opacity:1;pointer-events:all;}
+        .search-box input{border:none;outline:none;padding:0.55rem 1rem;font-family:'Manrope',sans-serif;font-size:0.88rem;color:var(--text-dark);width:100%;background:transparent;}
+        .search-submit{background:var(--primary);border:none;padding:0.55rem 1rem;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.3s;flex-shrink:0;}
+        .search-submit:hover{background:var(--primary-dark);}
+        .nav-auth{display:flex;align-items:center;gap:0.4rem;}
+        .btn-login{padding:0.5rem 1.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;color:var(--primary);border:2px solid var(--primary);transition:all 0.3s ease;white-space:nowrap;}
+        .btn-login:hover{background:var(--primary);color:white;transform:translateY(-2px);}
+        .btn-register{padding:0.5rem 1.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;background:var(--primary);color:white;border:2px solid var(--primary);transition:all 0.3s ease;box-shadow:0 4px 12px rgba(10,126,164,0.3);white-space:nowrap;}
+        .btn-register:hover{background:var(--primary-dark);border-color:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 18px rgba(10,126,164,0.4);}
+        .mobile-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;}
+        .mobile-toggle span{width:25px;height:3px;background:var(--text-dark);transition:all 0.3s ease;border-radius:2px;}
+        .mobile-auth{display:none;}
+
+        /* ── PAGE HEADER ── */
+        .page-header{margin-top:80px;padding:3rem 2rem 2rem;background:linear-gradient(135deg,rgba(10,126,164,0.05),rgba(16,185,129,0.05));text-align:center;}
+        .page-title{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:800;color:var(--text-dark);margin-bottom:0.5rem;animation:fadeInUp 0.8s ease;}
+        .page-description{font-size:1.1rem;color:var(--text-light);max-width:700px;margin:0 auto;animation:fadeInUp 0.8s ease 0.2s both;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+        /* ── PROFILE LAYOUT ── */
+        .profile-section{max-width:1200px;margin:3rem auto 5rem;padding:0 2rem;}
+        .profile-grid{display:grid;grid-template-columns:320px 1fr;gap:2rem;}
+
+        /* ── SIDEBAR ── */
+        .profile-sidebar{background:var(--white);border-radius:30px;box-shadow:var(--shadow-md);padding:2rem;height:fit-content;animation:fadeInUp 0.8s ease 0.2s both;}
+        .profile-avatar{text-align:center;margin-bottom:1.5rem;}
+        .avatar-image{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:3rem;color:white;font-weight:600;box-shadow:0 10px 25px rgba(10,126,164,0.3);overflow:hidden;background-size:cover;background-position:center;}
+        .profile-name{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text-dark);margin-bottom:0.3rem;}
+        .profile-email{color:var(--text-light);font-size:0.9rem;margin-bottom:1rem;}
+        .profile-stats{display:flex;justify-content:center;gap:1.5rem;padding:1rem 0;border-top:2px solid var(--bg-light);border-bottom:2px solid var(--bg-light);margin-bottom:1.5rem;}
+        .stat-item{text-align:center;}
+        .stat-value{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:700;color:var(--primary);line-height:1.2;}
+        .stat-label{font-size:0.8rem;color:var(--text-light);}
+        .profile-menu{list-style:none;}
+        .profile-menu li{margin-bottom:0.5rem;}
+        .profile-menu a{display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1rem;border-radius:12px;color:var(--text-dark);text-decoration:none;font-weight:500;transition:all 0.3s ease;}
+        .profile-menu a:hover{background:var(--bg-light);color:var(--primary);}
+        .profile-menu a.active{background:var(--primary);color:white;}
+        .menu-icon{font-size:1.2rem;}
+
+        /* ── CONTENT PANELS ── */
+        .profile-content{background:var(--white);border-radius:30px;box-shadow:var(--shadow-md);padding:2.5rem;animation:fadeInUp 0.8s ease 0.3s both;}
+        .content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--bg-light);}
+        .content-title{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;color:var(--text-dark);}
+        .btn-edit{padding:0.6rem 1.5rem;background:transparent;color:var(--primary);border:2px solid var(--primary);border-radius:50px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.3s ease;text-decoration:none;display:inline-block;}
+        .btn-edit:hover{background:var(--primary);color:white;transform:translateY(-2px);}
+
+        /* Info grid */
+        .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2rem;}
+        .info-item{background:var(--bg-light);padding:1.2rem;border-radius:16px;}
+        .info-label{font-size:0.8rem;color:var(--text-light);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.5px;}
+        .info-value{font-size:1rem;font-weight:600;color:var(--text-dark);}
+
+        /* Bookings */
+        .bookings-list{display:flex;flex-direction:column;gap:1rem;}
+        .booking-card{display:flex;justify-content:space-between;align-items:center;padding:1.2rem;background:var(--bg-light);border-radius:16px;transition:transform 0.3s ease;}
+        .booking-card:hover{transform:translateX(5px);}
+        .booking-info h4{font-size:1.1rem;font-weight:700;margin-bottom:0.3rem;}
+        .booking-meta{display:flex;gap:1.5rem;font-size:0.85rem;color:var(--text-light);}
+        .booking-actions{display:flex;align-items:center;gap:1rem;}
+        .booking-status{padding:0.3rem 1rem;border-radius:50px;font-size:0.75rem;font-weight:600;text-transform:uppercase;}
+        .status-confirmed{background:#d1fae5;color:#065f46;}
+        .status-pending{background:#fed7aa;color:#92400e;}
+        .status-completed{background:#e0e7ff;color:#3730a3;}
+        .booking-price{font-weight:700;color:var(--primary);}
 
         /* Preferences */
-        .pref-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
+        .pref-list{display:flex;flex-direction:column;gap:1.2rem;}
+        .pref-item{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--bg-light);}
+        .pref-item:last-child{border-bottom:none;}
+        .pref-label{font-weight:600;}
+        .pref-value{color:var(--text-light);}
+        .switch{position:relative;display:inline-block;width:52px;height:26px;}
+        .switch input{opacity:0;width:0;height:0;}
+        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:34px;}
+        .slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%;}
+        input:checked+.slider{background-color:var(--primary);}
+        input:checked+.slider:before{transform:translateX(26px);}
 
-        .pref-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--bg-light);
-        }
+        /* ── FOOTER ── */
+        .footer{background:var(--text-dark);color:white;padding:4rem 2rem 2rem;width:100%;}
+        .footer-content{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:3rem;margin-bottom:3rem;}
+        .footer-section h3{font-family:'Sora',sans-serif;font-size:1.3rem;margin-bottom:1.5rem;color:white;}
+        .footer-section p,.footer-section a{color:rgba(255,255,255,0.7);text-decoration:none;display:block;margin-bottom:0.8rem;transition:color 0.3s ease;}
+        .footer-section a:hover{color:var(--secondary);}
+        .social-links{display:flex;gap:1rem;margin-top:1rem;}
+        .social-link{width:40px;height:40px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;object-fit:cover;overflow:hidden;}
+        .social-link:hover{background:var(--primary);transform:translateY(-3px);}
+        .footer-bottom{max-width:1400px;margin:0 auto;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);text-align:center;color:rgba(255,255,255,0.5);}
 
-        .pref-item:last-child {
-            border-bottom: none;
-        }
-
-        .pref-label {
-            font-weight: 600;
-        }
-
-        .pref-value {
-            color: var(--text-light);
-        }
-
-        /* Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 26px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .3s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--text-dark);
-            color: white;
-            padding: 4rem 2rem 2rem;
-            width: 100%;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-section h3 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: white;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.8rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--secondary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            object-fit: cover;
-            overflow: hidden;
-        }
-
-        .social-link:hover {
-            background: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        @media (max-width: 968px) {
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .nav-menu {
-                position: fixed;
-                top: 80px;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 2rem;
-                gap: 1.5rem;
-                box-shadow: var(--shadow-lg);
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .nav-menu.active {
-                transform: translateX(0);
-            }
-
-            .page-title {
-                font-size: 2.2rem;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .booking-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .booking-meta {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
+        /* ── RESPONSIVE ── */
+        @media(max-width:968px){.profile-grid{grid-template-columns:1fr;}}
+        @media(max-width:768px){
+            .mobile-toggle{display:flex;}
+            .nav-actions{display:none;}
+            .nav-menu{position:fixed;top:80px;left:0;right:0;background:white;flex-direction:column;padding:2rem;gap:1.5rem;box-shadow:var(--shadow-lg);transform:translateX(-100%);transition:transform 0.3s ease;}
+            .nav-menu.active{transform:translateX(0);}
+            .mobile-auth{display:flex !important;flex-direction:column;align-items:center;gap:0.8rem;padding-top:1.2rem;border-top:1px solid #E2E8F0;width:100%;}
+            .mobile-search{display:flex !important;align-items:center;width:100%;border:2px solid #E2E8F0;border-radius:50px;overflow:hidden;background:white;}
+            .mobile-search input{flex:1;border:none;outline:none;padding:0.65rem 1.2rem;font-family:'Manrope',sans-serif;font-size:0.9rem;color:var(--text-dark);}
+            .mobile-search button{background:var(--primary);border:none;padding:0.65rem 1rem;color:white;cursor:pointer;display:flex;align-items:center;}
+            .mobile-auth-btns{display:flex;gap:0.8rem;width:100%;}
+            .mobile-auth-btns a{flex:1;text-align:center;}
+            .page-title{font-size:2.2rem;}
+            .info-grid{grid-template-columns:1fr;}
+            .booking-card{flex-direction:column;align-items:flex-start;gap:1rem;}
+            .booking-meta{flex-wrap:wrap;gap:1rem;}
         }
     </style>
 </head>
 <body>
 
-<!-- Header (exact same as original) -->
 <header class="header" id="header">
     <nav class="nav-container">
-        <!-- Logo -->
-        <a href="index.html" class="logo">
+        <a href="index.php" class="logo">
             <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
             Jettransfer
         </a>
-
-        <!-- Nav Menu -->
         <ul class="nav-menu" id="navMenu">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="destination.html">Destinations</a></li>
-            <li><a href="package.html">Packages</a></li>
-            <li><a href="vehicles.html">Vehicles</a></li>
-            <li><a href="profile.html" class="active">Profile</a></li>
-            <li><a href="service.html">Services & Gallery</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-
-            <!-- Mobile only: search + auth -->
+            <li><a href="index.php">Home</a></li>
+            <li><a href="destination.php">Destinations</a></li>
+            <li><a href="package.php">Packages</a></li>
+            <li><a href="vehicles.php">Vehicles</a></li>
+            <li><a href="service.php">Services &amp; Gallery</a></li>
+            <li><a href="contact.php">Contact Us</a></li>
+            <li><a href="aboutus.php">About Us</a></li>
+            <li><a href="profile.php" class="active">Profile</a></li>
+            
             <li class="mobile-auth">
                 <div class="mobile-search">
                     <input type="text" placeholder="Search destinations, packages…">
-                    <button>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </button>
+                    <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
                 </div>
                 <div class="mobile-auth-btns">
-                    <a href="login.html" class="btn-login" style="display:block; padding: 0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
-                    <a href="register.html" class="btn-register" style="display:block; padding: 0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
+                    <a href="login.php" class="btn-login" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
+                    <a href="register.php" class="btn-register" style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
                 </div>
             </li>
         </ul>
-
-        <!-- Right Side Actions -->
         <div class="nav-actions">
-            <!-- Search -->
             <div class="nav-search" id="navSearch">
-                <button class="search-toggle" id="searchToggle" aria-label="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </button>
+                <button class="search-toggle" id="searchToggle" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
                 <div class="search-box" id="searchBox">
                     <input type="text" placeholder="Search destinations, packages…" id="searchInput">
-                    <button class="search-submit">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </button>
+                    <button class="search-submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
                 </div>
             </div>
-
-            <!-- Login / Register -->
             <div class="nav-auth">
-                <a href="login.html" class="btn-login">Login</a>
-                <a href="register.html" class="btn-register">Register</a>
+                <a href="login.php" class="btn-login">Login</a>
+                <a href="register.php" class="btn-register">Register</a>
             </div>
         </div>
-
-        <!-- Mobile Toggle -->
-        <div class="mobile-toggle" id="mobileToggle">
-            <span></span><span></span><span></span>
-        </div>
+        <div class="mobile-toggle" id="mobileToggle"><span></span><span></span><span></span></div>
     </nav>
 </header>
 
-<!-- Page Header -->
 <section class="page-header">
     <h1 class="page-title">My Profile</h1>
     <p class="page-description">Manage your personal information, bookings, and preferences</p>
 </section>
 
-<!-- Profile Section -->
 <section class="profile-section">
     <div class="profile-grid">
-        <!-- Profile Sidebar -->
+
+        <!-- Sidebar -->
         <aside class="profile-sidebar">
             <div class="profile-avatar">
-                <div class="avatar-image">JD</div>
-                <h2 class="profile-name">Aarav Rohit</h2>
-                <p class="profile-email">aarav.rohit1990@gmail.com</p>
+                <div class="avatar-image" id="avatarDisplay">AR</div>
+                <h2 class="profile-name" id="sidebarName">Aarav Rohit</h2>
+                <p class="profile-email" id="sidebarEmail">aarav.rohit1990@gmail.com</p>
             </div>
-
             <div class="profile-stats">
-                <div class="stat-item">
-                    <div class="stat-value">3</div>
-                    <div class="stat-label">Bookings</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">Reviews</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">1</div>
-                    <div class="stat-label">Years</div>
-                </div>
+                <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Bookings</div></div>
+                <div class="stat-item"><div class="stat-value">2</div><div class="stat-label">Reviews</div></div>
+                <div class="stat-item"><div class="stat-value">1</div><div class="stat-label">Years</div></div>
             </div>
-
             <ul class="profile-menu">
-                <li><a href="#personal" class="active" onclick="showTab('personal'); return false;"><span class="menu-icon">👤</span> Personal Info</a></li>
-                <li><a href="#bookings" onclick="showTab('bookings'); return false;"><span class="menu-icon">📅</span> My Bookings</a></li>
-                <li><a href="#preferences" onclick="showTab('preferences'); return false;"><span class="menu-icon">⚙️</span> Preferences</a></li>
-                <li><a href="#security" onclick="showTab('security'); return false;"><span class="menu-icon">🔒</span> Security</a></li>
-                <li><a href="#logout" style="color: #EF4444;"><span class="menu-icon">🚪</span> Logout</a></li>
+                <li><a href="#" class="active" id="tab-btn-personal" onclick="showTab('personal',this);return false;"><span class="menu-icon">👤</span> Personal Info</a></li>
+                <li><a href="#" id="tab-btn-bookings" onclick="showTab('bookings',this);return false;"><span class="menu-icon">📅</span> My Bookings</a></li>
+                <li><a href="#" id="tab-btn-preferences" onclick="showTab('preferences',this);return false;"><span class="menu-icon">⚙️</span> Preferences</a></li>
+                <li><a href="#" id="tab-btn-security" onclick="showTab('security',this);return false;"><span class="menu-icon">🔒</span> Security</a></li>
+                <li><a href="#" style="color:#EF4444;" onclick="return false;"><span class="menu-icon">🚪</span> Logout</a></li>
             </ul>
         </aside>
 
-        <!-- Profile Content - Personal Info Tab (default) -->
+        <!-- Personal Info Tab -->
         <div class="profile-content" id="personal-tab">
             <div class="content-header">
                 <h2 class="content-title">Personal Information</h2>
-                <a href="editprofile.html" class="btn-edit">Edit Profile</a>
+                <a href="editprofile.php" class="btn-edit">Edit Profile</a>
             </div>
-
             <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value">Aarav Rohit</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Email Address</div>
-                    <div class="info-value">aarav.rohit1990@gmail.com</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Phone Number</div>
-                    <div class="info-value">+94 77 123 4567</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Date of Birth</div>
-                    <div class="info-value">15 March 1990</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Nationality</div>
-                    <div class="info-value">Indian</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Member Since</div>
-                    <div class="info-value">January 2025</div>
-                </div>
+                <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="infoFullName">Aarav Rohit</div></div>
+                <div class="info-item"><div class="info-label">Email Address</div><div class="info-value" id="infoEmail">aarav.rohit1990@gmail.com</div></div>
+                <div class="info-item"><div class="info-label">Phone Number</div><div class="info-value" id="infoPhone">+94 77 123 4567</div></div>
+                <div class="info-item"><div class="info-label">Date of Birth</div><div class="info-value" id="infoDob">15 March 1990</div></div>
+                <div class="info-item"><div class="info-label">Nationality</div><div class="info-value" id="infoNationality">Indian</div></div>
+                <div class="info-item"><div class="info-label">Member Since</div><div class="info-value">January 2025</div></div>
             </div>
-
-            <div style="margin-top: 2rem;">
-                <h3 style="font-family: 'Sora', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">Address</h3>
-                <div class="info-item" style="background: var(--bg-light); padding: 1.2rem; border-radius: 16px;">
-                    <div class="info-value">Gandhi Nagar, J/8 D.s. Road</div>
-                </div>
+            <div style="margin-top:2rem;">
+                <h3 style="font-family:'Sora',sans-serif;font-size:1.2rem;margin-bottom:1rem;">Address</h3>
+                <div class="info-item"><div class="info-value" id="infoAddress">Gandhi Nagar, J/8 D.s. Road</div></div>
             </div>
         </div>
 
-        <!-- Profile Content - Bookings Tab (hidden by default) -->
-        <div class="profile-content" id="bookings-tab" style="display: none;">
+        <!-- Bookings Tab -->
+        <div class="profile-content" id="bookings-tab" style="display:none;">
             <div class="content-header">
                 <h2 class="content-title">My Bookings</h2>
-                <a href="package.html" class="btn-edit">Browse Packages</a>
+                <a href="package.php" class="btn-edit">Browse Packages</a>
             </div>
-
             <div class="bookings-list">
                 <div class="booking-card">
-                    <div>
+                    <div class="booking-info">
                         <h4>Full Island Tour</h4>
-                        <div class="booking-meta">
-                            <span>📅 14 Days / 13 Nights</span>
-                            <span>👥 4 People</span>
-                            <span>📆 10-23 May 2026</span>
-                        </div>
+                        <div class="booking-meta"><span>📅 14 Days / 13 Nights</span><span>👥 4 People</span><span>📆 10-23 May 2026</span></div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span class="booking-status status-confirmed">Confirmed</span>
-                        <span class="booking-price">LKR 180,000</span>
-                    </div>
+                    <div class="booking-actions"><span class="booking-status status-confirmed">Confirmed</span><span class="booking-price">LKR 180,000</span></div>
                 </div>
-
                 <div class="booking-card">
-                    <div>
+                    <div class="booking-info">
                         <h4>Southern Beach Escape</h4>
-                        <div class="booking-meta">
-                            <span>📅 5 Days / 4 Nights</span>
-                            <span>👥 2 People</span>
-                            <span>📆 15-19 June 2026</span>
-                        </div>
+                        <div class="booking-meta"><span>📅 5 Days / 4 Nights</span><span>👥 2 People</span><span>📆 15-19 June 2026</span></div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span class="booking-status status-pending">Pending</span>
-                        <span class="booking-price">LKR 75,000</span>
-                    </div>
+                    <div class="booking-actions"><span class="booking-status status-pending">Pending</span><span class="booking-price">LKR 75,000</span></div>
                 </div>
-
                 <div class="booking-card">
-                    <div>
+                    <div class="booking-info">
                         <h4>Hill Country Tour</h4>
-                        <div class="booking-meta">
-                            <span>📅 7 Days / 6 Nights</span>
-                            <span>👥 3 People</span>
-                            <span>📆 02-08 April 2026</span>
-                        </div>
+                        <div class="booking-meta"><span>📅 7 Days / 6 Nights</span><span>👥 3 People</span><span>📆 02-08 April 2026</span></div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span class="booking-status status-completed">Completed</span>
-                        <span class="booking-price">LKR 60,000</span>
-                    </div>
+                    <div class="booking-actions"><span class="booking-status status-completed">Completed</span><span class="booking-price">LKR 60,000</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- Profile Content - Preferences Tab (hidden by default) -->
-        <div class="profile-content" id="preferences-tab" style="display: none;">
+        <!-- Preferences Tab -->
+        <div class="profile-content" id="preferences-tab" style="display:none;">
             <div class="content-header">
                 <h2 class="content-title">Preferences</h2>
-                <a href="#" class="btn-edit">Save Changes</a>
+                <a href="#" class="btn-edit" onclick="return false;">Save Changes</a>
             </div>
-
             <div class="pref-list">
-                <div class="pref-item">
-                    <span class="pref-label">Email Notifications</span>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="pref-item">
-                    <span class="pref-label">SMS Notifications</span>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="pref-item">
-                    <span class="pref-label">Promotional Offers</span>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="pref-item">
-                    <span class="pref-label">Preferred Currency</span>
-                    <span class="pref-value">Sri Lankan Rupee (LKR)</span>
-                </div>
-                <div class="pref-item">
-                    <span class="pref-label">Preferred Language</span>
-                    <span class="pref-value">English</span>
-                </div>
-                <div class="pref-item">
-                    <span class="pref-label">Travel Style</span>
-                    <span class="pref-value">Cultural, Nature, Beach</span>
-                </div>
+                <div class="pref-item"><span class="pref-label">Email Notifications</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+                <div class="pref-item"><span class="pref-label">SMS Notifications</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+                <div class="pref-item"><span class="pref-label">Promotional Offers</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+                <div class="pref-item"><span class="pref-label">Preferred Currency</span><span class="pref-value">Sri Lankan Rupee (LKR)</span></div>
+                <div class="pref-item"><span class="pref-label">Preferred Language</span><span class="pref-value">English</span></div>
+                <div class="pref-item"><span class="pref-label">Travel Style</span><span class="pref-value">Cultural, Nature, Beach</span></div>
             </div>
         </div>
 
-        <!-- Profile Content - Security Tab (hidden by default) -->
-        <div class="profile-content" id="security-tab" style="display: none;">
+        <!-- Security Tab -->
+        <div class="profile-content" id="security-tab" style="display:none;">
             <div class="content-header">
                 <h2 class="content-title">Security Settings</h2>
-                <a href="#" class="btn-edit">Update</a>
+                <a href="#" class="btn-edit" onclick="return false;">Update</a>
             </div>
-
             <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Password</div>
-                    <div class="info-value">••••••••</div>
-                </div>
+                <div class="info-item"><div class="info-label">Password</div><div class="info-value">••••••••</div></div>
                 <div class="info-item">
                     <div class="info-label">Two-Factor Authentication</div>
-                    <div class="info-value" style="display: flex; align-items: center; gap: 1rem;">
-                        <span>Disabled</span>
-                        <label class="switch">
-                            <input type="checkbox">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+                    <div class="info-value" style="display:flex;align-items:center;gap:1rem;"><span>Disabled</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Last Login</div>
-                    <div class="info-value">24 February 2026, 10:30 AM</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Login Devices</div>
-                    <div class="info-value">3 active sessions</div>
-                </div>
+                <div class="info-item"><div class="info-label">Last Login</div><div class="info-value">24 February 2026, 10:30 AM</div></div>
+                <div class="info-item"><div class="info-label">Login Devices</div><div class="info-value">3 active sessions</div></div>
             </div>
-
-            <div style="margin-top: 2rem;">
-                <a href="forgot-password.html" style="color: var(--primary); text-decoration: none; font-weight: 600;">Change Password →</a>
+            <div style="margin-top:2rem;">
+                <a href="forgot-password.php" style="color:var(--primary);text-decoration:none;font-weight:600;">Change Password →</a>
             </div>
         </div>
+
     </div>
 </section>
 
-<!-- Footer (exact same as original) -->
 <footer class="footer" id="contact">
     <div class="footer-content">
         <div class="footer-section">
             <h3>Jettransfer Travels</h3>
             <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
             <div class="social-links">
-                <img src="images/insta1.webp" alt="Instagram logo" class="social-link">
-                <img src="images/fb.avif" alt="Facebook logo" class="social-link">
-                <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link">
+                <img src="images/insta1.webp" alt="Instagram" class="social-link">
+                <img src="images/fb.avif" alt="Facebook" class="social-link">
+                <img src="images/tiktok.webp" alt="TikTok" class="social-link">
             </div>
         </div>
         <div class="footer-section">
             <h3>Quick Links</h3>
-            <a href="destination.html">Destinations</a>
-            <a href="package.html">Tour Packages</a>
-            <a href="vehicles.html">Our Vehicles</a>
-            <a href="service.html">Services & Gallery</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="destination.php">Destinations</a>
+            <a href="package.php">Tour Packages</a>
+            <a href="vehicles.php">Our Vehicles</a>
+            <a href="service.php">Services &amp; Gallery</a>
+            <a href="contact.php">Contact Us</a>
         </div>
         <div class="footer-section">
             <h3>Contact Us</h3>
@@ -1190,7 +345,7 @@
             <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
             <p>Saturday: 10:00 AM - 6:00 PM</p>
             <p>Sunday: 10:00 AM - 6:00 PM</p>
-            <p style="margin-top: 1rem; color: var(--secondary);">24/7 Emergency Support Available</p>
+            <p style="margin-top:1rem;color:var(--secondary);">24/7 Emergency Support Available</p>
         </div>
     </div>
     <div class="footer-bottom">
@@ -1199,89 +354,78 @@
 </footer>
 
 <script>
-    // Mobile menu toggle
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navMenu = document.getElementById('navMenu');
+    /* ── Load saved profile from localStorage ── */
+    function loadProfileData() {
+        const saved = localStorage.getItem('jettransfer_profile');
+        if (!saved) return;
+        const d = JSON.parse(saved);
+        const fullName = [d.firstName, d.lastName].filter(Boolean).join(' ');
 
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+        // Avatar
+        const avatar = document.getElementById('avatarDisplay');
+        if (d.avatarSrc && d.avatarSrc !== 'null') {
+            avatar.textContent = '';
+            avatar.style.background = 'none';
+            avatar.style.backgroundImage = 'url(' + d.avatarSrc + ')';
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+        } else if (fullName) {
+            const initials = [d.firstName?.[0], d.lastName?.[0]].filter(Boolean).join('').toUpperCase();
+            avatar.textContent = initials;
+        }
+
+        // Sidebar
+        if (fullName) document.getElementById('sidebarName').textContent = fullName;
+        if (d.email)  document.getElementById('sidebarEmail').textContent = d.email;
+
+        // Personal tab
+        if (fullName)         document.getElementById('infoFullName').textContent = fullName;
+        if (d.email)          document.getElementById('infoEmail').textContent = d.email;
+        if (d.phone)          document.getElementById('infoPhone').textContent = d.phone;
+        if (d.nationality)    document.getElementById('infoNationality').textContent = d.nationality;
+        if (d.dob) {
+            const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const [y, m, day] = d.dob.split('-');
+            document.getElementById('infoDob').textContent = parseInt(day) + ' ' + months[parseInt(m)-1] + ' ' + y;
+        }
+        const addr = [d.address, d.city, d.country].filter(Boolean).join(', ');
+        if (addr) document.getElementById('infoAddress').textContent = addr;
+    }
+    loadProfileData();
+
+    /* ── Tab switching ── */
+    function showTab(name, el) {
+        ['personal','bookings','preferences','security'].forEach(t => {
+            document.getElementById(t + '-tab').style.display = (t === name) ? 'block' : 'none';
         });
+        document.querySelectorAll('.profile-menu a').forEach(a => a.classList.remove('active'));
+        if (el) el.classList.add('active');
     }
 
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-        });
+    /* ── Mobile menu ── */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('active');
+    });
+    document.querySelectorAll('.nav-menu a').forEach(a => {
+        a.addEventListener('click', () => document.getElementById('navMenu').classList.remove('active'));
     });
 
-    // Header scroll effect
-    const header = document.getElementById('header');
+    /* ── Header scroll ── */
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
+        document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
     });
 
-    // Search toggle - using unique variable names
-    const searchToggleBtn = document.getElementById('searchToggle');
-    const searchBoxDiv = document.getElementById('searchBox');
-    const searchInputField = document.getElementById('searchInput');
-
-    if (searchToggleBtn) {
-        searchToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (searchBoxDiv) {
-                searchBoxDiv.classList.toggle('open');
-                if (searchBoxDiv.classList.contains('open') && searchInputField) {
-                    setTimeout(() => searchInputField.focus(), 300);
-                }
-            }
-        });
-    }
-
-    // Close search when clicking outside
-    document.addEventListener('click', (e) => {
-        const navSearch = document.getElementById('navSearch');
-        if (navSearch && !navSearch.contains(e.target)) {
-            if (searchBoxDiv) {
-                searchBoxDiv.classList.remove('open');
-            }
-        }
+    /* ── Search toggle ── */
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBox    = document.getElementById('searchBox');
+    const searchInput  = document.getElementById('searchInput');
+    searchToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        searchBox.classList.toggle('open');
+        if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
     });
-
-    // Tab switching function
-    function showTab(tabName) {
-        // Hide all tabs
-        document.getElementById('personal-tab').style.display = 'none';
-        document.getElementById('bookings-tab').style.display = 'none';
-        document.getElementById('preferences-tab').style.display = 'none';
-        document.getElementById('security-tab').style.display = 'none';
-        
-        // Show selected tab
-        document.getElementById(tabName + '-tab').style.display = 'block';
-        
-        // Update active state in sidebar menu
-        document.querySelectorAll('.profile-menu a').forEach(link => {
-            link.classList.remove('active');
-        });
-        event.target.closest('a').classList.add('active');
-    }
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const headerOffset = 80;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            }
-        });
+    document.addEventListener('click', e => {
+        if (!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open');
     });
 </script>
 </body>

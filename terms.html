@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Jettransfer Travels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A7EA4;
+            --primary-dark: #065A7A;
+            --secondary: #F59E0B;
+            --accent: #10B981;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.6rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.88rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after,
+        .nav-menu a.active::after {
+            width: 100%;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+
+        .nav-search {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #E2E8F0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .search-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .search-box {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            overflow: hidden;
+            width: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: width 0.4s ease, opacity 0.3s ease;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .search-box.open {
+            width: 280px;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 0.55rem 1rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+            width: 100%;
+            background: transparent;
+        }
+
+        .search-submit {
+            background: var(--primary);
+            border: none;
+            padding: 0.55rem 1rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .search-submit:hover {
+            background: var(--primary-dark);
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-login:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
+            white-space: nowrap;
+        }
+
+        .btn-register:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .mobile-auth {
+            display: none;
+        }
+
+        /* ── HERO ── */
+        .terms-hero {
+            margin-top: 80px;
+            height: 50vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .terms-hero-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            z-index: 0;
+        }
+
+        .terms-hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(6,90,122,0.88), rgba(10,126,164,0.80));
+            z-index: 1;
+        }
+
+        .hero-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            animation: float 10s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .hero-shape:nth-child(3) {
+            width: 380px;
+            height: 380px;
+            top: -130px;
+            right: -60px;
+            animation-delay: 0s;
+        }
+
+        .hero-shape:nth-child(4) {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: 8%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-18px) rotate(4deg); }
+        }
+
+        .terms-hero-content {
+            position: relative;
+            z-index: 3;
+            color: white;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-breadcrumb {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+            margin-bottom: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        .terms-hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .terms-hero p {
+            font-size: 1.1rem;
+            opacity: 0.88;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── LAYOUT ── */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: sticky;
+            top: 110px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .sidebar-header h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.82rem;
+            opacity: 0.85;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--primary);
+            background: rgba(10,126,164,0.06);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-nav a .nav-num {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            flex-shrink: 0;
+            transition: background 0.25s;
+        }
+
+        .sidebar-nav a:hover .nav-num,
+        .sidebar-nav a.active .nav-num {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-updated {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #F1F5F9;
+        }
+
+        .sidebar-updated p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .sidebar-updated span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ── CONTENT ── */
+        .terms-intro {
+            background: linear-gradient(135deg, rgba(10,126,164,0.06), rgba(16,185,129,0.05));
+            border: 1px solid rgba(10,126,164,0.15);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .terms-intro p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.9;
+        }
+
+        .terms-intro strong {
+            color: var(--primary);
+        }
+
+        .terms-section {
+            margin-bottom: 3.5rem;
+            scroll-margin-top: 110px;
+        }
+
+        .terms-section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .section-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .terms-section h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .terms-section p {
+            color: var(--text-light);
+            line-height: 1.9;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .terms-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .terms-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .terms-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 0.8rem;
+        }
+
+        .terms-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+            margin-top: 0.55rem;
+        }
+
+        .info-box {
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .info-box.blue {
+            background: rgba(10,126,164,0.07);
+            border: 1px solid rgba(10,126,164,0.18);
+        }
+
+        .info-box.amber {
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.25);
+        }
+
+        .info-box.green {
+            background: rgba(16,185,129,0.07);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        .info-box.red {
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .info-box-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .info-box p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .info-box p strong {
+            color: var(--text-dark);
+        }
+
+        /* ── REFUND TABLE ── */
+        .terms-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .terms-table th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .terms-table td {
+            padding: 0.9rem 1.2rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .terms-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .terms-table tr:nth-child(even) td {
+            background: var(--bg-light);
+        }
+
+        .terms-table tr:hover td {
+            background: rgba(10,126,164,0.04);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .badge.refund {
+            background: rgba(16,185,129,0.12);
+            color: #059669;
+        }
+
+        .badge.partial {
+            background: rgba(245,158,11,0.12);
+            color: #D97706;
+        }
+
+        .badge.no-refund {
+            background: rgba(239,68,68,0.1);
+            color: #DC2626;
+        }
+
+        /* ── DIVIDER ── */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #E2E8F0 30%, #E2E8F0 70%, transparent);
+            margin: 3.5rem 0;
+        }
+
+        /* ── CONTACT STRIP ── */
+        .contact-strip {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            padding: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .contact-strip h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.4rem;
+        }
+
+        .contact-strip p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+        }
+
+        .contact-strip a {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--secondary);
+            color: var(--text-dark);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.3);
+        }
+
+        .contact-strip a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245,158,11,0.45);
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ── ANIMATIONS ── */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .sidebar-nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-menu.active {
+                transform: translateX(0);
+            }
+
+            .nav-actions {
+                display: none;
+            }
+
+            .terms-hero h1 {
+                font-size: 2.4rem;
+            }
+
+            .sidebar-nav {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-strip {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .page-wrapper {
+                padding: 3rem 1.2rem;
+            }
+
+            .mobile-auth {
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                padding-top: 1.2rem;
+                border-top: 1px solid #E2E8F0;
+                width: 100%;
+            }
+
+            .mobile-auth-btns {
+                display: flex;
+                gap: 0.8rem;
+                width: 100%;
+            }
+
+            .mobile-auth-btns a {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header" id="header">
+    <nav class="nav-container">
+        <a href="index.html" class="logo">
+            <img src="logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.php">Home</a></li>
+            <li><a href="destination.php" class="active">Destinations</a></li>
+            <li><a href="packages.php">Packages</a></li>
+            <li><a href="vehicles.php">Vehicles</a></li>
+            <li><a href="service.php">Services &amp; Gallery</a></li>
+            <li><a href="contact.php">Contact Us</a></li>
+            <li><a href="aboutus.php">About Us</a></li>
+
+            <li class="mobile-auth">
+                <div class="mobile-auth-btns">
+                    <a href="login.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
+                    <a href="register.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
+                </div>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            
+                
+            </div>
+            <div class="nav-auth">
+                <a href="login.php" class="btn-login">Login</a>
+                <a href="register.php" class="btn-register">Register</a>
+            </div>
+        </div>
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
+
+<!-- ── HERO ── -->
+<section class="terms-hero">
+    <img src="southern.jpg" alt="Sri Lanka" class="terms-hero-img">
+    <div class="terms-hero-overlay"></div>
+    <div class="hero-shape"></div>
+    <div class="hero-shape"></div>
+    <div class="terms-hero-content">
+        <h1>Terms &amp; Conditions</h1>
+        <p>Simple, clear, and honest — just the way we do things.</p>
+    </div>
+</section>
+
+<!-- ── MAIN ── -->
+<div class="page-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fade-in">
+        <div class="sidebar-card">
+            <div class="sidebar-header">
+                <h3>📋 Quick Navigation</h3>
+                <p>Jump to any section</p>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <a href="#accepting" class="active"><span class="nav-num">1</span> Accepting These Terms</a>
+                <a href="#bookings"><span class="nav-num">2</span> Making a Booking</a>
+                <a href="#payments"><span class="nav-num">3</span> Payments</a>
+                <a href="#cancellations"><span class="nav-num">4</span> Cancellations &amp; Refunds</a>
+                <a href="#behaviour"><span class="nav-num">5</span> Passenger Behaviour</a>
+                <a href="#responsibility"><span class="nav-num">6</span> Our Responsibility</a>
+                <a href="#vehicles"><span class="nav-num">7</span> Vehicles &amp; Drivers</a>
+                <a href="#privacy"><span class="nav-num">8</span> Your Privacy</a>
+                <a href="#changes"><span class="nav-num">9</span> Changes to Terms</a>
+                <a href="#questions"><span class="nav-num">10</span> Questions?</a>
+            </nav>
+            <div class="sidebar-updated">
+                <p>Last updated: <span>January 2026</span></p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="terms-content">
+
+        <div class="terms-intro fade-in">
+            <p>By booking with <strong>Jettransfer Travels</strong>, you agree to these terms. We've kept things simple and straightforward — no confusing language. Please take a few minutes to read through before you book. If you have any questions, we're always happy to help!</p>
+        </div>
+
+        <!-- 1 -->
+        <div class="terms-section fade-in" id="accepting">
+            <div class="terms-section-header">
+                <div class="section-icon">📄</div>
+                <div>
+                    <span class="section-num">Section 01</span>
+                    <h2>Accepting These Terms</h2>
+                </div>
+            </div>
+            <p>When you make a booking with us — online, by phone, or by email — you're agreeing to everything on this page. These terms apply to all our services, including airport transfers, day trips, tour packages, and custom travel plans.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 2 -->
+        <div class="terms-section fade-in" id="bookings">
+            <div class="terms-section-header">
+                <div class="section-icon">📅</div>
+                <div>
+                    <span class="section-num">Section 02</span>
+                    <h2>Making a Booking</h2>
+                </div>
+            </div>
+            <p>Your booking is only confirmed once you receive a written confirmation from us. A booking request alone doesn't mean it's locked in.</p>
+            <ul class="terms-list">
+                <li>Please book at least <strong>48 hours in advance</strong> for standard trips.</li>
+                <li>Last-minute bookings (under 24 hours) may cost a little extra and depend on availability.</li>
+                <li>Make sure all your details are correct — pick-up point, drop-off, date, time, and number of passengers.</li>
+                <li>Group bookings of 10 or more people need at least <strong>7 days' notice</strong>.</li>
+                <li>We reserve the right to decline a booking if needed.</li>
+            </ul>
+            <div class="info-box amber">
+                <span class="info-box-icon">⚠️</span>
+                <p><strong>Double-check your details!</strong> We can't take responsibility for missed trips due to incorrect information provided at the time of booking.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 3 -->
+        <div class="terms-section fade-in" id="payments">
+            <div class="terms-section-header">
+                <div class="section-icon">💳</div>
+                <div>
+                    <span class="section-num">Section 03</span>
+                    <h2>Payments</h2>
+                </div>
+            </div>
+            <p>We don't process payments through our website. Here's how our payment process works:</p>
+            <ul class="terms-list">
+                <li>Once your booking is confirmed, you'll receive a <strong>confirmation message via Email and WhatsApp</strong> with your full trip details and the payment amount.</li>
+                <li>All prices are quoted in <strong>Sri Lankan Rupees (LKR)</strong>.</li>
+                <li>Payment is made <strong>directly to the driver</strong> at the start of your trip — cash only.</li>
+                <li>Please have the correct amount ready and present your confirmation message to the driver.</li>
+            </ul>
+            <div class="info-box green">
+                <span class="info-box-icon">✅</span>
+                <p><strong>Keep your confirmation!</strong> Save your Email or WhatsApp confirmation and show it to your driver at the beginning of the trip.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 4 -->
+        <div class="terms-section fade-in" id="cancellations">
+            <div class="terms-section-header">
+                <div class="section-icon">🔄</div>
+                <div>
+                    <span class="section-num">Section 04</span>
+                    <h2>Cancellations &amp; Refunds</h2>
+                </div>
+            </div>
+            <p>We understand plans change! Here's what to expect if you need to cancel:</p>
+            <table class="terms-table">
+                <thead>
+                    <tr>
+                        <th>Notice Given</th>
+                        <th>Refund</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>More than 7 days</td>
+                        <td>Full refund</td>
+                        <td><span class="badge refund">Full Refund</span></td>
+                    </tr>
+                    <tr>
+                        <td>3–7 days</td>
+                        <td>50% refund</td>
+                        <td><span class="badge partial">Partial Refund</span></td>
+                    </tr>
+                    <tr>
+                        <td>24–72 hours</td>
+                        <td>25% refund</td>
+                        <td><span class="badge partial">Partial Refund</span></td>
+                    </tr>
+                    <tr>
+                        <td>Less than 24 hours</td>
+                        <td>No refund</td>
+                        <td><span class="badge no-refund">No Refund</span></td>
+                    </tr>
+                    <tr>
+                        <td>No-show</td>
+                        <td>No refund</td>
+                        <td><span class="badge no-refund">No Refund</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <ul class="terms-list">
+                <li>To cancel, contact us via <strong>Email or WhatsApp</strong> as soon as possible.</li>
+                <li>All refunds are given <strong>in person at our office</strong> in Matara.</li>
+                <li>If <em>we</em> cancel your booking, you'll receive a full refund or a free alternative — no questions asked.</li>
+            </ul>
+            <div class="info-box blue">
+                <span class="info-box-icon">ℹ️</span>
+                <p>Since payments are made directly to the driver, any eligible refund will be arranged through our office. Please contact us to organise this.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 5 -->
+        <div class="terms-section fade-in" id="behaviour">
+            <div class="terms-section-header">
+                <div class="section-icon">🤝</div>
+                <div>
+                    <span class="section-num">Section 05</span>
+                    <h2>Passenger Behaviour</h2>
+                </div>
+            </div>
+            <p>We want everyone to have a great trip. To keep things safe and enjoyable for all, we ask that passengers:</p>
+            <ul class="terms-list">
+                <li><strong>No smoking</strong> in any of our vehicles.</li>
+                <li><strong>No alcohol</strong> without prior agreement.</li>
+                <li>Wear your <strong>seatbelt</strong> at all times.</li>
+                <li>Treat our drivers and staff with kindness and respect.</li>
+                <li>Any damage caused to the vehicle will be charged to the passenger responsible.</li>
+            </ul>
+            <div class="info-box red">
+                <span class="info-box-icon">🚫</span>
+                <p><strong>Zero tolerance:</strong> If a passenger behaves in a way that puts others at risk, we may end the trip immediately with no refund.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 6 -->
+        <div class="terms-section fade-in" id="responsibility">
+            <div class="terms-section-header">
+                <div class="section-icon">🛡️</div>
+                <div>
+                    <span class="section-num">Section 06</span>
+                    <h2>Our Responsibility</h2>
+                </div>
+            </div>
+            <p>We take your safety seriously and carry full insurance. That said, there are a few things outside our control:</p>
+            <ul class="terms-list">
+                <li>We are not responsible for delays caused by traffic, bad weather, or road conditions beyond our control.</li>
+                <li>We are not liable for lost or stolen personal belongings left in our vehicles — please keep valuables with you.</li>
+                <li>Our maximum liability is limited to the total value of your booking.</li>
+            </ul>
+            <div class="info-box amber">
+                <span class="info-box-icon">⚠️</span>
+                <p><strong>Travel Insurance:</strong> We strongly recommend taking out travel insurance before your trip to cover any unexpected events.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 7 -->
+        <div class="terms-section fade-in" id="vehicles">
+            <div class="terms-section-header">
+                <div class="section-icon">🚗</div>
+                <div>
+                    <span class="section-num">Section 07</span>
+                    <h2>Our Vehicles &amp; Drivers</h2>
+                </div>
+            </div>
+            <p>We take pride in our fleet and our team. Here's what you can expect:</p>
+            <ul class="terms-list">
+                <li>All vehicles are <strong>air-conditioned, clean, and regularly serviced</strong>.</li>
+                <li>All drivers are fully <strong>licensed and experienced</strong>.</li>
+                <li>If a vehicle breaks down, we'll arrange a replacement as quickly as possible at <strong>no extra cost</strong>.</li>
+                <li>For airport pickups, we track your flight and adjust the pick-up time automatically — no stress!</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 8 -->
+        <div class="terms-section fade-in" id="privacy">
+            <div class="terms-section-header">
+                <div class="section-icon">🔒</div>
+                <div>
+                    <span class="section-num">Section 08</span>
+                    <h2>Your Privacy</h2>
+                </div>
+            </div>
+            <p>Your privacy matters to us. Here's how we handle your information:</p>
+            <ul class="terms-list">
+                <li>We only collect information needed to process your booking.</li>
+                <li>We <strong>never sell</strong> your data to anyone.</li>
+                <li>We may contact you with booking updates or (with your permission) special offers.</li>
+                <li>You can ask us to view, update, or delete your data at any time — just contact us directly.</li>
+            </ul>
+            <div class="info-box green">
+                <span class="info-box-icon">🔒</span>
+                <p>Your information is stored securely and only used to provide you with the best travel experience possible.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 9 -->
+        <div class="terms-section fade-in" id="changes">
+            <div class="terms-section-header">
+                <div class="section-icon">📝</div>
+                <div>
+                    <span class="section-num">Section 09</span>
+                    <h2>Changes to These Terms</h2>
+                </div>
+            </div>
+            <p>We may update these terms from time to time. Any changes take effect as soon as they're published on our website. We'll do our best to let you know about any big changes via Email or WhatsApp. By continuing to use our services after an update, you're agreeing to the new terms.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 10 -->
+        <div class="terms-section fade-in" id="questions">
+            <div class="terms-section-header">
+                <div class="section-icon">📞</div>
+                <div>
+                    <span class="section-num">Section 10</span>
+                    <h2>Questions?</h2>
+                </div>
+            </div>
+            <p>If anything here is unclear, just reach out — we're happy to help before you book!</p>
+            <ul class="terms-list">
+                <li>📞 <strong>+94 72 403 0499</strong></li>
+                <li>📧 <strong>jettransfer@outlook.com</strong></li>
+                <li>📍 Ruwani Uyana, Matara, Sri Lanka</li>
+                <li>🕐 Mon–Sun, 8:00 AM – 6:00 PM &nbsp;|&nbsp; 24/7 emergency line available</li>
+            </ul>
+        </div>
+
+        <div class="contact-strip fade-in">
+            <div>
+                <h3>Still have questions?</h3>
+                <p>We're friendly, we're fast, and we're here to help.</p>
+            </div>
+            <a href="contact.php">Get in Touch →</a>
+        </div>
+
+    </main>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Jettransfer Travels</h3>
+            <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
+            <div class="social-links">
+                <img src="images/insta1.webp" alt="Instagram" class="social-link">
+                <img src="images/fb.avif" alt="Facebook" class="social-link">
+                <img src="images/tiktok.webp" alt="TikTok" class="social-link">
+            </div>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="destination.php">Destinations</a>
+            <a href="package.php">Tour Packages</a>
+            <a href="vehicles.php">Our Vehicles</a>
+            <a href="aboutus.php">About Us</a>
+            <a href="terms.html">Terms &amp; Conditions</a>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>📞 +94 72 403 0499</p>
+            <p>📧 jettransfer@outlook.com</p>
+            <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+        </div>
+        <div class="footer-section">
+            <h3>Business Hours</h3>
+            <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+            <p>Saturday: 10:00 AM - 6:00 PM</p>
+            <p>Sunday: 10:00 AM - 6:00 PM</p>
+            <p style="margin-top:1rem; color:var(--secondary);">24/7 Emergency Support Available</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('active');
+    });
+
+    document.querySelectorAll('.nav-menu a').forEach(l => {
+        l.addEventListener('click', () => document.getElementById('navMenu').classList.remove('active'));
+    });
+
+    window.addEventListener('scroll', () => {
+        document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBox    = document.getElementById('searchBox');
+    const searchInput  = document.getElementById('searchInput');
+
+    searchToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        searchBox.classList.toggle('open');
+        if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    const sections  = document.querySelectorAll('.terms-section');
+    const sideLinks = document.querySelectorAll('#sidebarNav a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(sec => {
+            if (window.scrollY >= sec.offsetTop - 140) current = sec.getAttribute('id');
+        });
+        sideLinks.forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+        });
+    });
+
+    document.querySelectorAll('#sidebarNav a').forEach(a => {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) window.scrollTo({ top: target.offsetTop - 110, behavior: 'smooth' });
+        });
+    });
+</script>
+</body>
+</html>
