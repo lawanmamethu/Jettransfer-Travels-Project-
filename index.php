@@ -306,7 +306,7 @@ if (!$conn->connect_error) {
         .package-info-item{display:flex;align-items:center;gap:0.5rem;color:var(--text-light);font-size:0.95rem}
 
         /* FEATURES */
-        .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:3rem}
+        .features-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:3rem}
         .feature-item{text-align:center;padding:2rem}
         .feature-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:20px;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;font-size:2rem;color:white;transform:rotate(-5deg);transition:transform 0.3s ease}
         .feature-item:hover .feature-icon{transform:rotate(0deg) scale(1.1)}
@@ -538,7 +538,7 @@ if (!$conn->connect_error) {
                     </div>
                     <div class="card-footer">
                         <div class="package-price">LKR 75,000<span> / person</span></div>
-                        <a href="package.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
+                        <a href="packages.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
                     </div>
                 </div>
             </div>
@@ -553,7 +553,7 @@ if (!$conn->connect_error) {
                     </div>
                     <div class="card-footer">
                         <div class="package-price">LKR 180,000<span> / person</span></div>
-                        <a href="package.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
+                        <a href="packages.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
                     </div>
                 </div>
             </div>
@@ -568,7 +568,7 @@ if (!$conn->connect_error) {
                     </div><br>
                     <div class="card-footer">
                         <div class="package-price">LKR 60,000<span> / person</span></div>
-                        <a href="package.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
+                        <a href="packages.php" class="btn btn-primary" style="padding:0.7rem 1.8rem;font-size:0.95rem">View</a>
                     </div>
                 </div>
             </div>

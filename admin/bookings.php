@@ -1,12 +1,9 @@
 <?php
-
 session_start();
-
 
 require_once __DIR__ . '/db_packages.php';
 $pdo = getDB();
 
-// ── Helper: sanitize ─────────────────────────────────────────
 function clean(string $value): string {
     return htmlspecialchars(strip_tags(trim($value)), ENT_QUOTES, 'UTF-8');
 }

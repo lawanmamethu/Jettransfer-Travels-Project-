@@ -1,12 +1,9 @@
 <?php
-// ============================================================
-//  Jettransfer Travels
-// ============================================================
 
 define('DB_HOST',    'localhost');
-define('DB_NAME',    'jettransfer');   // your database name
-define('DB_USER',    'root');          // XAMPP default
-define('DB_PASS',    '');              // XAMPP default (empty)
+define('DB_NAME',    'jettransfer');  
+define('DB_USER',    'root');        
+define('DB_PASS',    '');              
 define('DB_CHARSET', 'utf8mb4');
 
 function getDB(): PDO

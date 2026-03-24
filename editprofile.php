@@ -267,10 +267,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <h2 class="sb-name" id="sbName"><?= htmlspecialchars($fullName) ?></h2>
         <p class="sb-email"><?= htmlspecialchars($user['email'] ?? '') ?></p>
       </div>
-      <div class="sb-stats">
-        <div><div class="sb-stat-val">0</div><div class="sb-stat-lbl">Bookings</div></div>
-        <div><div class="sb-stat-val">0</div><div class="sb-stat-lbl">Reviews</div></div>
-      </div>
+      
       <ul class="sb-menu">
         <li><a href="profile.php">👤 Personal Info</a></li>
         <li><a href="editprofile.php" class="active">✏️ Edit Profile</a></li>

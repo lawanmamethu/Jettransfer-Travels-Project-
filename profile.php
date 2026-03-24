@@ -207,7 +207,7 @@ input:checked+.slider:before{transform:translateX(24px)}
     </ul>
     <div class="nav-actions">
       
-      <!-- ✅ Profile pill dropdown (replaces Login/Register when logged in) -->
+      <!-- Profile pill dropdown -->
       <div class="profile-dropdown" id="profileDropdown">
         <button class="profile-pill" onclick="toggleDD()">
           <div class="pill-avatar"><?= $initials ?></div>
@@ -251,10 +251,7 @@ input:checked+.slider:before{transform:translateX(24px)}
         <h2 class="sb-name"><?= htmlspecialchars($fullName) ?></h2>
         <p class="sb-email"><?= htmlspecialchars($user['email'] ?? '') ?></p>
       </div>
-      <div class="sb-stats">
-        <div><div class="sb-stat-val">0</div><div class="sb-stat-lbl">Bookings</div></div>
-        <div><div class="sb-stat-val">0</div><div class="sb-stat-lbl">Reviews</div></div>
-      </div>
+    
       <ul class="sb-menu">
         <li><a href="profile.php?tab=personal"     class="<?= $tab==='personal'    ?'active':'' ?>">👤 Personal Info</a></li>
         <li><a href="editprofile.php"               class="<?= $tab==='edit'        ?'active':'' ?>">✏️ Edit Profile</a></li>

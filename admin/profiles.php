@@ -1,12 +1,10 @@
 <?php
-// ── admin/profiles.php ────────────────────────────────────────
 session_start();
 if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
 
 require_once '../db.php';
 $msg = '';
 
-// ── Actions ──────────────────────────────────────────────────
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 $tid    = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
 
@@ -24,17 +22,17 @@ if ($action === 'delete' && $tid) {
     $msg = '🗑️ User deleted.';
 }
 
-// ── Fetch admin info ──────────────────────────────────────────
+// ── Fetch admin info 
 $ar   = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
 $adm  = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
 
-// ── Stats ─────────────────────────────────────────────────────
+// ── Stats 
 $total    = $conn->query("SELECT COUNT(*) FROM users")->fetch_row()[0] ?? 0;
 $active   = $conn->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fetch_row()[0] ?? 0;
 $inactive = $total - $active;
 $today    = $conn->query("SELECT COUNT(*) FROM users WHERE DATE(created_at)=CURDATE()")->fetch_row()[0] ?? 0;
 
-// ── Search + Filter ───────────────────────────────────────────
+// ── Search + Filter
 $search = trim($_GET['search'] ?? '');
 $status = $_GET['status'] ?? 'all';
 $where  = '1';
@@ -48,6 +46,7 @@ if ($status === 'inactive') $where .= ' AND is_active=0';
 $users = $conn->query("SELECT * FROM users WHERE $where ORDER BY id DESC");
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

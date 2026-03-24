@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
 
@@ -109,26 +108,25 @@ $conn->close();
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;display:flex}
 
-/* ─── Sidebar ─── */
-.sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);min-height:100vh;position:fixed;left:0;top:0;bottom:0;display:flex;flex-direction:column;z-index:100;transition:transform .3s ease;overflow-y:auto}
-.sidebar-brand{padding:1.8rem 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.8rem}
-.sidebar-logo{width:42px;height:42px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.sidebar-brand-text h2{font-family:'Sora',sans-serif;font-size:1rem;font-weight:800;color:#fff}
-.sidebar-brand-text span{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase}
-.sidebar-nav{flex:1;padding:1.2rem .8rem}
-.nav-label{font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);padding:.5rem .8rem;margin-top:.8rem;margin-bottom:.3rem}
-.nav-item{display:flex;align-items:center;gap:.75rem;padding:.75rem .9rem;border-radius:12px;color:rgba(255,255,255,.55);text-decoration:none;font-size:.9rem;font-weight:500;transition:all .2s;margin-bottom:.2rem}
-.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.nav-item.active{background:linear-gradient(135deg,rgba(10,126,164,.35),rgba(16,185,129,.2));color:#fff;box-shadow:inset 0 0 0 1px rgba(10,126,164,.4)}
-.nav-icon{width:20px;height:20px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--primary);color:#fff;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:50px}
-.sidebar-footer{padding:1rem .8rem 1.5rem;border-top:1px solid rgba(255,255,255,.07)}
-.sidebar-admin{display:flex;align-items:center;gap:.75rem;padding:.75rem .9rem;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:.5rem}
-.sa-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--primary-dark),#043D54);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff;flex-shrink:0}
-.sa-info h4{font-size:.85rem;font-weight:600;color:#fff}
-.sa-info p{font-size:.72rem;color:rgba(255,255,255,.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
-.btn-logout{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border-radius:12px;color:rgba(255,255,255,.5);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;font-family:'Manrope',sans-serif;text-decoration:none}
-.btn-logout:hover{background:rgba(239,68,68,.15);color:#FCA5A5}
+/* SIDEBAR */
+        .sidebar { width:var(--sidebar-w); background:var(--sidebar-bg); min-height:100vh; position:fixed; left:0; top:0; bottom:0; display:flex; flex-direction:column; z-index:100; transition:transform .3s ease; }
+        .sidebar-brand { padding:1.8rem 1.5rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; gap:.8rem; }
+        .sidebar-logo { width:42px; height:42px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+        .sidebar-brand-text h2 { font-family:'Sora',sans-serif; font-size:1rem; font-weight:800; color:#fff; }
+        .sidebar-brand-text span { font-size:.72rem; color:rgba(255,255,255,.4); letter-spacing:1.5px; text-transform:uppercase; }
+        .sidebar-nav { flex:1; padding:1.2rem .8rem; overflow-y:auto; }
+        .nav-label { font-size:.68rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.25); padding:.5rem .8rem; margin-top:.8rem; margin-bottom:.3rem; }
+        .nav-item { display:flex; align-items:center; gap:.75rem; padding:.75rem .9rem; border-radius:12px; color:rgba(255,255,255,.55); text-decoration:none; font-size:.9rem; font-weight:500; transition:all .2s ease; margin-bottom:.2rem; }
+        .nav-item:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.9); }
+        .nav-item.active { background:linear-gradient(135deg,rgba(10,126,164,.35),rgba(16,185,129,.2)); color:#fff; box-shadow:inset 0 0 0 1px rgba(10,126,164,.4); }
+        .nav-icon { width:20px; height:20px; flex-shrink:0; }
+        .sidebar-footer { padding:1rem .8rem 1.5rem; border-top:1px solid rgba(255,255,255,.07); }
+        .admin-profile { display:flex; align-items:center; gap:.75rem; padding:.75rem .9rem; border-radius:12px; background:rgba(255,255,255,.05); margin-bottom:.5rem; }
+        .admin-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:700; color:#fff; flex-shrink:0; }
+        .admin-info h4 { font-size:.85rem; font-weight:600; color:#fff; }
+        .admin-info p { font-size:.72rem; color:rgba(255,255,255,.4); }
+        .btn-logout { display:flex; align-items:center; gap:.6rem; padding:.7rem .9rem; border-radius:12px; color:rgba(255,255,255,.5); font-size:.88rem; font-weight:500; cursor:pointer; transition:all .2s; border:none; background:none; width:100%; font-family:'Manrope',sans-serif; }
+        .btn-logout:hover { background:rgba(239,68,68,.15); color:#FCA5A5; }
 
 /* ─── Main ─── */
 .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column}
@@ -317,13 +315,17 @@ tr:hover td{background:#FAFBFD}
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Profiles
     </a>
+    <a href="bookings.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Bookings
+        </a>
     <a href="services.php" class="nav-item">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       Services &amp; Gallery
     </a>
     <a href="contact.php" class="nav-item active">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Contact Messages <span class="nav-badge"><?= $stats['new'] > 0 ? $stats['new'] : '' ?></span>
+      Contact Messages 
     </a>
     <div class="nav-label">Other</div>
     <a href="../index.php" class="nav-item" target="_blank">
@@ -332,15 +334,18 @@ tr:hover td{background:#FAFBFD}
     </a>
   </nav>
   <div class="sidebar-footer">
-    <div class="sidebar-admin">
-      <div class="sa-avatar"><?= $admInit ?></div>
-      <div class="sa-info"><h4><?= $admName ?></h4><p><?= $admEmail ?></p></div>
+        <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div class="admin-info">
+                <h4>Admin</h4>
+                <p>admin@jettransfer.com</p>
+            </div>
+        </div>
+        <a href="logout.php" class="btn-logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+        </a>
     </div>
-    <a href="logout.php" class="btn-logout">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Logout
-    </a>
-  </div>
 </aside>
 
 <!-- ── MAIN ── -->
