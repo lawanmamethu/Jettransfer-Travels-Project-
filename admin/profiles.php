@@ -12,12 +12,12 @@ if ($action === 'toggle' && $tid) {
     $r   = $conn->query("SELECT is_active FROM users WHERE id=$tid LIMIT 1");
     $row = $r ? $r->fetch_assoc() : null;
     if ($row) {
-        $new = $row['is_active'] ? 0 : 1;
+        $new = $row['is_active'] ? 0 : 1;  
         $conn->query("UPDATE users SET is_active=$new WHERE id=$tid");
         $msg = $new ? '✅ User activated.' : '⚠️ User deactivated.';
     }
 }
-if ($action === 'delete' && $tid) {
+if ($action === 'delete' && $tid) {  
     $conn->query("DELETE FROM users WHERE id=$tid");
     $msg = '🗑️ User deleted.';
 }
