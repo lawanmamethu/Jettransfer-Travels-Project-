@@ -1,5 +1,4 @@
 <?php
-
 $conn = new mysqli('localhost', 'root', '', 'jettransfer');
 if ($conn->connect_error) {
     die('<div style="font-family:sans-serif;padding:3rem;text-align:center;color:red">
@@ -10,12 +9,61 @@ if ($conn->connect_error) {
 }
 $conn->set_charset('utf8mb4');
 
-// Get ALL active destinations from DB
+// --- CREATE / ADD Destination ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {                                   //check if a variable is set
+    $action = $_POST['action'];
+
+    if ($action === 'add') {
+        $name       = $conn->real_escape_string($_POST['name']);
+        $district   = $conn->real_escape_string($_POST['district']);
+        $category   = $conn->real_escape_string($_POST['category']);
+        $short_desc = $conn->real_escape_string($_POST['short_desc']);
+        $badge_label= $conn->real_escape_string($_POST['badge_label']);
+        $image_path = $conn->real_escape_string($_POST['image_path']);
+        $detail_page= $conn->real_escape_string($_POST['detail_page']);
+        $is_active  = 1;
+
+        $sql = "INSERT INTO destinations (name,district,category,short_desc,badge_label,image_path,detail_page,is_active)
+                VALUES ('$name','$district','$category','$short_desc','$badge_label','$image_path','$detail_page','$is_active')";
+        $conn->query($sql);
+    }
+
+    // --- UPDATE Destination ---
+    if ($action === 'update' && isset($_POST['id'])) {
+        $id         = (int)$_POST['id'];
+        $name       = $conn->real_escape_string($_POST['name']);
+        $district   = $conn->real_escape_string($_POST['district']);
+        $category   = $conn->real_escape_string($_POST['category']);
+        $short_desc = $conn->real_escape_string($_POST['short_desc']);
+        $badge_label= $conn->real_escape_string($_POST['badge_label']);
+        $image_path = $conn->real_escape_string($_POST['image_path']);
+        $detail_page= $conn->real_escape_string($_POST['detail_page']);
+        $is_active  = isset($_POST['is_active']) ? 1 : 0;
+
+        $sql = "UPDATE destinations SET
+                name='$name', district='$district', category='$category',
+                short_desc='$short_desc', badge_label='$badge_label',
+                image_path='$image_path', detail_page='$detail_page', is_active='$is_active'
+                WHERE id=$id";
+        $conn->query($sql);
+    }
+
+    // --- DELETE Destination ---
+    if ($action === 'delete' && isset($_POST['id'])) {
+        $id = (int)$_POST['id'];
+        $conn->query("DELETE FROM destinations WHERE id=$id");
+    }
+
+    // After CRUD, reload page to see changes
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit;
+}
+
+// --- READ / FETCH Destinations ---
 $destinations = [];
 $r = $conn->query("SELECT * FROM destinations WHERE is_active=1 ORDER BY name ASC");
 if ($r) while ($row = $r->fetch_assoc()) $destinations[] = $row;
 
-// Fetch categories from DB
 $categories = [];
 $r2 = $conn->query("SELECT DISTINCT category FROM destinations WHERE is_active=1 ORDER BY category ASC");
 if ($r2) while ($row = $r2->fetch_assoc()) $categories[] = $row['category'];

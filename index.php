@@ -398,14 +398,14 @@ if (!$conn->connect_error) {
     </video>
     <div class="hero-overlay"></div>
     
-    <!-- BEAUTIFUL BANNER TEXT -->
+    <!-- BANNER TEXT -->
     <div class="hero-text-banner">
         <div class="brand-title">Jettransfer Travels</div>
         <div class="brand-sub">Explore Sri Lanka · Ride in Style</div>
     </div>
 </section>
 
-<!-- ── POPULAR DESTINATIONS (Dynamic from DB) WITH FLYING EMOJIS ── -->
+<!-- ── POPULAR DESTINATIONS WITH FLYING EMOJIS ── -->
 <section class="section" id="destinations">
     <!-- Flying Travel Emojis Background -->
     <div class="flying-emojis-bg">
@@ -672,8 +672,8 @@ if (!$conn->connect_error) {
         <div class="footer-section">
             <h3>Quick Links</h3>
             <a href="destination.php">Destinations</a>
-            <a href="package.php">Tour Packages</a>
-            <a href="vehicles.php">Our Vehicles</a>
+            <a href="packages.php">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
             <a href="service.php">Services</a>
             <a href="service.php">Gallery</a>
         </div>
