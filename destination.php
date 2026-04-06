@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 $conn->set_charset('utf8mb4');
 
 // --- CREATE / ADD Destination ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {                                   //check if a variable is set
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
     if ($action === 'add') {
@@ -149,26 +149,207 @@ $conn->close();
         .filter-btn:hover,.filter-btn.active{border-color:var(--primary);background:var(--primary);color:white;transform:translateY(-2px);box-shadow:0 6px 16px rgba(10,126,164,0.3)}
         .results-count{text-align:center;margin-bottom:20px;color:var(--text-light);font-size:0.85rem;position:relative;z-index:1}
         .results-count span{color:var(--primary);font-weight:700;font-size:1rem}
+        
+        /* FIXED CARD STYLES - Buttons aligned at bottom */
         .card-grid{max-width:1200px;margin:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;position:relative;z-index:1}
-        .card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.07);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.4s;position:relative;cursor:pointer}
-        .card:hover{transform:translateY(-12px);box-shadow:0 24px 50px rgba(10,126,164,0.18)}
-        .card-img-wrap{position:relative;overflow:hidden;height:220px}
-        .card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)}
-        .card:hover img{transform:scale(1.12)}
-        .card-img-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(6,90,122,0.55) 0%,transparent 60%);opacity:0;transition:opacity 0.4s}
-        .card:hover .card-img-wrap::after{opacity:1}
-        .card-badge{position:absolute;top:14px;left:14px;z-index:2;background:var(--secondary);color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:0.25rem 0.75rem;border-radius:50px;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
-        .card-view-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.7);z-index:3;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;color:var(--primary);opacity:0;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1)}
-        .card:hover .card-view-icon{opacity:1;transform:translate(-50%,-50%) scale(1)}
-        .card-content{padding:20px 22px 24px}
-        .card-meta{display:flex;align-items:center;gap:0.4rem;color:var(--text-light);font-size:0.75rem;margin-bottom:0.4rem}
-        .card-meta svg{color:var(--primary)}
-        .card h3{margin-bottom:8px;font-family:'Sora',sans-serif;font-size:1.15rem;color:var(--text-dark);font-weight:700}
-        .card p{color:var(--text-light);margin-bottom:16px;font-size:0.87rem;line-height:1.55}
-        .btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.4rem;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;text-decoration:none;border-radius:50px;font-weight:600;font-size:0.84rem;transition:all 0.3s;box-shadow:0 4px 12px rgba(10,126,164,0.3)}
-        .btn svg{transition:transform 0.3s}
-        .btn:hover{background:linear-gradient(135deg,var(--primary-dark),#043D54);transform:translateY(-2px);box-shadow:0 8px 20px rgba(10,126,164,0.4)}
-        .btn:hover svg{transform:translateX(4px)}
+        
+        .card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.4s ease;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 50px rgba(10,126,164,0.18);
+        }
+
+        .card-img-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 220px;
+            flex-shrink: 0;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .card:hover img {
+            transform: scale(1.12);
+        }
+
+        .card-img-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(6,90,122,0.55) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .card:hover .card-img-wrap::after {
+            opacity: 1;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 2;
+            background: var(--secondary);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .card-view-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%) scale(0.7);
+            z-index: 3;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        .card:hover .card-view-icon {
+            opacity: 1;
+            transform: translate(-50%,-50%) scale(1);
+        }
+
+        .card-content {
+            padding: 20px 22px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .card-meta svg { color: var(--primary); }
+
+        .card h3 {
+            margin-bottom: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.15rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin-bottom: 16px;
+            font-size: 0.87rem;
+            line-height: 1.55;
+        }
+
+        .nearby-section {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid rgba(10,126,164,0.15);
+        }
+
+        .nearby-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .nearby-title svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .attractions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .attraction-tag {
+            background: var(--bg-light);
+            border-radius: 30px;
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(10,126,164,0.2);
+        }
+
+        .attraction-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.4rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.84rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
+            margin-top: auto;
+            width: fit-content;
+        }
+
+        .btn svg { transition: transform 0.3s; }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #043D54);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(10,126,164,0.4);
+        }
+
+        .btn:hover svg { transform: translateX(4px); }
+        
         .no-results{text-align:center;padding:60px 20px;grid-column:1/-1;display:none}
         .no-results .emoji{font-size:3.5rem;margin-bottom:1rem}
         .no-results h3{font-family:'Sora',sans-serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:0.5rem}
@@ -232,7 +413,6 @@ $conn->close();
             </li>
         </ul>
         <div class="nav-actions">
-            
             <div class="nav-auth">
                 <a href="login.php" class="btn-login">Login</a>
                 <a href="register.php" class="btn-register">Register</a>
@@ -299,7 +479,28 @@ $conn->close();
             <p style="font-size:.9rem;margin-top:.5rem">Add destinations from the <a href="admin/destinations.php" style="color:var(--primary);font-weight:600">Admin Panel</a>.</p>
         </div>
         <?php else: ?>
-        <?php foreach($destinations as $i => $d): ?>
+        <?php 
+        // Define nearby attractions data for each destination
+        $nearbyAttractions = [
+            'Ella' => ['🌉 Nine Arch Bridge', '⛰️ Little Adam\'s Peak', '💦 Ravana Falls'],
+            'Sigiriya' => ['🏞️ Pidurangala Rock', '💧 Minneriya Tank', '🦁 Sigiriya Museum'],
+            'Galle' => ['🏰 Galle Lighthouse', '🌊 Unawatuna Beach', '🛍️ Dutch Market'],
+            'Colombo' => ['🏛️ Gangaramaya Temple', '🛍️ Pettah Market', '🌊 Galle Face Green'],
+            'Dambulla' => ['🏯 Golden Temple', '🐘 Minneriya Safari', '🗿 Ibbankatuwa Tombs'],
+            'Kandy' => ['🦷 Temple of Tooth', '🌸 Peradeniya Gardens', '🎭 Kandy Dance Show'],
+            'Nuwara Eliya' => ['🍃 Tea Factory', '🌹 Gregory Park', '🏞️ Hakgala Gardens'],
+            'Jaffna' => ['🏯 Nallur Temple', '🏝️ Delft Island', '⚓ Jaffna Fort'],
+            'Sinharaja' => ['🦜 Rainforest Trek', '💦 Waterfalls', '🦋 Butterfly Garden'],
+            'Arugam Bay' => ['🏄 Surf Points', '🐘 Kumana Park', '🌅 Crocodile Rock'],
+            'Mirissa' => ['🐋 Whale Watching', '🏖️ Secret Beach', '🌊 Parrot Rock'],
+            'Bentota' => ['🚤 Water Sports', '🐢 Turtle Hatchery', '🌿 Madu River'],
+            'Trincomalee' => ['🏯 Koneswaram Temple', '🐬 Pigeon Island', '🏖️ Nilaveli Beach'],
+            'Yala' => ['🐆 Leopard Safari', '🦚 Bird Watching', '🏞️ Buttuwa Lake']
+        ];
+        ?>
+        <?php foreach($destinations as $i => $d): 
+            $attractions = isset($nearbyAttractions[$d['name']]) ? $nearbyAttractions[$d['name']] : ['⭐ Nearby gems to explore', '📍 Local highlights', '🌟 Must-visit spots'];
+        ?>
         <div class="card dest-card fade-in"
              style="--i:<?= $i ?>"
              data-cat="<?= htmlspecialchars($d['category']) ?>"
@@ -320,6 +521,19 @@ $conn->close();
                 </div>
                 <h3><?= htmlspecialchars($d['name']) ?></h3>
                 <p><?= htmlspecialchars($d['short_desc']) ?></p>
+                
+                <div class="nearby-section">
+                    <div class="nearby-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 0 0 20 15 15 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg>
+                        Nearby Attractions
+                    </div>
+                    <div class="attractions-list">
+                        <?php foreach($attractions as $attraction): ?>
+                        <span class="attraction-tag"><?= htmlspecialchars($attraction) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                
                 <a href="<?= htmlspecialchars($d['detail_page']) ?>" class="btn">
                     View More
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -410,12 +624,6 @@ const obs=new IntersectionObserver(entries=>{
     entries.forEach(e=>{if(e.isIntersecting){const d=e.target.style.getPropertyValue('--i')||0;setTimeout(()=>e.target.classList.add('visible'),d*80);}});
 },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
-const searchToggle=document.getElementById('searchToggle');
-const searchBox=document.getElementById('searchBox');
-const searchInput=document.getElementById('searchInput');
-searchToggle.addEventListener('click',e=>{e.stopPropagation();searchBox.classList.toggle('open');if(searchBox.classList.contains('open')) setTimeout(()=>searchInput.focus(),300);});
-document.addEventListener('click',e=>{if(!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open');});
-searchInput.addEventListener('input',()=>{document.getElementById('destSearch').value=searchInput.value;applyFilters();});
 function setFilter(btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters();}
 function applyFilters(){
     const search=document.getElementById('destSearch').value.trim().toLowerCase();

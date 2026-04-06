@@ -85,7 +85,7 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
 .btn-nav-login:hover{background:var(--primary);color:white;transform:translateY(-2px)}
 .btn-nav-register{padding:.5rem 1.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:.88rem;background:var(--primary);color:white;border:2px solid var(--primary);transition:all .3s;white-space:nowrap}
 .btn-nav-register:hover{background:var(--primary-dark);transform:translateY(-2px)}
-/* Profile dropdown (when logged in) */
+/* Profile dropdown */
 .profile-dropdown{position:relative}
 .profile-pill{display:flex;align-items:center;gap:.5rem;padding:.4rem .9rem .4rem .45rem;border-radius:50px;border:2px solid #E2E8F0;background:white;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;font-size:.88rem;color:var(--text-dark);transition:all .25s;white-space:nowrap}
 .profile-pill:hover{border-color:var(--primary);box-shadow:0 2px 12px rgba(10,126,164,.15)}
@@ -137,8 +137,11 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
 .form-card{background:white;border-radius:24px;box-shadow:var(--shadow-lg);padding:2.5rem;animation:fadeInUp .8s ease .3s both;position:relative;overflow:hidden}
 .form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--primary),var(--accent),var(--secondary))}
 .form-header{margin-bottom:2rem}
-.form-header h2{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.4rem}
-.form-header p{color:var(--text-light);font-size:.92rem}
+.form-header h2{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.4rem;transition:opacity .4s ease}
+.form-header p{color:var(--text-light);font-size:.92rem;transition:opacity .4s ease}
+/* Greeting fade transition */
+.greeting-fade{animation:greetFade .5s ease}
+@keyframes greetFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 /* Alert */
 .alert{padding:1rem 1.2rem;border-radius:14px;margin-bottom:1.5rem;font-size:.9rem;font-weight:600;display:flex;align-items:flex-start;gap:.7rem}
 .alert.success{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0}
@@ -223,18 +226,9 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
       </li>
     </ul>
     <div class="nav-actions">
-      <div class="nav-search" id="navSearch">
-        <button class="search-toggle" id="searchToggle">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
-        <div class="search-box" id="searchBox">
-          <input type="text" placeholder="Search destinations…" id="searchInput">
-          <button class="search-submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-        </div>
-      </div>
+      
 
       <?php if ($isLoggedIn): ?>
-        <!-- ✅ Logged in: show profile dropdown -->
         <div class="profile-dropdown" id="profileDropdown">
           <button class="profile-pill" onclick="toggleDD()">
             <div class="pill-avatar"><?= $userInitials ?></div>
@@ -255,7 +249,6 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
           </div>
         </div>
       <?php else: ?>
-        <!-- ✅ Not logged in: show Login/Register -->
         <a href="login.php" class="btn-nav-login">Login</a>
         <a href="register.php" class="btn-nav-register">Register</a>
       <?php endif; ?>
@@ -306,14 +299,13 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
           <p>Sat – Sun: 10:00 AM – 6:00 PM</p>
           <p style="color:var(--accent);font-weight:600;margin-top:.3rem;font-size:.82rem">24/7 Emergency Support ✅</p>
         </div>
-      </div>  
-      
+      </div>
     </div>
 
     <!-- RIGHT: Contact Form -->
     <div class="form-card">
       <?php if ($success): ?>
-        <!-- ✅ SUCCESS STATE -->
+        <!-- SUCCESS STATE -->
         <div class="success-box">
           <div class="success-icon">✅</div>
           <h3>Message Sent!</h3>
@@ -322,8 +314,9 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
         </div>
       <?php else: ?>
         <div class="form-header">
-          <h2>Send Us a Message</h2>
-          <p>Fill in the form below and we'll get back to you as soon as possible.</p>
+          <!-- ✅ IDs used by the auto-updating greeting JS below -->
+          <h2 id="greetTitle">Send Us a Message</h2>
+          <p id="greetSub">Fill in the form below and we'll get back to you as soon as possible.</p>
         </div>
 
         <?php if (!empty($errors)): ?>
@@ -431,32 +424,79 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
 </footer>
 
 <script>
-// Nav
+// ── Nav ──────────────────────────────────────────────────────
 const mobileToggle = document.getElementById('mobileToggle');
 const navMenu = document.getElementById('navMenu');
 mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
 document.querySelectorAll('.nav-menu a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('active')));
 window.addEventListener('scroll', () => document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100));
 
-// Search
+// ── Search ───────────────────────────────────────────────────
 const st = document.getElementById('searchToggle'), sb = document.getElementById('searchBox');
-st.addEventListener('click', e => { e.stopPropagation(); sb.classList.toggle('open'); if (sb.classList.contains('open')) setTimeout(() => document.getElementById('searchInput').focus(), 300); });
-document.addEventListener('click', e => { if (!document.getElementById('navSearch').contains(e.target)) sb.classList.remove('open'); });
+st.addEventListener('click', e => {
+  e.stopPropagation();
+  sb.classList.toggle('open');
+  if (sb.classList.contains('open')) setTimeout(() => document.getElementById('searchInput').focus(), 300);
+});
+document.addEventListener('click', e => {
+  if (!document.getElementById('navSearch').contains(e.target)) sb.classList.remove('open');
+});
 
-// Profile dropdown
+// ── Profile dropdown ─────────────────────────────────────────
 function toggleDD() { document.getElementById('dropdownMenu')?.classList.toggle('open'); }
 document.addEventListener('click', e => {
   const dd = document.getElementById('profileDropdown');
   if (dd && !dd.contains(e.target)) document.getElementById('dropdownMenu')?.classList.remove('open');
 });
 
-// Char count
+// ── Char count ───────────────────────────────────────────────
 function updateCharCount(el) {
   document.getElementById('charCount').textContent = el.value.length;
 }
-// Init char count if message has content (e.g. after failed submit)
 const msgEl = document.getElementById('message');
 if (msgEl) updateCharCount(msgEl);
+
+// ── Auto-updating greeting based on visitor's local time ─────
+// Runs immediately on load, then re-checks every 60 seconds.
+// If the clock crosses a time boundary (e.g. noon, 5pm) while
+// the page is open, the heading updates automatically.
+function updateGreeting() {
+  const title = document.getElementById('greetTitle');
+  const sub   = document.getElementById('greetSub');
+  if (!title || !sub) return; // not shown when success state is displayed
+
+  const hour = new Date().getHours();
+  let newTitle, newSub;
+
+  if (hour >= 5 && hour < 12) {
+    newTitle = '🌅 Good morning! Send us a message';
+    newSub   = "Start your day with us — fill in the form and we'll get back to you shortly.";
+  } else if (hour >= 12 && hour < 17) {
+    newTitle = '☀️ Good afternoon! Send us a message';
+    newSub   = "We're fully active right now — expect a quick reply to your enquiry.";
+  } else if (hour >= 17 && hour < 21) {
+    newTitle = '🌇 Good evening! Send us a message';
+    newSub   = "Our team wraps up soon — send your message and we'll respond first thing tomorrow.";
+  } else {
+    newTitle = '🌙 Send us a message';
+    newSub   = "It's late but we're still here. Drop your message and we'll reply as soon as possible.";
+  }
+
+  // Only animate if the text is actually changing
+  if (title.textContent !== newTitle) {
+    title.classList.remove('greeting-fade');
+    sub.classList.remove('greeting-fade');
+    // Force reflow so the animation restarts cleanly
+    void title.offsetWidth;
+    title.textContent = newTitle;
+    sub.textContent   = newSub;
+    title.classList.add('greeting-fade');
+    sub.classList.add('greeting-fade');
+  }
+}
+
+updateGreeting();                         // run immediately on page load
+setInterval(updateGreeting, 60 * 1000);  // re-check every 60 seconds
 </script>
 </body>
 </html>

@@ -1,3 +1,19 @@
+<?php
+session_start();
+if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
+
+require_once '../db.php';
+
+// Fetch admin info (same as index.php)
+$ar  = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
+$adm = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
+$admName  = htmlspecialchars($adm['name']);
+$admEmail = htmlspecialchars($adm['email']);
+$admInit  = strtoupper(substr($adm['name'],0,1));
+
+// Note: The actual vehicle CRUD operations are handled by ../vehicles.php API endpoint
+// This file is just the admin interface
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -196,6 +212,7 @@
             background: none;
             width: 100%;
             font-family: 'Manrope', sans-serif;
+            text-decoration: none;
         }
 
         .btn-logout:hover {
@@ -759,98 +776,61 @@
         <nav class="sidebar-nav">
             <div class="nav-label">Main</div>
             <a href="index.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" />
-                    <rect x="14" y="3" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" />
-                    <rect x="14" y="14" width="7" height="7" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
             <div class="nav-label">Modules</div>
             <a href="destinations.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 Destinations
             </a>
             <a href="packages.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 Packages
             </a>
             <a href="vehicles.php" class="nav-item active">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="1" y="3" width="15" height="13" />
-                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                    <circle cx="5.5" cy="18.5" r="2.5" />
-                    <circle cx="18.5" cy="18.5" r="2.5" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                 Vehicles
             </a>
             <a href="profiles.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 Profiles
             </a>
             <a href="bookings.php" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Bookings
-        </a>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Bookings
+            </a>
             <a href="services.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 Services & Gallery
             </a>
             <a href="contact.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 Contact Us / Reviews
             </a>
+            <div class="nav-label">Reports</div>
+            <a href="admin_monthly_report.php" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Monthly Report
+            </a>
             <div class="nav-label">Other</div>
-            <a href="../index.php" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
+            <a href="../index.php" class="nav-item" target="_blank">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 View Site
             </a>
         </nav>
         <div class="sidebar-footer">
             <div class="admin-profile">
-                <div class="admin-avatar" id="sidebarAvatar">A</div>
+                <div class="admin-avatar"><?= $admInit ?></div>
                 <div class="admin-info">
-                    <h4 id="adminName">Admin</h4>
-                    <p id="adminEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                            data-cfemail="f392979e9a9db39996878781929d80959681dd909c9e">[email&#160;protected]</a></p>
+                    <h4><?= $admName ?></h4>
+                    <p><?= $admEmail ?></p>
                 </div>
             </div>
-            <button class="btn-logout" onclick="logout()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
+            <a href="logout.php" class="btn-logout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -872,7 +852,7 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <div class="topbar-avatar" id="topbarAvatar">A</div>
+                <div class="topbar-avatar" id="topbarAvatar"><?= $admInit ?></div>
             </div>
         </header>
 
@@ -1021,20 +1001,11 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
-        // ── Session check ────────────────────────────────────────
-        fetch('check-session.php')
-            .then(r => r.json())
-            .then(data => {
-                if (!data.loggedIn) { window.location.href = 'login.php'; return; }
-                const name = data.name || 'Admin';
-                const ini = name.charAt(0).toUpperCase();
-                document.getElementById('adminName').textContent = name;
-                document.getElementById('adminEmail').textContent = data.email || '';
-                document.getElementById('sidebarAvatar').textContent = ini;
-                document.getElementById('topbarAvatar').textContent = ini;
-            });
+        // Admin info from PHP
+        const adminName = '<?= $admName ?>';
+        const adminEmail = '<?= $admEmail ?>';
+        const adminInit = '<?= $admInit ?>';
 
         // ── Pill HTML helpers ────────────────────────────────────
         function availPill(val) {
@@ -1053,7 +1024,7 @@
             tbody.innerHTML = '';
             vehicles.forEach((v, i) => {
                 const imgCell = v.image
-                    ? `<img src="${v.image}" alt="${v.name}" class="vehicle-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    ? `<img src="../${v.image}" alt="${v.name}" class="vehicle-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
                     : '';
                 tbody.innerHTML += `
             <tr>
@@ -1063,34 +1034,45 @@
                         ${imgCell}
                         <div class="vehicle-thumb-placeholder" style="${v.image ? 'display:none' : ''}">🚗</div>
                         <div>
-                            <div class="vehicle-name">${v.name}</div>
-                            <div class="vehicle-plate">${v.plate}</div>
+                            <div class="vehicle-name">${escapeHtml(v.name)}</div>
+                            <div class="vehicle-plate">${escapeHtml(v.plate)}</div>
                         </div>
                     </div>
-                </td>
-                <td>${v.type}</td>
+                 </td>
+                <td>${escapeHtml(v.type)}</td>
                 <td>${v.seats}</td>
-                <td>${v.fuel}</td>
-                <td>${v.luggage}</td>
+                <td>${escapeHtml(v.fuel)}</td>
+                <td>${escapeHtml(v.luggage)}</td>
                 <td>${availPill(v.availability)}</td>
                 <td>${condPill(v.condition_status)}</td>
                 <td>
-                    <button class="btn-edit" onclick="openModal(${v.id}, '${v.name}', '${v.plate}', '${v.availability}', '${v.condition_status}')">
+                    <button class="btn-edit" onclick="openModal(${v.id}, '${escapeHtml(v.name)}', '${escapeHtml(v.plate)}', '${v.availability}', '${v.condition_status}')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         Edit
                     </button>
-                </td>
+                 </td>
                 <td>
-                    <button class="btn-delete" onclick="deleteVehicle(${v.id}, '${v.name}')">
+                    <button class="btn-delete" onclick="deleteVehicle(${v.id}, '${escapeHtml(v.name)}')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                         Delete
                     </button>
-                </td>
-            </tr>`;
+                 </td>
+             </tr>`;
             });
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('vehicleTable').style.display = 'table';
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
 
         // ── Load vehicles ────────────────────────────────────────
@@ -1145,8 +1127,8 @@
             formData.append('id', id);
             formData.append('availability', availability);
             formData.append('condition_status', condition);
-
             formData.append('action', 'update');
+
             fetch('../vehicles.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(data => {
@@ -1210,8 +1192,8 @@
             formData.append('image', image);
             formData.append('availability', availability);
             formData.append('condition_status', condition);
-
             formData.append('action', 'add');
+
             fetch('../vehicles.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(data => {
@@ -1236,8 +1218,8 @@
 
             const formData = new FormData();
             formData.append('id', id);
-
             formData.append('action', 'delete');
+
             fetch('../vehicles.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(data => {
@@ -1264,15 +1246,11 @@
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
+        
         document.getElementById('sidebarOverlay').addEventListener('click', () => {
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('sidebarOverlay').classList.remove('show');
         });
-
-        function logout() {
-            if (!confirm('Are you sure you want to logout?')) return;
-            window.location.href = 'logout.php';
-        }
     </script>
 </body>
 

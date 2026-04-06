@@ -7,9 +7,7 @@
     <title>Our Vehicles - Jettransfer Travels</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0A7EA4;
@@ -27,544 +25,92 @@
             --warning: #F59E0B;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Manrope', sans-serif; color: var(--text-dark); line-height: 1.6; overflow-x: hidden; background: var(--bg-light); }
 
-        body {
-            font-family: 'Manrope', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-            background: var(--bg-light);
-        }
-
-        /* ── Logo ── */
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: contain;
-        }
-
-        /* ── Nav Actions ── */
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-shrink: 0;
-        }
-
-        .nav-auth {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .btn-login {
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .btn-login:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-register {
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            background: var(--primary);
-            color: white;
-            border: 2px solid var(--primary);
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
-            white-space: nowrap;
-        }
-
-        .btn-register:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        /* ── Mobile auth ── */
-        .mobile-auth {
-            display: none;
-        }
-
-        .mobile-auth-btns {
-            display: flex;
-            gap: 0.8rem;
-            width: 100%;
-        }
-
-        .mobile-auth-btns a {
-            flex: 1;
-        }
+        /* ========== CONSISTENT NAVBAR STYLES (matches destination page) ========== */
+        .logo-img { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(2,6,23,.10); box-shadow: 0 10px 22px rgba(10,126,164,.15); background: #fff; }
+        .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: var(--shadow-sm); z-index: 1000; transition: all 0.3s ease; }
+        .header.scrolled { box-shadow: var(--shadow-md); }
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: .6rem; white-space: nowrap; }
+        .nav-menu { display: flex; list-style: none; gap: 1.6rem; align-items: center; }
+        .nav-menu a { color: var(--text-dark); text-decoration: none; font-weight: 500; font-size: 0.88rem; transition: color 0.3s ease; position: relative; }
+        .nav-menu a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s ease; }
+        .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
+        .nav-menu a:hover, .nav-menu a.active { color: var(--primary); }
+        .nav-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+        .nav-auth { display: flex; align-items: center; gap: 0.4rem; }
+        .btn-login { padding: 0.5rem 1.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.88rem; color: var(--primary); border: 2px solid var(--primary); transition: all 0.3s; white-space: nowrap; }
+        .btn-login:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .btn-register { padding: 0.5rem 1.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.88rem; background: var(--primary); color: white; border: 2px solid var(--primary); transition: all 0.3s; box-shadow: 0 4px 12px rgba(10,126,164,0.3); white-space: nowrap; }
+        .btn-register:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+        .mobile-toggle span { width: 25px; height: 3px; background: var(--text-dark); border-radius: 2px; transition: all 0.3s ease; }
+        .mobile-auth { display: none; }
+        .mobile-auth-btns { display: flex; gap: 0.8rem; width: 100%; }
+        .mobile-auth-btns a { flex: 1; }
 
         @media (max-width: 768px) {
-            .nav-actions {
-                display: none;
-            }
-
-            .mobile-auth {
-                display: flex !important;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.8rem;
-                padding-top: 1.2rem;
-                border-top: 1px solid #E2E8F0;
-                width: 100%;
-            }
+            .mobile-toggle { display: flex; }
+            .nav-actions { display: none; }
+            .nav-menu { position: fixed; top: 80px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; box-shadow: var(--shadow-lg); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 999; }
+            .nav-menu.active { transform: translateX(0); }
+            .mobile-auth { display: flex !important; flex-direction: column; align-items: center; gap: 0.8rem; padding-top: 1.2rem; border-top: 1px solid #E2E8F0; width: 100%; }
         }
 
-        /* ── Header ── */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .header.scrolled {
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 1.6rem;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.88rem;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu a:hover::after,
-        .nav-menu a.active::after {
-            width: 100%;
-        }
-
-        .nav-menu a:hover,
-        .nav-menu a.active {
-            color: var(--primary);
-        }
-
-        .mobile-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .mobile-toggle span {
-            width: 25px;
-            height: 3px;
-            background: var(--text-dark);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .nav-menu {
-                position: fixed;
-                top: 80px;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 2rem;
-                gap: 1.5rem;
-                box-shadow: var(--shadow-lg);
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 999;
-            }
-
-            .nav-menu.active {
-                transform: translateX(0);
-            }
-        }
-
-        /* ── Page Header ── */
-        .page-header {
-            margin-top: 80px;
-            padding: 4rem 2rem 3rem;
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .page-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 1rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .page-description {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            max-width: 700px;
-            margin: 0 auto;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ── Vehicles Section ── */
-        .vehicles-section {
-            max-width: 1400px;
-            margin: 3rem auto;
-            padding: 0 2rem 2rem;
-        }
-
-        .vehicles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        /* ── Loading & Error states ── */
-        .loading-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--bg-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .error-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3rem 2rem;
-            color: #EF4444;
-            font-size: 1rem;
-        }
-
-        /* ── Vehicle Card ── */
-        .vehicle-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: all 0.4s ease;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .vehicle-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .vehicle-image {
-            width: 100%;
-            height: 240px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .vehicle-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .vehicle-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: white;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            z-index: 2;
-        }
-
-        .badge-available {
-            background: rgba(16, 185, 129, 0.9);
-        }
-
-        .badge-booked {
-            background: rgba(100, 116, 139, 0.9);
-        }
-
-        .badge-maintenance {
-            background: rgba(245, 158, 11, 0.9);
-        }
-
-        .vehicle-content {
-            padding: 2rem;
-        }
-
-        .vehicle-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .vehicle-type {
-            display: inline-block;
-            background: var(--bg-light);
-            color: var(--primary);
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .vehicle-name {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .vehicle-plate {
-            font-size: 0.82rem;
-            color: var(--text-light);
-            margin-top: 0.3rem;
-        }
-
-        .vehicle-specs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--bg-light);
-        }
-
-        .spec-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .spec-icon {
-            font-size: 1.1rem;
-        }
-
-        .status-row {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid var(--bg-light);
-        }
-
-        .status-pill {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.4rem 0.9rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            background: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-
+        /* ========== REST OF YOUR EXISTING STYLES ========== */
+        .page-header { margin-top: 80px; padding: 4rem 2rem 3rem; position: relative; overflow: hidden; text-align: center; }
+        .page-title { font-family: 'Sora', sans-serif; font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 1rem; animation: fadeInUp 0.8s ease; }
+        .page-description { font-size: 1.2rem; color: rgba(255,255,255,0.9); max-width: 700px; margin: 0 auto; animation: fadeInUp 0.8s ease 0.2s both; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .vehicles-section { max-width: 1400px; margin: 3rem auto; padding: 0 2rem 2rem; }
+        .vehicles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
+        .loading-state { grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1.1rem; }
+        .loading-spinner { width: 48px; height: 48px; border: 4px solid var(--bg-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-state { grid-column: 1 / -1; text-align: center; padding: 3rem 2rem; color: #EF4444; font-size: 1rem; }
+        .vehicle-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-md); transition: all 0.4s ease; opacity: 0; animation: fadeInUp 0.6s ease forwards; }
+        .vehicle-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
+        .vehicle-image { width: 100%; height: 240px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .vehicle-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        .vehicle-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: white; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 2; }
+        .badge-available { background: rgba(16,185,129,0.9); }
+        .badge-booked { background: rgba(100,116,139,0.9); }
+        .badge-maintenance { background: rgba(245,158,11,0.9); }
+        .vehicle-content { padding: 2rem; }
+        .vehicle-header { margin-bottom: 1.5rem; }
+        .vehicle-type { display: inline-block; background: var(--bg-light); color: var(--primary); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+        .vehicle-name { font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; }
+        .vehicle-plate { font-size: 0.82rem; color: var(--text-light); margin-top: 0.3rem; }
+        .vehicle-specs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--bg-light); }
+        .spec-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); font-size: 0.9rem; font-weight: 500; }
+        .spec-icon { font-size: 1.1rem; }
+        .status-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--bg-light); }
+        .status-pill { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; background: var(--bg-light); color: var(--text-dark); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .status-dot.green { background: #10B981; }
         .status-dot.yellow { background: #F59E0B; }
         .status-dot.red { background: #EF4444; }
-
-        /* ── Footer ── */
-        .footer {
-            background: var(--text-dark);
-            color: white;
-            padding: 4rem 2rem 2rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-section h3 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.8rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--secondary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            object-fit: cover;
-        }
-
-        .social-link:hover {
-            background: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .page-title { font-size: 2.5rem; }
-            .page-description { font-size: 1.05rem; }
-            .vehicles-grid { grid-template-columns: 1fr; }
-            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
-        }
+        .footer { background: var(--text-dark); color: white; padding: 4rem 2rem 2rem; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem; }
+        .footer-section h3 { font-family: 'Sora', sans-serif; font-size: 1.3rem; margin-bottom: 1.5rem; }
+        .footer-section p, .footer-section a { color: rgba(255,255,255,0.7); text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s ease; }
+        .footer-section a:hover { color: var(--secondary); }
+        .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+        .social-link { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; object-fit: cover; }
+        .social-link:hover { background: var(--primary); transform: translateY(-3px); }
+        .footer-bottom { max-width: 1400px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.5); }
+        @media (max-width: 768px) { .page-title { font-size: 2.5rem; } .page-description { font-size: 1.05rem; } .vehicles-grid { grid-template-columns: 1fr; } .footer-content { grid-template-columns: 1fr; gap: 2rem; } }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
     <header class="header" id="header">
         <nav class="nav-container">
             <a href="index.php" class="logo">
-                <img src="logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+                <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
                 Jettransfer
             </a>
             <ul class="nav-menu" id="navMenu">
@@ -577,10 +123,8 @@
                 <li><a href="contact.php">Contact Us</a></li>
                 <li class="mobile-auth">
                     <div class="mobile-auth-btns">
-                        <a href="login.php"
-                            style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
-                        <a href="register.php"
-                            style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
+                        <a href="login.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
+                        <a href="register.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
                     </div>
                 </li>
             </ul>
@@ -596,19 +140,13 @@
         </nav>
     </header>
 
-    <!-- Page Header -->
     <section class="page-header">
-        <img src="southern.jpg" alt=""
-            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(3px);transform:scale(1.05);">
-        <div
-            style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.82),rgba(16,185,129,0.75));z-index:1;">
-        </div>
+        <img src="southern.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(3px);transform:scale(1.05);">
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.82),rgba(16,185,129,0.75));z-index:1;"></div>
         <h1 class="page-title" style="position:relative;z-index:2;">Our Vehicles</h1>
-        <p class="page-description" style="position:relative;z-index:2;">Choose the best vehicle for your tour based on
-            your group size and comfort needs. All vehicles are well-maintained and driven by professional drivers.</p>
+        <p class="page-description" style="position:relative;z-index:2;">Choose the best vehicle for your tour based on your group size and comfort needs. All vehicles are well-maintained and driven by professional drivers.</p>
     </section>
 
-    <!-- Vehicles Section -->
     <section class="vehicles-section">
         <div class="vehicles-grid" id="vehiclesGrid">
             <div class="loading-state" id="loadingState">
@@ -618,22 +156,21 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer" id="contact">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>Jettransfer Travels</h3>
                 <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
                 <div class="social-links">
-                    <img src="img/insta.jpeg" alt="Instagram" class="social-link">
-                    <img src="img/fb.jpeg" alt="Facebook" class="social-link">
+                    <img src="images/insta1.webp" alt="Instagram" class="social-link">
+                    <img src="images/fb.avif" alt="Facebook" class="social-link">
                     <img src="images/tiktok.webp" alt="TikTok" class="social-link">
                 </div>
             </div>
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <a href="destination.php">Destinations</a>
-                <a href="package.php">Tour Packages</a>
+                <a href="packages.php">Tour Packages</a>
                 <a href="vehicles.html">Our Vehicles</a>
                 <a href="service.php">Services</a>
                 <a href="service.php">Gallery</a>
@@ -658,7 +195,6 @@
     </footer>
 
     <script>
-        // ── Nav & Header scripts ─────────────────────────────────────────
         const mobileToggle = document.getElementById('mobileToggle');
         const navMenu = document.getElementById('navMenu');
         mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
@@ -669,14 +205,13 @@
             document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
         });
 
-        // ── Card gradient backgrounds per vehicle type ───────────────────
         const gradients = {
-            'Luxury Car':  'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(16,185,129,0.85))',
-            'SUV':         'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(245,158,11,0.85))',
-            'Van':         'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(245,158,11,0.85))',
-            'Minibus':     'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(10,126,164,0.85))',
-            'Luxury Van':  'linear-gradient(135deg, rgba(245,158,11,0.85), rgba(16,185,129,0.85))',
-            'Premium Car': 'linear-gradient(135deg, rgba(6,90,122,0.9),   rgba(10,126,164,0.85))',
+            'Luxury Car': 'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(16,185,129,0.85))',
+            'SUV': 'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(245,158,11,0.85))',
+            'Van': 'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(245,158,11,0.85))',
+            'Minibus': 'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(10,126,164,0.85))',
+            'Luxury Van': 'linear-gradient(135deg, rgba(245,158,11,0.85), rgba(16,185,129,0.85))',
+            'Premium Car': 'linear-gradient(135deg, rgba(6,90,122,0.9), rgba(10,126,164,0.85))',
         };
 
         function badgeClass(availability) {
@@ -742,16 +277,10 @@
                     grid.innerHTML += buildCard(vehicle, index);
                 });
             } catch (error) {
-                grid.innerHTML = `
-                <div class="error-state">
-                    <p>⚠️ Could not load vehicles. Please try again.</p>
-                    <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-light);">${error.message}</p>
-                </div>`;
+                grid.innerHTML = `<div class="error-state"><p>⚠️ Could not load vehicles. Please try again.</p><p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-light);">${error.message}</p></div>`;
             }
         }
-
         loadVehicles();
     </script>
-
 </body>
 </html>

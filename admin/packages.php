@@ -15,6 +15,12 @@ function clean($v){ return htmlspecialchars(strip_tags(trim($v)), ENT_QUOTES, 'U
 
 $flash = '';
 
+// Check if is_active column exists, if not add it
+$check_column = $conn->query("SHOW COLUMNS FROM packages LIKE 'is_active'");
+if ($check_column->num_rows == 0) {
+    $conn->query("ALTER TABLE packages ADD COLUMN is_active TINYINT(1) DEFAULT 1");
+}
+
 // ── HANDLE POST ───────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $act = $_POST['action'] ?? '';
@@ -100,7 +106,7 @@ if (in_array($tierF,['budget','mid','luxury'])) {
 if ($durF > 0) $where .= " AND duration=$durF";
 
 $total  = $conn->query("SELECT COUNT(*) FROM packages WHERE $where")->fetch_row()[0] ?? 0;
-$pkgRes = $conn->query("SELECT * FROM packages WHERE $where ORDER BY sort_order ASC, id ASC LIMIT $limit OFFSET $offset");
+$pkgRes = $conn->query("SELECT * FROM packages WHERE $where ORDER BY id ASC LIMIT $limit OFFSET $offset");
 $packages = [];
 if ($pkgRes) while ($r = $pkgRes->fetch_assoc()) $packages[] = $r;
 $totalPages = (int)ceil($total / $limit);
@@ -286,33 +292,64 @@ td{padding:.9rem 1.2rem;font-size:.88rem;vertical-align:middle}
 
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-logo">✈️</div>
-    <div class="sidebar-brand-text"><h2>Jettransfer</h2><span>Admin Panel</span></div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-label">Main</div>
-    <a href="index.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
-    <div class="nav-label">Modules</div>
-    <a href="destinations.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Destinations</a>
-    <a href="packages.php" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Packages</a>
-    <a href="vehicles.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Vehicles</a>
-    <a href="profiles.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profiles</a>
-    <a href="bookings.php" class="nav-item">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">✈️</div>
+        <div class="sidebar-brand-text">
+            <h2>Jettransfer</h2><span>Admin Panel</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <a href="index.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <div class="nav-label">Modules</div>
+        <a href="destinations.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Destinations
+        </a>
+        <a href="packages.php" class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Packages
+        </a>
+        <a href="vehicles.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Vehicles
+        </a>
+        <a href="profiles.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profiles
+        </a>
+        <a href="bookings.php" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             Bookings
         </a>
-    <a href="services.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Services &amp; Gallery</a>
-    <a href="contact.php" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact Messages</a>
-    <div class="nav-label">Other</div>
-    <a href="../index.php" class="nav-item" target="_blank"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>View Site</a>
-  </nav>
-  <div class="sidebar-footer">
+        <a href="services.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Services & Gallery
+        </a>
+        <a href="contact.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Contact Us / Reviews
+        </a>
+        <div class="nav-label">Reports</div>
+        <a href="admin_monthly_report.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Monthly Report
+        </a>
+        <div class="nav-label">Other</div>
+        <a href="../index.php" class="nav-item" target="_blank">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            View Site
+        </a>
+    </nav>
+    <div class="sidebar-footer">
         <div class="admin-profile">
-            <div class="admin-avatar">A</div>
+            <div class="admin-avatar"><?= $admInit ?></div>
             <div class="admin-info">
-                <h4>Admin</h4>
-                <p>admin@jettransfer.com</p>
+                <h4><?= $admName ?></h4>
+                <p><?= $admEmail ?></p>
             </div>
         </div>
         <a href="logout.php" class="btn-logout">
@@ -404,33 +441,46 @@ td{padding:.9rem 1.2rem;font-size:.88rem;vertical-align:middle}
       <?php else: ?>
       <div class="tw">
         <table>
-          <thead><tr><th>Image</th><th>Package</th><th>Days</th><th>Tier</th><th>Price (LKR)</th><th>Vehicle</th><th>Hotel</th><th>Group</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Package</th>
+              <th>Days</th>
+              <th>Tier</th>
+              <th>Price (LKR)</th>
+              <th>Vehicle</th>
+              <th>Hotel</th>
+              <th>Group</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody>
           <?php foreach ($packages as $p):
             $imgSrc = $p['image'] ? '../'.$p['image'] : '../images/colombocitytour.jpeg';
           ?>
-          <tr>
-            <td><img src="<?= htmlspecialchars($imgSrc) ?>" alt="" class="pkg-thumb" onerror="this.src='../images/colombocitytour.jpeg'"></td>
-            <td><div class="pkg-name-cell"><?= htmlspecialchars($p['name']) ?><small>📍 <?= htmlspecialchars($p['locations']) ?></small></div></td>
-            <td><?= $p['duration'] ?> Day<?= $p['duration']>1?'s':'' ?></td>
-            <td><span class="tier-badge tier-<?= $p['price_tier'] ?>"><?= $p['price_tier'] ?></span></td>
-            <td class="price-cell"><?= number_format($p['price'],0) ?></td>
-            <td style="font-size:.82rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($p['vehicle']) ?></td>
-            <td><?= htmlspecialchars($p['hotel_rating']) ?></td>
-            <td style="font-size:.82rem"><?= htmlspecialchars($p['group_size']) ?></td>
-            <td><span class="status-pill <?= $p['is_active']?'status-on':'status-off' ?>"><?= $p['is_active']?'✅ Active':'🚫 Off' ?></span></td>
-            <td>
-              <div class="action-btns">
-                <a href="packages.php?edit=<?= $p['id'] ?>" class="btn-edit-r">✏️ Edit</a>
-                <form method="POST" style="display:inline">
-                  <input type="hidden" name="action" value="toggle">
-                  <input type="hidden" name="id" value="<?= $p['id'] ?>">
-                  <button type="submit" class="btn-tog-r <?= $p['is_active']?'btn-del-r':'btn-edit-r' ?>"><?= $p['is_active']?'Hide':'Show' ?></button>
-                </form>
-                <button class="btn-del-r" onclick="openDelModal(<?= $p['id'] ?>,'<?= htmlspecialchars(addslashes($p['name'])) ?>')">🗑️</button>
-              </div>
-            </td>
-          </tr>
+            <tr>
+              <td><img src="<?= htmlspecialchars($imgSrc) ?>" alt="" class="pkg-thumb" onerror="this.src='../images/colombocitytour.jpeg'"></td>
+              <td><div class="pkg-name-cell"><?= htmlspecialchars($p['name']) ?><small>📍 <?= htmlspecialchars($p['locations']) ?></small></div></td>
+              <td><?= $p['duration'] ?> Day<?= $p['duration']>1?'s':'' ?></td>
+              <td><span class="tier-badge tier-<?= $p['price_tier'] ?>"><?= $p['price_tier'] ?></span></td>
+              <td class="price-cell"><?= number_format($p['price'],0) ?></td>
+              <td style="font-size:.82rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($p['vehicle']) ?></td>
+              <td><?= htmlspecialchars($p['hotel_rating']) ?></td>
+              <td style="font-size:.82rem"><?= htmlspecialchars($p['group_size']) ?></td>
+              <td><span class="status-pill <?= $p['is_active']?'status-on':'status-off' ?>"><?= $p['is_active']?'✅ Active':'🚫 Off' ?></span></td>
+              <td>
+                <div class="action-btns">
+                  <a href="packages.php?edit=<?= $p['id'] ?>" class="btn-edit-r">✏️ Edit</a>
+                  <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="toggle">
+                    <input type="hidden" name="id" value="<?= $p['id'] ?>">
+                    <button type="submit" class="btn-tog-r <?= $p['is_active']?'btn-del-r':'btn-edit-r' ?>"><?= $p['is_active']?'Hide':'Show' ?></button>
+                  </form>
+                  <button class="btn-del-r" onclick="openDelModal(<?= $p['id'] ?>,'<?= htmlspecialchars(addslashes($p['name'])) ?>')">🗑️</button>
+                </div>
+              </td>
+            </tr>
           <?php endforeach; ?>
           </tbody>
         </table>

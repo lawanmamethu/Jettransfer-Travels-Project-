@@ -1,16 +1,36 @@
 <?php
+
 session_start();
+
 
 require_once __DIR__ . '/db_packages.php';
 $pdo = getDB();
 
+// Fetch admin info for topbar dropdown
+$admName = 'Admin';
+$admEmail = 'admin@jettransfer.com';
+$admInit = 'A';
+
+// Try to get admin info from admins table if exists
+try {
+    $stmt = $pdo->query("SELECT name, email FROM admins WHERE id = 1 LIMIT 1");
+    if ($stmt && $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $admName = $row['name'];
+        $admEmail = $row['email'];
+        $admInit = strtoupper(substr($row['name'], 0, 1));
+    }
+} catch (Exception $e) {
+    // Table might not exist, use defaults
+}
+
+// ── Helper: sanitize ─────────────────────────────────────────
 function clean(string $value): string {
     return htmlspecialchars(strip_tags(trim($value)), ENT_QUOTES, 'UTF-8');
 }
 
-
-//  HANDLE POST
-
+// ============================================================
+//  HANDLE POST — Save new booking (from package.html form)
+// ============================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
     header('Content-Type: application/json');
 
@@ -34,9 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
         echo json_encode(['status'=>'error','message'=>'Invalid date format.']); exit;
     }
 
+    $bookingType = $_POST['booking_type'] ?? 'standard';
+    $customDuration = ($bookingType === 'custom' && !empty($_POST['custom_duration'])) ? (int)$_POST['custom_duration'] : null;
+    $customHotel = ($bookingType === 'custom' && !empty($_POST['custom_hotel'])) ? clean($_POST['custom_hotel']) : null;
+    $customVehicle = ($bookingType === 'custom' && !empty($_POST['custom_vehicle'])) ? clean($_POST['custom_vehicle']) : null;
+    $customGroupSize = ($bookingType === 'custom' && !empty($_POST['custom_group_size'])) ? clean($_POST['custom_group_size']) : null;
+
     $stmt = $pdo->prepare(
-        'INSERT INTO bookings (package_name, price, customer_name, email, phone, travel_date, guests)
-         VALUES (:package_name, :price, :customer_name, :email, :phone, :travel_date, :guests)'
+        'INSERT INTO bookings (package_name, price, customer_name, email, phone, travel_date, guests, 
+         booking_type, custom_duration, custom_hotel, custom_vehicle, custom_group_size)
+         VALUES (:package_name, :price, :customer_name, :email, :phone, :travel_date, :guests,
+         :booking_type, :custom_duration, :custom_hotel, :custom_vehicle, :custom_group_size)'
     );
     $stmt->execute([
         ':package_name'  => clean($_POST['package_name']),
@@ -46,15 +74,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
         ':phone'         => clean($_POST['phone']),
         ':travel_date'   => $travelDate,
         ':guests'        => $guests,
+        ':booking_type'  => $bookingType,
+        ':custom_duration' => $customDuration,
+        ':custom_hotel'    => $customHotel,
+        ':custom_vehicle'  => $customVehicle,
+        ':custom_group_size' => $customGroupSize,
     ]);
 
     echo json_encode(['status'=>'success','message'=>'Booking confirmed!']);
     exit;
 }
 
-
-//  HANDLE DELETE 
-
+// ============================================================
+//  HANDLE DELETE — Cancel booking
+// ============================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $id = (int)$_POST['delete_id'];
     if ($id > 0) {
@@ -64,11 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     exit;
 }
 
-
+// ============================================================
 //  FETCH BOOKINGS
-
+// ============================================================
 $search  = clean($_GET['search']  ?? '');
-$status  = clean($_GET['status']  ?? '');
+$type    = clean($_GET['type']    ?? '');  // filter by booking type
 $page    = max(1, (int)($_GET['page'] ?? 1));
 $limit   = 15;
 $offset  = ($page - 1) * $limit;
@@ -81,6 +114,11 @@ if ($search) {
     $params[':search']  = "%$search%";
     $params[':search2'] = "%$search%";
     $params[':search3'] = "%$search%";
+}
+
+if ($type && in_array($type, ['standard', 'custom'])) {
+    $where[] = 'booking_type = :type';
+    $params[':type'] = $type;
 }
 
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -106,6 +144,8 @@ $totalPages = (int)ceil($total / $limit);
 $totalBookings = (int)$pdo->query('SELECT COUNT(*) FROM bookings')->fetchColumn();
 $todayBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = CURDATE()")->fetchColumn();
 $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColumn();
+$customBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE booking_type = 'custom'")->fetchColumn();
+$standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE booking_type = 'standard' OR booking_type IS NULL")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -165,19 +205,39 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
         .hamburger { display:none; background:none; border:none; cursor:pointer; padding:6px; color:var(--text-dark); }
         .page-title h1 { font-family:'Sora',sans-serif; font-size:1.2rem; font-weight:700; }
         .page-title p { font-size:.8rem; color:var(--text-light); }
-        .topbar-avatar { width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:.9rem; }
+
+        /* Admin dropdown in topbar */
+        .admin-dropdown { position:relative; }
+        .admin-pill { display:flex; align-items:center; gap:.5rem; padding:.4rem .9rem .4rem .45rem; border-radius:50px; border:2px solid #E2E8F0; background:white; cursor:pointer; font-family:'Manrope',sans-serif; font-weight:600; font-size:.88rem; color:var(--text-dark); transition:all .25s; white-space:nowrap; }
+        .admin-pill:hover { border-color:var(--primary); box-shadow:0 2px 12px rgba(10,126,164,.15); }
+        .admin-pill-avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,var(--primary-dark),#043D54); display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; color:#fff; flex-shrink:0; }
+        .admin-dd-menu { position:absolute; right:0; top:calc(100% + .6rem); background:white; border:1px solid #E2E8F0; border-radius:18px; box-shadow:0 10px 40px rgba(0,0,0,.14); min-width:240px; z-index:200; opacity:0; transform:translateY(-8px) scale(.97); pointer-events:none; transition:all .22s ease; }
+        .admin-dd-menu.open { opacity:1; transform:translateY(0) scale(1); pointer-events:all; }
+        .adm-header { display:flex; align-items:center; gap:.75rem; padding:1rem 1.1rem .8rem; }
+        .adm-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--primary-dark),#043D54); display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:700; color:#fff; flex-shrink:0; }
+        .adm-name { font-weight:700; font-size:.92rem; color:var(--text-dark); margin-bottom:.1rem; }
+        .adm-role { font-size:.72rem; color:#94A3B8; text-transform:uppercase; letter-spacing:.5px; }
+        .adm-email { font-size:.73rem; color:#94A3B8; margin-top:.15rem; overflow:hidden; text-overflow:ellipsis; max-width:170px; }
+        .adm-divider { height:1px; background:#F1F5F9; margin:.3rem 0; }
+        .adm-item { display:flex; align-items:center; gap:.6rem; padding:.65rem 1rem; color:var(--text-dark); text-decoration:none; font-size:.88rem; font-weight:500; transition:background .15s; border-radius:10px; margin:.1rem .4rem; }
+        .adm-item:hover { background:#F1F5F9; color:var(--primary); }
+        .adm-item.site { color:var(--text-light); }
+        .adm-item.logout { color:#EF4444!important; }
+        .adm-item.logout:hover { background:#FEE2E2!important; color:#DC2626!important; }
 
         /* ── PAGE BODY ── */
         .page-body { padding:2rem; flex:1; }
 
         /* ── STATS ── */
-        .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; margin-bottom:2rem; }
+        .stats-strip { display:grid; grid-template-columns:repeat(6,1fr); gap:1.2rem; margin-bottom:2rem; }
         .stat-card { background:white; border-radius:16px; padding:1.4rem; box-shadow:var(--shadow-sm); display:flex; align-items:center; gap:1rem; border:1px solid var(--border); }
         .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
         .stat-icon.blue   { background:rgba(10,126,164,0.12); }
         .stat-icon.green  { background:rgba(16,185,129,0.12); }
         .stat-icon.yellow { background:rgba(245,158,11,0.12); }
         .stat-icon.purple { background:rgba(124,58,237,0.12); }
+        .stat-icon.teal   { background:rgba(20,184,166,0.12); }
+        .stat-icon.orange { background:rgba(249,115,22,0.12); }
         .stat-info h3 { font-family:'Sora',sans-serif; font-size:1.6rem; font-weight:800; color:var(--text-dark); line-height:1; }
         .stat-info p  { font-size:0.82rem; color:var(--text-light); margin-top:0.2rem; }
 
@@ -187,6 +247,9 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
         .toolbar-search input { width:100%; padding:0.7rem 1rem 0.7rem 2.8rem; border:2px solid var(--border); border-radius:50px; font-family:inherit; font-size:0.9rem; outline:none; background:white; color:var(--text-dark); transition:border-color .3s; }
         .toolbar-search input:focus { border-color:var(--primary); }
         .toolbar-search .s-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--text-light); }
+        .filter-group { display:flex; align-items:center; gap:.8rem; }
+        .filter-btn { padding:.55rem 1.2rem; border-radius:50px; border:2px solid var(--border); background:white; font-family:inherit; font-size:.85rem; font-weight:600; color:var(--text-light); cursor:pointer; transition:all .25s; text-decoration:none; display:inline-block; }
+        .filter-btn:hover, .filter-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
         .toolbar-right { display:flex; gap:.8rem; align-items:center; }
 
         /* ── TABLE ── */
@@ -205,14 +268,15 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
         .customer-cell { font-weight:700; color:var(--text-dark); }
         .customer-cell small { display:block; color:var(--text-light); font-weight:400; font-size:0.8rem; margin-top:.2rem; }
         .price-cell { font-family:'Sora',sans-serif; font-weight:700; color:var(--primary); }
-
-        .badge { padding:0.28rem 0.85rem; border-radius:50px; font-size:0.75rem; font-weight:700; text-transform:uppercase; }
-        .badge-confirmed { background:#d1fae5; color:#065f46; }
-        .badge-pending   { background:#fed7aa; color:#92400e; }
-        .badge-cancelled { background:#fee2e2; color:#991b1b; }
-        .badge-completed { background:#e0e7ff; color:#3730a3; }
-
-        .btn-delete { padding:0.38rem 0.9rem; background:rgba(239,68,68,0.1); color:var(--danger); border:none; border-radius:8px; font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all .2s; }
+        
+        /* Custom badge */
+        .custom-badge { display:inline-block; padding:.2rem .7rem; border-radius:50px; font-size:.7rem; font-weight:700; background:linear-gradient(135deg,#10B981,#059669); color:white; white-space:nowrap; }
+        .standard-badge { display:inline-block; padding:.2rem .7rem; border-radius:50px; font-size:.7rem; font-weight:700; background:#E2E8F0; color:#64748B; white-space:nowrap; }
+        
+        /* View details button */
+        .btn-view { padding:0.38rem 0.9rem; background:rgba(10,126,164,0.1); color:var(--primary); border:none; border-radius:8px; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all .2s; margin-right:.5rem; }
+        .btn-view:hover { background:var(--primary); color:white; }
+        .btn-delete { padding:0.38rem 0.9rem; background:rgba(239,68,68,0.1); color:var(--danger); border:none; border-radius:8px; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all .2s; }
         .btn-delete:hover { background:var(--danger); color:white; }
 
         /* ── PAGINATION ── */
@@ -243,7 +307,17 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
         .btn-confirm-yes:hover { background:#DC2626; }
         .btn-confirm-no { padding:.75rem 2rem; background:transparent; color:var(--text-light); border:2px solid var(--border); border-radius:50px; font-family:inherit; font-size:.95rem; font-weight:600; cursor:pointer; }
 
+        /* ── DETAILS MODAL ── */
+        .details-modal { max-width: 550px; }
+        .details-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
+        .details-row { display: flex; border-bottom: 1px solid #F1F5F9; padding: 0.6rem 0; }
+        .details-label { font-weight: 700; width: 130px; flex-shrink: 0; color: var(--text-dark); font-size: 0.85rem; }
+        .details-value { color: var(--text-light); font-size: 0.85rem; flex: 1; }
+        .custom-section { background: linear-gradient(135deg,#F0FDF4,#ECFDF5); border-radius: 12px; padding: 1rem; margin-top: 1rem; }
+        .custom-title { font-weight: 700; color: #065f46; margin-bottom: 0.8rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
         /* ── RESPONSIVE ── */
+        @media(max-width:1200px) { .stats-strip { grid-template-columns:repeat(3,1fr); } }
         @media(max-width:1024px) { .stats-strip { grid-template-columns:repeat(2,1fr); } }
         @media(max-width:768px) {
             .sidebar { transform:translateX(-100%); }
@@ -258,7 +332,9 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="sidebar-logo">✈️</div>
@@ -302,6 +378,11 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Contact Us / Reviews
         </a>
+        <div class="nav-label">Reports</div>
+        <a href="admin_monthly_report.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Monthly Report
+        </a>
         <div class="nav-label">Other</div>
         <a href="../index.php" class="nav-item" target="_blank">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -310,10 +391,10 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
     </nav>
     <div class="sidebar-footer">
         <div class="admin-profile">
-            <div class="admin-avatar">A</div>
+            <div class="admin-avatar"><?= $admInit ?></div>
             <div class="admin-info">
-                <h4>Admin</h4>
-                <p>admin@jettransfer.com</p>
+                <h4><?= htmlspecialchars($admName) ?></h4>
+                <p><?= htmlspecialchars($admEmail) ?></p>
             </div>
         </div>
         <a href="logout.php" class="btn-logout">
@@ -323,7 +404,9 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
     </div>
 </aside>
 
-
+<!-- ══════════════════════════════════
+     MAIN
+══════════════════════════════════ -->
 <div class="main">
     <header class="topbar">
         <div class="topbar-left">
@@ -332,19 +415,34 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
             </button>
             <div class="page-title">
                 <h1>Bookings Management</h1>
-                <p>View and manage all customer bookings</p>
+                <p>View and manage all customer bookings (including custom packages)</p>
             </div>
         </div>
-        <div class="topbar-right">
-            <div class="topbar-avatar">A</div>
+        <div class="admin-dropdown" id="adminDropdown">
+            <button class="admin-pill" onclick="toggleAdminDD()">
+                <div class="admin-pill-avatar"><?= $admInit ?></div>
+                <span><?= htmlspecialchars($admName) ?></span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="admin-dd-menu" id="adminDDMenu">
+                <div class="adm-header">
+                    <div class="adm-avatar"><?= $admInit ?></div>
+                    <div><div class="adm-name"><?= htmlspecialchars($admName) ?></div><div class="adm-role">Administrator</div></div>
+                </div>
+                <div class="adm-divider"></div>
+                <a href="../index.php" target="_blank" class="adm-item site">🌐 View Website</a>
+                <a href="index.php" class="adm-item">📊 Dashboard</a>
+                <div class="adm-divider"></div>
+                <a href="logout.php" class="adm-item logout">🚪 Logout</a>
+            </div>
         </div>
     </header>
 
     <div class="page-body">
 
         <?php if (isset($_GET['deleted'])): ?>
-        <div class="toast">✅ Booking deleted successfully!</div>
-        <script>setTimeout(() => document.querySelector('.toast')?.remove(), 3500);</script>
+        <div class="toast" id="deletedToast">✅ Booking deleted successfully!</div>
+        <script>setTimeout(() => document.getElementById('deletedToast')?.remove(), 3500);</script>
         <?php endif; ?>
 
         <!-- Stats -->
@@ -366,8 +464,22 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
             <div class="stat-card">
                 <div class="stat-icon yellow">👥</div>
                 <div class="stat-info">
-                    <h3><?= $totalGuests ?></h3>
+                    <h3><?= $totalGuests ?: 0 ?></h3>
                     <p>Total Guests</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon teal">✏️</div>
+                <div class="stat-info">
+                    <h3><?= $customBookings ?></h3>
+                    <p>Custom Bookings</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">📋</div>
+                <div class="stat-info">
+                    <h3><?= $standardBookings ?></h3>
+                    <p>Standard Bookings</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -386,11 +498,17 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
                     <span class="s-icon">🔍</span>
                     <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search by name, package, email…">
                 </div>
+                <div class="filter-group">
+                    <span class="filter-label" style="font-weight:600;font-size:.88rem;color:var(--text-light);">Filter:</span>
+                    <a href="bookings.php" class="filter-btn <?= $type === '' ? 'active' : '' ?>">All</a>
+                    <a href="bookings.php?type=standard" class="filter-btn <?= $type === 'standard' ? 'active' : '' ?>">Standard</a>
+                    <a href="bookings.php?type=custom" class="filter-btn <?= $type === 'custom' ? 'active' : '' ?>">Custom</a>
+                </div>
                 <div class="toolbar-right">
                     <button type="submit" style="padding:.7rem 1.5rem;background:var(--primary);color:white;border:none;border-radius:50px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;">
                         Search
                     </button>
-                    <?php if ($search): ?>
+                    <?php if ($search || $type): ?>
                     <a href="bookings.php" style="padding:.7rem 1.2rem;border:2px solid var(--border);border-radius:50px;font-size:.88rem;font-weight:600;color:var(--text-light);text-decoration:none;">
                         Clear
                     </a>
@@ -420,12 +538,13 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
                             <th>#</th>
                             <th>Customer</th>
                             <th>Package</th>
+                            <th>Type</th>
                             <th>Travel Date</th>
                             <th>Guests</th>
                             <th>Price</th>
                             <th>Phone</th>
                             <th>Booked On</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -439,12 +558,22 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
                                 </div>
                             </td>
                             <td style="font-weight:600;"><?= htmlspecialchars($b['package_name']) ?></td>
+                            <td>
+                                <?php if (($b['booking_type'] ?? 'standard') === 'custom'): ?>
+                                    <span class="custom-badge">✏️ Custom</span>
+                                <?php else: ?>
+                                    <span class="standard-badge">📦 Standard</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= date('d M Y', strtotime($b['travel_date'])) ?></td>
                             <td style="text-align:center;"><?= $b['guests'] ?></td>
                             <td class="price-cell"><?= htmlspecialchars($b['price']) ?></td>
                             <td><?= htmlspecialchars($b['phone']) ?></td>
                             <td style="color:var(--text-light);"><?= date('d M Y', strtotime($b['created_at'])) ?></td>
                             <td>
+                                <?php if (($b['booking_type'] ?? 'standard') === 'custom'): ?>
+                                    <button class="btn-view" onclick="viewDetails(<?= $b['id'] ?>)">📋 View Details</button>
+                                <?php endif; ?>
                                 <button class="btn-delete" onclick="openDeleteModal(<?= $b['id'] ?>, '<?= htmlspecialchars(addslashes($b['customer_name'])) ?>')">
                                     🗑️ Delete
                                 </button>
@@ -459,18 +588,18 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
             <?php if ($totalPages > 1): ?>
             <div class="pagination">
                 <?php if ($page > 1): ?>
-                    <a href="?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>" class="page-btn">← Prev</a>
+                    <a href="?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>&type=<?= urlencode($type) ?>" class="page-btn">← Prev</a>
                 <?php else: ?>
                     <span class="page-btn disabled">← Prev</span>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"
+                    <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&type=<?= urlencode($type) ?>"
                        class="page-btn <?= $i === $page ? 'active' : '' ?>"><?= $i ?></a>
                 <?php endfor; ?>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>" class="page-btn">Next →</a>
+                    <a href="?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>&type=<?= urlencode($type) ?>" class="page-btn">Next →</a>
                 <?php else: ?>
                     <span class="page-btn disabled">Next →</span>
                 <?php endif; ?>
@@ -488,17 +617,61 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
         <div class="confirm-icon">🗑️</div>
         <h3>Delete Booking?</h3>
         <p id="deleteMsg">This action cannot be undone.</p>
-        <div class="confirm-btns">
-            <form method="POST" id="deleteForm">
-                <input type="hidden" name="delete_id" id="deleteId">
-                <div class="confirm-btns">
-                    <button type="submit" class="btn-confirm-yes">Yes, Delete</button>
-                    <button type="button" class="btn-confirm-no" onclick="closeDeleteModal()">Cancel</button>
-                </div>
-            </form>
+        <form method="POST" id="deleteForm">
+            <input type="hidden" name="delete_id" id="deleteId">
+            <div class="confirm-btns">
+                <button type="submit" class="btn-confirm-yes">Yes, Delete</button>
+                <button type="button" class="btn-confirm-no" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- CUSTOM DETAILS MODAL -->
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal-box details-modal">
+        <button class="modal-close-btn" onclick="closeDetailsModal()">✕</button>
+        <h2 class="modal-title" style="color:var(--primary);">📋 Custom Booking Details</h2>
+        <div id="detailsContent">
+            <div style="text-align:center;padding:2rem;">Loading...</div>
         </div>
     </div>
 </div>
+
+<style>
+.modal-box {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #64748B;
+    line-height: 1;
+}
+.modal-title {
+    font-family: 'Sora', sans-serif;
+    margin-bottom: 0.3rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <script>
     function toggleSidebar() {
@@ -508,6 +681,16 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
     document.getElementById('sidebarOverlay').addEventListener('click', () => {
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebarOverlay').classList.remove('show');
+    });
+
+    function toggleAdminDD() {
+        document.getElementById('adminDDMenu').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('adminDropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            document.getElementById('adminDDMenu').classList.remove('open');
+        }
     });
 
     function openDeleteModal(id, name) {
@@ -521,6 +704,65 @@ $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColu
     document.getElementById('deleteModal').addEventListener('click', function(e) {
         if (e.target === this) closeDeleteModal();
     });
+
+    function viewDetails(id) {
+        const modal = document.getElementById('detailsModal');
+        const content = document.getElementById('detailsContent');
+        content.innerHTML = '<div style="text-align:center;padding:2rem;">Loading details...</div>';
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        // Fetch booking details via AJAX
+        fetch(`get_booking_details.php?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let html = '<div class="details-grid">';
+                    html += '<div class="details-row"><div class="details-label">Customer:</div><div class="details-value">' + escapeHtml(data.customer_name) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Email:</div><div class="details-value">' + escapeHtml(data.email) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Phone:</div><div class="details-value">' + escapeHtml(data.phone) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Package:</div><div class="details-value">' + escapeHtml(data.package_name) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Base Price:</div><div class="details-value">' + escapeHtml(data.price) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Travel Date:</div><div class="details-value">' + escapeHtml(data.travel_date) + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Guests:</div><div class="details-value">' + data.guests + '</div></div>';
+                    html += '<div class="details-row"><div class="details-label">Booked On:</div><div class="details-value">' + escapeHtml(data.created_at) + '</div></div>';
+                    
+                    if (data.custom_duration || data.custom_hotel || data.custom_vehicle || data.custom_group_size) {
+                        html += '<div class="custom-section"><div class="custom-title">✏️ Customization Details</div>';
+                        if (data.custom_duration) html += '<div class="details-row"><div class="details-label">Duration:</div><div class="details-value">' + data.custom_duration + ' Days</div></div>';
+                        if (data.custom_hotel) html += '<div class="details-row"><div class="details-label">Hotel Rating:</div><div class="details-value">' + escapeHtml(data.custom_hotel) + '</div></div>';
+                        if (data.custom_vehicle) html += '<div class="details-row"><div class="details-label">Vehicle:</div><div class="details-value">' + escapeHtml(data.custom_vehicle) + '</div></div>';
+                        if (data.custom_group_size) html += '<div class="details-row"><div class="details-label">Group Size:</div><div class="details-value">' + escapeHtml(data.custom_group_size) + '</div></div>';
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div style="text-align:center;padding:2rem;color:#EF4444;">❌ ' + escapeHtml(data.message) + '</div>';
+                }
+            })
+            .catch(error => {
+                content.innerHTML = '<div style="text-align:center;padding:2rem;color:#EF4444;">❌ Error loading details</div>';
+            });
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetailsModal();
+    });
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
 </script>
 </body>
 </html>

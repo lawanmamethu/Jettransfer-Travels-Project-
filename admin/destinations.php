@@ -2,9 +2,14 @@
 session_start();
 if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
 
-$conn = new mysqli('localhost', 'root', '', 'jettransfer');
-if ($conn->connect_error) { die('<p style="color:red;padding:1rem">DB Error: '.$conn->connect_error.'</p>'); }
-$conn->set_charset('utf8mb4');
+require_once '../db.php';
+
+// Fetch admin info (same as index.php)
+$ar  = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
+$adm = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
+$admName  = htmlspecialchars($adm['name']);
+$admEmail = htmlspecialchars($adm['email']);
+$admInit  = strtoupper(substr($adm['name'],0,1));
 
 $message = ''; $msgType = 'success';
 
@@ -184,7 +189,9 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="sidebar-logo">✈️</div>
-        <div class="sidebar-brand-text"><h2>Jettransfer</h2><span>Admin Panel</span></div>
+        <div class="sidebar-brand-text">
+            <h2>Jettransfer</h2><span>Admin Panel</span>
+        </div>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-label">Main</div>
@@ -221,6 +228,11 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Contact Us / Reviews
         </a>
+        <div class="nav-label">Reports</div>
+        <a href="admin_monthly_report.php" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Monthly Report
+        </a>
         <div class="nav-label">Other</div>
         <a href="../index.php" class="nav-item" target="_blank">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -229,8 +241,11 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
     </nav>
     <div class="sidebar-footer">
         <div class="admin-profile">
-            <div class="admin-avatar">A</div>
-            <div class="admin-info"><h4>Admin</h4><p>admin@jettransfer.com</p></div>
+            <div class="admin-avatar"><?= $admInit ?></div>
+            <div class="admin-info">
+                <h4><?= $admName ?></h4>
+                <p><?= $admEmail ?></p>
+            </div>
         </div>
         <a href="logout.php" class="btn-logout">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -252,7 +267,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
             </div>
         </div>
         <div class="topbar-right">
-            <div class="topbar-avatar">A</div>
+            <div class="topbar-avatar"><?= $admInit ?></div>
         </div>
     </header>
 

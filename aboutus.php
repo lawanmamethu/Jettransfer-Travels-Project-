@@ -23,25 +23,19 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Manrope', sans-serif; color: var(--text-dark); line-height: 1.6; overflow-x: hidden; }
-        .logo-img { width: 80px; height: 80px; border-radius: 12px; object-fit: contain; }
+        
+        /* ========== CONSISTENT NAVBAR STYLES (matches destination page) ========== */
+        .logo-img { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(2,6,23,.10); box-shadow: 0 10px 22px rgba(10,126,164,.15); background: #fff; }
         .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: var(--shadow-sm); z-index: 1000; transition: all 0.3s ease; }
         .header.scrolled { box-shadow: var(--shadow-md); }
         .nav-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .logo { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: .6rem; white-space: nowrap; }
         .nav-menu { display: flex; list-style: none; gap: 1.6rem; align-items: center; }
         .nav-menu a { color: var(--text-dark); text-decoration: none; font-weight: 500; font-size: 0.88rem; transition: color 0.3s ease; position: relative; }
         .nav-menu a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s ease; }
         .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
         .nav-menu a:hover, .nav-menu a.active { color: var(--primary); }
         .nav-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-        .nav-search { position: relative; display: flex; align-items: center; }
-        .search-toggle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #E2E8F0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dark); transition: all 0.3s ease; }
-        .search-toggle:hover { border-color: var(--primary); color: var(--primary); background: var(--bg-light); }
-        .search-box { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; background: white; border: 2px solid var(--primary); border-radius: 50px; overflow: hidden; width: 0; opacity: 0; pointer-events: none; transition: width 0.4s ease, opacity 0.3s ease; box-shadow: var(--shadow-md); z-index: 10; }
-        .search-box.open { width: 280px; opacity: 1; pointer-events: all; }
-        .search-box input { border: none; outline: none; padding: 0.55rem 1rem; font-family: 'Manrope', sans-serif; font-size: 0.88rem; color: var(--text-dark); width: 100%; background: transparent; }
-        .search-submit { background: var(--primary); border: none; padding: 0.55rem 1rem; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; flex-shrink: 0; }
-        .search-submit:hover { background: var(--primary-dark); }
         .nav-auth { display: flex; align-items: center; gap: 0.4rem; }
         .btn-login { padding: 0.5rem 1.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.88rem; color: var(--primary); border: 2px solid var(--primary); transition: all 0.3s ease; white-space: nowrap; }
         .btn-login:hover { background: var(--primary); color: white; transform: translateY(-2px); }
@@ -50,6 +44,18 @@
         .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
         .mobile-toggle span { width: 25px; height: 3px; background: var(--text-dark); transition: all 0.3s ease; border-radius: 2px; }
         .mobile-auth { display: none; }
+        
+        @media (max-width: 768px) {
+            .mobile-toggle { display: flex; }
+            .nav-actions { display: none; }
+            .nav-menu { position: fixed; top: 80px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; box-shadow: var(--shadow-lg); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 999; }
+            .nav-menu.active { transform: translateX(0); }
+            .mobile-auth { display: flex !important; flex-direction: column; align-items: center; gap: 0.8rem; padding-top: 1.2rem; border-top: 1px solid #E2E8F0; width: 100%; }
+            .mobile-auth-btns { display: flex; gap: 0.8rem; width: 100%; }
+            .mobile-auth-btns a { flex: 1; text-align: center; }
+        }
+        
+        /* ========== REST OF YOUR EXISTING STYLES ========== */
         .about-hero { margin-top: 80px; height: 65vh; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; }
         .about-hero-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; }
         .about-hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(10,126,164,0.75), rgba(16,185,129,0.65)); z-index: 1; }
@@ -80,7 +86,6 @@
         .story-text h2 { font-family: 'Sora', sans-serif; font-size: 2.6rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.2; }
         .story-text h2 span { color: var(--primary); }
         .story-text p { color: var(--text-light); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.2rem; }
-        .story-text p:last-child { margin-bottom: 0; }
         .mv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
         .mv-card { background: white; border-radius: 24px; padding: 3rem; box-shadow: var(--shadow-md); position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease; }
         .mv-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
@@ -116,13 +121,13 @@
         .footer-section p, .footer-section a { color: rgba(255,255,255,0.7); text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s; }
         .footer-section a:hover { color: var(--secondary); }
         .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
-        .social-link { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .social-link { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; object-fit: cover; }
         .social-link:hover { background: var(--primary); transform: translateY(-3px); }
         .footer-bottom { max-width: 1400px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.5); }
         .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
         @media (max-width: 1024px) { .story-grid { grid-template-columns: 1fr; gap: 3rem; } .story-badge { right: 20px; bottom: -20px; width: 130px; height: 130px; } .story-badge .badge-num { font-size: 2.4rem; } .mv-grid { grid-template-columns: 1fr; } .values-grid { grid-template-columns: repeat(2, 1fr); } .about-hero h1 { font-size: 2.8rem; } }
-        @media (max-width: 768px) { .mobile-toggle { display: flex; } .nav-menu { position: fixed; top: 80px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; box-shadow: var(--shadow-lg); transform: translateX(-100%); transition: transform 0.3s ease; } .nav-menu.active { transform: translateX(0); } .nav-actions { display: none; } .about-hero h1 { font-size: 2.2rem; } .section-title { font-size: 2rem; } .values-grid { grid-template-columns: 1fr; } .cta-box h2 { font-size: 2rem; } .cta-btns { flex-direction: column; align-items: center; } .mobile-auth { display: flex !important; flex-direction: column; align-items: center; gap: 0.8rem; padding-top: 1.2rem; border-top: 1px solid #E2E8F0; width: 100%; } .mobile-auth-btns { display: flex; gap: 0.8rem; width: 100%; } .mobile-auth-btns a { flex: 1; text-align: center; } }
+        @media (max-width: 768px) { .about-hero h1 { font-size: 2.2rem; } .section-title { font-size: 2rem; } .values-grid { grid-template-columns: 1fr; } .cta-box h2 { font-size: 2rem; } .cta-btns { flex-direction: column; align-items: center; } }
     </style>
 </head>
 <body>
@@ -141,8 +146,6 @@
             <li><a href="service.php">Services &amp; Gallery</a></li>
             <li><a href="contact.php">Contact Us</a></li>
             <li><a href="aboutus.php" class="active">About Us</a></li>
-
-
             <li class="mobile-auth">
                 <div class="mobile-auth-btns">
                     <a href="login.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center">Login</a>
@@ -151,7 +154,6 @@
             </li>
         </ul>
         <div class="nav-actions">
-            
             <div class="nav-auth">
                 <a href="login.php" class="btn-login">Login</a>
                 <a href="register.php" class="btn-register">Register</a>
@@ -296,15 +298,6 @@
         entries.forEach((entry, i) => { if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 100); });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-    const searchToggle = document.getElementById('searchToggle');
-    const searchBox = document.getElementById('searchBox');
-    const searchInput = document.getElementById('searchInput');
-    searchToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        searchBox.classList.toggle('open');
-        if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
-    });
-    document.addEventListener('click', (e) => { if (!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open'); });
 </script>
 </body>
 </html>

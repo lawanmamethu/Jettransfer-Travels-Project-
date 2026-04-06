@@ -1,4 +1,38 @@
 <?php
+// Handle form submission FIRST before any connection is closed
+$enquiry_success = false;
+$enquiry_error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_enquiry'])) {
+    // Create a NEW connection for the form submission
+    $conn_submit = new mysqli('localhost', 'root', '', 'jettransfer');
+    
+    if (!$conn_submit->connect_error) {
+        $conn_submit->set_charset('utf8mb4');
+        
+        $service_name = $conn_submit->real_escape_string($_POST['service_name']);
+        $customer_name = $conn_submit->real_escape_string($_POST['customer_name']);
+        $customer_email = $conn_submit->real_escape_string($_POST['customer_email']);
+        $customer_phone = $conn_submit->real_escape_string($_POST['customer_phone']);
+        $travel_date = $conn_submit->real_escape_string($_POST['travel_date']);
+        $travelers = (int)$_POST['travelers'];
+        $message = $conn_submit->real_escape_string($_POST['message']);
+        
+        $sql = "INSERT INTO service_enquiries (service_name, customer_name, customer_email, customer_phone, travel_date, travelers, message, status, created_at) 
+                VALUES ('$service_name', '$customer_name', '$customer_email', '$customer_phone', '$travel_date', $travelers, '$message', 'new', NOW())";
+        
+        if ($conn_submit->query($sql)) {
+            $enquiry_success = true;
+        } else {
+            $enquiry_error = "Database error: " . $conn_submit->error;
+        }
+        $conn_submit->close();
+    } else {
+        $enquiry_error = "Connection error. Please try again.";
+    }
+}
+
+// Now proceed with main page data fetching
 $conn = new mysqli('localhost', 'root', '', 'jettransfer');
 if (!$conn->connect_error) {
     $conn->set_charset('utf8mb4');
@@ -42,6 +76,8 @@ if (!$conn->connect_error) {
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --success: #10B981;
+            --error: #EF4444;
         }
         * { 
             margin:0; 
@@ -53,6 +89,9 @@ if (!$conn->connect_error) {
             color:var(--text-dark); 
             line-height:1.6; 
             overflow-x:hidden; 
+        }
+        body.modal-open {
+            overflow: hidden;
         }
 
         /* HEADER */
@@ -371,11 +410,24 @@ if (!$conn->connect_error) {
             flex-direction:column; 
             gap:1rem; 
             cursor:pointer; 
+            position:relative;
         }
         .srv-card:hover { 
             transform:translateY(-10px); 
             box-shadow:var(--shadow-lg); 
             border-color:rgba(10,126,164,.15); 
+        }
+        .popular-badge {
+            position:absolute;
+            top:1rem;
+            right:1rem;
+            background:var(--secondary);
+            color:white;
+            padding:0.25rem 0.8rem;
+            border-radius:50px;
+            font-size:0.7rem;
+            font-weight:700;
+            z-index:1;
         }
         .srv-icon { 
             width:70px; 
@@ -396,9 +448,9 @@ if (!$conn->connect_error) {
         .srv-title { 
             font-family:'Sora',sans-serif; 
             font-size:1.2rem;
-             font-weight:700; 
-             color:var(--text-dark); 
-            }
+            font-weight:700; 
+            color:var(--text-dark); 
+        }
         .srv-desc { 
             color:var(--text-light); 
             font-size:.9rem; 
@@ -426,6 +478,23 @@ if (!$conn->connect_error) {
             background:var(--primary); 
             color:white; 
             transform:translateX(3px); 
+        }
+        .btn-book {
+            background:var(--secondary);
+            color:white;
+            border:none;
+            padding:0.6rem 1rem;
+            border-radius:50px;
+            margin-top:0.5rem;
+            cursor:pointer;
+            font-weight:600;
+            font-size:0.85rem;
+            transition:all .28s;
+            width:100%;
+        }
+        .btn-book:hover {
+            background:#e68a00;
+            transform:translateY(-2px);
         }
 
         /* PROCESS STRIP */
@@ -455,7 +524,7 @@ if (!$conn->connect_error) {
         .proc-item h4 { 
             font-family:'Sora',sans-serif; 
             font-size:1rem; 
-            \font-weight:700; 
+            font-weight:700; 
             margin-bottom:.3rem; 
         }
         .proc-item p { 
@@ -498,12 +567,12 @@ if (!$conn->connect_error) {
         }
         .gal-item { 
             position:relative;
-             border-radius:14px; 
-             overflow:hidden; 
-             cursor:pointer; 
-             box-shadow:var(--shadow-sm); 
-             transition:opacity .4s,transform .4s; 
-            }
+            border-radius:14px; 
+            overflow:hidden; 
+            cursor:pointer; 
+            box-shadow:var(--shadow-sm); 
+            transition:opacity .4s,transform .4s; 
+        }
         .gal-item.tall { 
             grid-row:span 2; 
         }
@@ -540,7 +609,6 @@ if (!$conn->connect_error) {
             font-weight:700; 
             color:white; 
             margin-bottom:.2rem; 
-        
         }
         .gal-overlay span { 
             font-size:.78rem; 
@@ -649,15 +717,16 @@ if (!$conn->connect_error) {
             right:-3.5rem; 
         }
 
-        /* SERVICE MODAL */
+        /* SERVICE MODAL WITH ENQUIRY FORM */
         .svc-modal { 
             display:none; 
             position:fixed; 
             inset:0; 
-            background:rgba(15,23,42,.6); 
+            background:rgba(15,23,42,.85); 
             z-index:9998; 
             align-items:center; 
             justify-content:center; 
+            backdrop-filter:blur(4px);
         }
         .svc-modal.open { 
             display:flex; 
@@ -666,8 +735,10 @@ if (!$conn->connect_error) {
             background:white; 
             border-radius:20px; 
             padding:2.5rem; 
-            max-width:500px; 
+            max-width:550px; 
             width:92%; 
+            max-height:90vh;
+            overflow-y:auto;
             box-shadow:0 20px 60px rgba(0,0,0,.3); 
             position:relative; 
             animation:fadeInUp .35s ease both; 
@@ -682,6 +753,10 @@ if (!$conn->connect_error) {
             cursor:pointer; 
             color:#64748B; 
             line-height:1; 
+            transition:color .3s;
+        }
+        .svc-modal-close:hover {
+            color:var(--error);
         }
         .svc-modal-icon { 
             width:56px; 
@@ -697,48 +772,147 @@ if (!$conn->connect_error) {
         .svc-modal-title { 
             font-family:'Sora',sans-serif; 
             color:var(--primary); 
-            margin-bottom:1rem; 
+            margin-bottom:0.5rem; 
             font-size:1.5rem; 
         }
         .svc-modal-desc { 
             color:#64748B; 
             line-height:1.75; 
             font-size:.95rem; 
+            margin-bottom:1.5rem;
+            padding-bottom:1rem;
+            border-bottom:1px solid #E2E8F0;
         }
-        .svc-modal-actions { 
-            margin-top:1.8rem; 
-            display:flex; 
-            gap:1rem; 
+        
+        /* Enquiry Form Styles */
+        .enquiry-toggle {
+            background:var(--primary);
+            color:white;
+            border:none;
+            padding:0.75rem 1.5rem;
+            border-radius:50px;
+            font-weight:700;
+            cursor:pointer;
+            width:100%;
+            margin-bottom:1rem;
+            transition:all .3s;
         }
-        .btn-enquire { 
-            background:var(--primary); 
-            color:white; 
-            padding:.75rem 1.8rem; 
-            border-radius:50px; 
-            text-decoration:none; 
-            font-weight:700; 
-            font-size:.9rem; 
-            transition:background .3s; 
-            box-shadow:0 4px 15px rgba(10,126,164,.3); 
+        .enquiry-toggle:hover {
+            background:var(--primary-dark);
+            transform:translateY(-2px);
         }
-        .btn-enquire:hover { 
-            background:var(--primary-dark); 
+        .enquiry-form {
+            display:none;
+            margin-top:1rem;
+            animation:fadeInUp .4s ease;
         }
-        .btn-close-modal { 
-            background:none; 
-            border:2px solid #E2E8F0; 
-            color:#64748B; 
-            padding:.75rem 1.8rem; 
-            border-radius:50px; 
-            font-family:inherit; 
-            font-weight:600; 
-            font-size:.9rem; 
-            cursor:pointer; 
-            transition:all .3s; 
+        .enquiry-form.show {
+            display:block;
         }
-        .btn-close-modal:hover { 
-            border-color:var(--primary); 
-            color:var(--primary); 
+        .form-group {
+            margin-bottom:1rem;
+        }
+        .form-group label {
+            display:block;
+            margin-bottom:0.4rem;
+            font-weight:600;
+            font-size:0.85rem;
+            color:var(--text-dark);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width:100%;
+            padding:0.75rem;
+            border:2px solid #E2E8F0;
+            border-radius:12px;
+            font-family:'Manrope',sans-serif;
+            font-size:0.9rem;
+            transition:border-color .3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline:none;
+            border-color:var(--primary);
+        }
+        .form-row {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:1rem;
+        }
+        .btn-submit-enquiry {
+            background:var(--success);
+            color:white;
+            border:none;
+            padding:0.85rem;
+            border-radius:50px;
+            font-weight:700;
+            font-size:1rem;
+            cursor:pointer;
+            width:100%;
+            transition:all .3s;
+        }
+        .btn-submit-enquiry:hover {
+            background:#0d9668;
+            transform:translateY(-2px);
+        }
+        .success-message {
+            background:#D1FAE5;
+            color:#065F46;
+            padding:1rem;
+            border-radius:12px;
+            text-align:center;
+            margin-top:1rem;
+        }
+        .error-message {
+            background:#FEE2E2;
+            color:#991B1B;
+            padding:0.75rem;
+            border-radius:12px;
+            text-align:center;
+            margin-bottom:1rem;
+            font-size:0.85rem;
+        }
+        .svc-modal-actions {
+            display:flex;
+            gap:1rem;
+            margin-top:1rem;
+        }
+        .btn-enquire {
+            background:var(--primary);
+            color:white;
+            padding:.75rem 1.8rem;
+            border-radius:50px;
+            text-decoration:none;
+            font-weight:700;
+            font-size:.9rem;
+            transition:background .3s;
+            box-shadow:0 4px 15px rgba(10,126,164,.3);
+            border:none;
+            cursor:pointer;
+            flex:1;
+            text-align:center;
+        }
+        .btn-enquire:hover {
+            background:var(--primary-dark);
+        }
+        .btn-close-modal {
+            background:none;
+            border:2px solid #E2E8F0;
+            color:#64748B;
+            padding:.75rem 1.8rem;
+            border-radius:50px;
+            font-family:inherit;
+            font-weight:600;
+            font-size:.9rem;
+            cursor:pointer;
+            transition:all .3s;
+            flex:1;
+        }
+        .btn-close-modal:hover {
+            border-color:var(--primary);
+            color:var(--primary);
         }
 
         /* CTA STRIP */
@@ -900,6 +1074,10 @@ if (!$conn->connect_error) {
             .lb-next{ 
                 right:-2.5rem; 
             }
+            .form-row {
+                grid-template-columns:1fr;
+                gap:0;
+            }
         }
         @media(max-width:480px){ 
             .gallery-grid{ 
@@ -932,11 +1110,7 @@ if (!$conn->connect_error) {
             <li><a href="service.php" class="active">Services &amp; Gallery</a></li>
             <li><a href="contact.php">Contact Us</a></li>
             <li><a href="aboutus.php">About Us</a></li>
-
             <li class="mobile-auth">
-                <div style="display:flex;align-items:center;width:100%;border:2px solid #E2E8F0;border-radius:50px;overflow:hidden;background:white">
-                    
-                </div>
                 <div style="display:flex;gap:.8rem;width:100%">
                     <a href="login.php" class="btn-login" style="flex:1;text-align:center;display:block;padding:.6rem 1rem">Login</a>
                     <a href="register.php" class="btn-register" style="flex:1;text-align:center;display:block;padding:.6rem 1rem">Register</a>
@@ -944,9 +1118,6 @@ if (!$conn->connect_error) {
             </li>
         </ul>
         <div class="nav-actions">
-            
-                
-            </div>
             <div class="nav-auth">
                 <a href="login.php" class="btn-login">Login</a>
                 <a href="register.php" class="btn-register">Register</a>
@@ -988,6 +1159,9 @@ Sustainability is a core principle of our operations. We prioritize eco-friendly
         <?php else: ?>
         <?php foreach ($services as $i => $s): ?>
             <div class="srv-card fade-in" style="animation-delay:<?= ($i * 0.1) ?>s">
+                <?php if(isset($s['is_popular']) && $s['is_popular']): ?>
+                    <span class="popular-badge">🔥 Popular</span>
+                <?php endif; ?>
                 <div class="srv-icon"><?= htmlspecialchars($s['icon']) ?></div>
                 <h3 class="srv-title"><?= htmlspecialchars($s['title']) ?></h3>
                 <p class="srv-desc"><?= htmlspecialchars($s['description']) ?></p>
@@ -997,6 +1171,9 @@ Sustainability is a core principle of our operations. We prioritize eco-friendly
                             '<?= addslashes(htmlspecialchars($s['modal_text'] ?: $s['description'])) ?>',
                             '<?= addslashes(htmlspecialchars($s['icon'])) ?>'
                         )">Learn More →</button>
+                <button class="btn-book" onclick="openServiceModalWithForm('<?= addslashes(htmlspecialchars($s['title'])) ?>', '<?= addslashes(htmlspecialchars($s['modal_text'] ?: $s['description'])) ?>', '<?= addslashes(htmlspecialchars($s['icon'])) ?>')">
+                    📅 Quick Enquiry
+                </button>
             </div>
         <?php endforeach; ?>
         <?php endif; ?>
@@ -1081,8 +1258,8 @@ Sustainability is a core principle of our operations. We prioritize eco-friendly
         <div class="footer-section">
             <h3>Quick Links</h3>
             <a href="destination.php">Destinations</a>
-            <a href="package.php">Tour Packages</a>
-            <a href="vehicles.php">Our Vehicles</a>
+            <a href="packages.php">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
             <a href="service.php">Services</a>
             <a href="service.php">Gallery</a>
         </div>
@@ -1105,15 +1282,69 @@ Sustainability is a core principle of our operations. We prioritize eco-friendly
     </div>
 </footer>
 
-<!-- SERVICE MODAL -->
+<!-- SERVICE MODAL WITH ENQUIRY FORM -->
 <div class="svc-modal" id="serviceModal">
     <div class="svc-modal-inner">
         <button class="svc-modal-close" onclick="closeServiceModal()">✕</button>
         <div class="svc-modal-icon" id="modalIcon">🗺️</div>
         <h2 class="svc-modal-title" id="svcModalTitle">Service</h2>
         <p class="svc-modal-desc" id="svcModalDesc"></p>
+        
+        <button class="enquiry-toggle" id="enquiryToggleBtn" onclick="toggleEnquiryForm()">
+            📝 Send Enquiry
+        </button>
+        
+        <div class="enquiry-form" id="enquiryForm">
+            <div id="formMessage"></div>
+            <form method="POST" action="" id="enquiryFormElement">
+                <input type="hidden" name="service_name" id="hiddenServiceName">
+                <input type="hidden" name="submit_enquiry" value="1">
+                
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="customer_name" id="customerName" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="customer_email" id="customerEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" name="customer_phone" id="customerPhone" required placeholder="+94 XX XXX XXXX">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Travel Date</label>
+                        <input type="date" name="travel_date" id="travelDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Travelers</label>
+                        <select name="travelers" id="travelers">
+                            <option value="1">1 Traveler</option>
+                            <option value="2">2 Travelers</option>
+                            <option value="3">3 Travelers</option>
+                            <option value="4">4 Travelers</option>
+                            <option value="5">5 Travelers</option>
+                            <option value="6">6+ Travelers</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Special Requests / Message</label>
+                    <textarea name="message" id="enquiryMessage" rows="3" placeholder="Any special requirements or questions?"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit-enquiry">✈️ Submit Enquiry</button>
+            </form>
+        </div>
+        
         <div class="svc-modal-actions">
-            <a href="#contact" class="btn-enquire" onclick="closeServiceModal()">Enquire Now</a>
+            <a href="contact.php" class="btn-enquire" onclick="closeServiceModal()">Contact Us Directly</a>
             <button class="btn-close-modal" onclick="closeServiceModal()">Close</button>
         </div>
     </div>
@@ -1130,11 +1361,36 @@ Sustainability is a core principle of our operations. We prioritize eco-friendly
     </div>
 </div>
 
+<!-- SUCCESS TOAST NOTIFICATION -->
+<?php if ($enquiry_success): ?>
+<div id="successToast" style="position:fixed; bottom:20px; right:20px; background:var(--success); color:white; padding:1rem 1.5rem; border-radius:12px; z-index:10000; animation:fadeInUp 0.3s ease; box-shadow:var(--shadow-lg);">
+    ✅ Enquiry sent successfully! We'll contact you within 24 hours.
+</div>
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById('successToast');
+        if(toast) toast.style.display = 'none';
+    }, 5000);
+</script>
+<?php elseif ($enquiry_error): ?>
+<div id="errorToast" style="position:fixed; bottom:20px; right:20px; background:var(--error); color:white; padding:1rem 1.5rem; border-radius:12px; z-index:10000; animation:fadeInUp 0.3s ease; box-shadow:var(--shadow-lg);">
+    ❌ <?= htmlspecialchars($enquiry_error) ?>
+</div>
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById('errorToast');
+        if(toast) toast.style.display = 'none';
+    }, 5000);
+</script>
+<?php endif; ?>
+
 <script>
 // Mobile menu
 const mobileToggle = document.getElementById('mobileToggle');
 const navMenu = document.getElementById('navMenu');
-mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+if(mobileToggle) {
+    mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+}
 document.querySelectorAll('.nav-menu a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('active')));
 
 // Header scroll
@@ -1156,40 +1412,94 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     });
 });
 
-// Search toggle
-const searchToggle = document.getElementById('searchToggle');
-const searchBox    = document.getElementById('searchBox');
-const searchInput  = document.getElementById('searchInput');
-if (searchToggle) {
-    searchToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        searchBox.classList.toggle('open');
-        if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
-    });
-}
-document.addEventListener('click', (e) => {
-    if (!document.getElementById('navSearch').contains(e.target)) {
-        if (searchBox) searchBox.classList.remove('open');
-    }
-});
+// Service Modal Functions
+let currentServiceTitle = '';
 
-// ── Service Modal
 function openServiceModal(title, desc, icon) {
+    currentServiceTitle = title;
     document.getElementById('svcModalTitle').textContent = title;
-    document.getElementById('svcModalDesc').textContent  = desc;
-    document.getElementById('modalIcon').textContent     = icon || '🌐';
+    document.getElementById('svcModalDesc').textContent = desc;
+    document.getElementById('modalIcon').textContent = icon || '🌐';
+    document.getElementById('hiddenServiceName').value = title;
+    
+    // Reset and hide enquiry form
+    const enquiryForm = document.getElementById('enquiryForm');
+    enquiryForm.classList.remove('show');
+    document.getElementById('enquiryFormElement').reset();
+    document.getElementById('formMessage').innerHTML = '';
+    
+    // Reset toggle button text
+    const toggleBtn = document.getElementById('enquiryToggleBtn');
+    toggleBtn.textContent = '📝 Send Enquiry';
+    toggleBtn.style.background = 'var(--primary)';
+    
     document.getElementById('serviceModal').classList.add('open');
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
 }
+
+function openServiceModalWithForm(title, desc, icon) {
+    openServiceModal(title, desc, icon);
+    // Auto-show the enquiry form
+    setTimeout(() => {
+        toggleEnquiryForm(true);
+    }, 100);
+}
+
 function closeServiceModal() {
     document.getElementById('serviceModal').classList.remove('open');
     document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
 }
-document.getElementById('serviceModal').addEventListener('click', function(e) {
-    if (e.target === this) closeServiceModal();
-});
 
-// ── Gallery Filter
+function toggleEnquiryForm(forceShow = false) {
+    const form = document.getElementById('enquiryForm');
+    const toggleBtn = document.getElementById('enquiryToggleBtn');
+    
+    if (forceShow || !form.classList.contains('show')) {
+        form.classList.add('show');
+        toggleBtn.textContent = '📝 Hide Enquiry Form';
+        toggleBtn.style.background = '#64748B';
+    } else {
+        form.classList.remove('show');
+        toggleBtn.textContent = '📝 Send Enquiry';
+        toggleBtn.style.background = 'var(--primary)';
+    }
+}
+
+// Form validation
+const enquiryForm = document.getElementById('enquiryFormElement');
+if(enquiryForm) {
+    enquiryForm.addEventListener('submit', function(e) {
+        const name = document.getElementById('customerName').value.trim();
+        const email = document.getElementById('customerEmail').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        
+        if (!name || !email || !phone) {
+            e.preventDefault();
+            document.getElementById('formMessage').innerHTML = '<div class="error-message">⚠️ Please fill in all required fields (Name, Email, Phone)</div>';
+            return false;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            e.preventDefault();
+            document.getElementById('formMessage').innerHTML = '<div class="error-message">⚠️ Please enter a valid email address</div>';
+            return false;
+        }
+        
+        const phoneRegex = /^[\+\d\s\-\(\)]{10,}$/;
+        if (!phoneRegex.test(phone)) {
+            e.preventDefault();
+            document.getElementById('formMessage').innerHTML = '<div class="error-message">⚠️ Please enter a valid phone number</div>';
+            return false;
+        }
+        
+        document.getElementById('formMessage').innerHTML = '<div class="success-message">📧 Sending your enquiry...</div>';
+    });
+}
+
+// Gallery Filter
 const galItems = Array.from(document.querySelectorAll('.gal-item'));
 document.querySelectorAll('.gal-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1202,7 +1512,7 @@ document.querySelectorAll('.gal-btn').forEach(btn => {
     });
 });
 
-// ── Lightbox
+// Lightbox
 let lbIndex = 0, lbVisible = [];
 function buildVisible() { lbVisible = galItems.filter(i => !i.classList.contains('hidden')); }
 galItems.forEach(item => {
@@ -1214,8 +1524,8 @@ galItems.forEach(item => {
 });
 function openLb() {
     const item = lbVisible[lbIndex];
-    document.getElementById('lbImg').src     = item.dataset.url;
-    document.getElementById('lbImg').alt     = item.dataset.title;
+    document.getElementById('lbImg').src = item.dataset.url;
+    document.getElementById('lbImg').alt = item.dataset.title;
     document.getElementById('lbCaption').textContent = item.dataset.title;
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1225,13 +1535,28 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 function lbNav(dir) { lbIndex = (lbIndex + dir + lbVisible.length) % lbVisible.length; openLb(); }
-document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
+const lightbox = document.getElementById('lightbox');
+if(lightbox) {
+    lightbox.addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
+}
 document.addEventListener('keydown', e => {
-    if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'ArrowRight') lbNav(1);
-    if (e.key === 'ArrowLeft')  lbNav(-1);
-    if (e.key === 'Escape')     closeLightbox();
+    if (document.getElementById('lightbox') && document.getElementById('lightbox').classList.contains('open')) {
+        if (e.key === 'ArrowRight') lbNav(1);
+        if (e.key === 'ArrowLeft')  lbNav(-1);
+        if (e.key === 'Escape')     closeLightbox();
+    }
+    if (e.key === 'Escape' && document.getElementById('serviceModal').classList.contains('open')) {
+        closeServiceModal();
+    }
 });
+
+// Close modal when clicking outside
+const serviceModal = document.getElementById('serviceModal');
+if(serviceModal) {
+    serviceModal.addEventListener('click', function(e) {
+        if (e.target === this) closeServiceModal();
+    });
+}
 </script>
 </body>
-</html>    
+</html>

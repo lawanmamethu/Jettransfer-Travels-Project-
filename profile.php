@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chgpa
 
 $r    = $conn->query("SELECT * FROM users WHERE id=$uid LIMIT 1");
 $user = $r ? $r->fetch_assoc() : [];
-$conn->close();
+//conn->close();
 
 // Derive display values
 $fullName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
@@ -301,18 +301,121 @@ input:checked+.slider:before{transform:translateX(24px)}
         </form>
       </div>
 
-      <!-- BOOKINGS -->
-      <div id="tab-bookings" class="tab-panel <?= $tab==='bookings'?'active':'' ?>">
-        <div class="panel-header">
-          <h2 class="panel-title">My Bookings</h2>
-          <a href="packages.php" class="btn-act btn-outline">Browse Packages</a>
+     <?php
+/*
+ ┌─────────────────────────────────────────────────────────┐
+ │  HOW TO FIX profile.php — Two steps                     │
+ │                                                         │
+ │  STEP 1 — In profile.php, find this line near the top:  │
+ │      $conn->close();                                    │
+ │  DELETE it (or comment it out). The connection must     │
+ │  stay open so the bookings tab can use it.              │
+ │                                                         │
+ │  STEP 2 — Replace the entire bookings tab-panel block   │
+ │  (the <div id="tab-bookings" ...> section) with the     │
+ │  code below. Paste it directly into profile.php.        │
+ └─────────────────────────────────────────────────────────┘
+*/
+?>
+
+<!-- ── BOOKINGS TAB ── paste this inside profile.php replacing the old bookings panel -->
+<div id="tab-bookings" class="tab-panel <?= $tab==='bookings'?'active':'' ?>">
+    <div class="panel-header">
+        <h2 class="panel-title">My Bookings</h2>
+        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+
+            <!-- ✅ Export as CSV button -->
+            <a href="export_bookings.php"
+               style="display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.3rem;
+                      background:#065F46;color:white;border-radius:50px;
+                      font-family:'Manrope',sans-serif;font-weight:600;font-size:.85rem;
+                      text-decoration:none;transition:all .25s;
+                      box-shadow:0 3px 10px rgba(6,95,70,.3)"
+               onmouseover="this.style.background='#047857';this.style.transform='translateY(-1px)'"
+               onmouseout="this.style.background='#065F46';this.style.transform='translateY(0)'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                Export as CSV
+            </a>
+
+            <a href="packages.php" class="btn-act btn-outline">Browse Packages</a>
         </div>
+    </div>
+
+    <?php
+    // ── Use the SAME $conn that is already open in profile.php
+    // (Do NOT require db.php again — it's already included at the top of profile.php)
+    $bookEmail    = $conn->real_escape_string($user['email'] ?? '');
+    $bRes2        = $conn->query("SELECT * FROM bookings WHERE email='$bookEmail' ORDER BY created_at DESC");
+    $userBookings = [];
+    if ($bRes2) while ($row = $bRes2->fetch_assoc()) $userBookings[] = $row;
+    ?>
+
+    <?php if (empty($userBookings)): ?>
         <div style="text-align:center;padding:3rem 1rem;color:var(--text-light)">
-          <div style="font-size:3.5rem;margin-bottom:1rem">📅</div>
-          <p style="font-weight:600;font-size:1rem;margin-bottom:.5rem">No bookings yet</p>
-          <p style="font-size:.88rem">Browse our packages and book your first Sri Lanka adventure!</p>
+            <div style="font-size:3.5rem;margin-bottom:1rem">📅</div>
+            <p style="font-weight:600;font-size:1rem;margin-bottom:.5rem">No bookings yet</p>
+            <p style="font-size:.88rem">Browse our packages and book your first Sri Lanka adventure!</p>
+            <a href="packages.php"
+               style="display:inline-block;margin-top:1rem;padding:.6rem 1.5rem;
+                      background:var(--primary);color:white;border-radius:50px;
+                      text-decoration:none;font-weight:600;font-size:.88rem">
+                Browse Packages →
+            </a>
         </div>
-      </div>
+    <?php else: ?>
+        <p style="font-size:.82rem;color:var(--text-light);margin-bottom:1rem">
+            You have <strong style="color:var(--primary)"><?= count($userBookings) ?></strong>
+            booking<?= count($userBookings) > 1 ? 's' : '' ?>.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:1rem">
+        <?php foreach ($userBookings as $b):
+            $statusColors = [
+                'Pending'   => ['bg'=>'#FEF3C7','txt'=>'#92400E'],
+                'Confirmed' => ['bg'=>'#ECFDF5','txt'=>'#065F46'],
+                'Completed' => ['bg'=>'#DBEAFE','txt'=>'#1E40AF'],
+                'Cancelled' => ['bg'=>'#FEE2E2','txt'=>'#991B1B'],
+            ];
+            $sc = $statusColors[$b['status']] ?? ['bg'=>'#F1F5F9','txt'=>'#475569'];
+        ?>
+        <div style="display:flex;justify-content:space-between;align-items:center;
+                    padding:1.1rem 1.2rem;background:var(--bg-light);border-radius:14px;
+                    transition:transform .2s"
+             onmouseover="this.style.transform='translateX(4px)'"
+             onmouseout="this.style.transform='translateX(0)'">
+            <div>
+                <div style="font-weight:700;font-size:.95rem;margin-bottom:.3rem">
+                    <?= htmlspecialchars($b['package_name']) ?>
+                </div>
+                <div style="display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.82rem;color:var(--text-light)">
+                    <span>📅 <?= date('d M Y', strtotime($b['travel_date'])) ?></span>
+                    <span>👥 <?= $b['guests'] ?> guest<?= $b['guests'] > 1 ? 's' : '' ?></span>
+                    <span>🕐 Booked <?= date('d M Y', strtotime($b['created_at'])) ?></span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:1rem;flex-shrink:0;margin-left:1rem">
+                <span style="padding:.28rem .85rem;border-radius:50px;font-size:.73rem;
+                             font-weight:700;background:<?= $sc['bg'] ?>;color:<?= $sc['txt'] ?>">
+                    <?= htmlspecialchars($b['status']) ?>
+                </span>
+                <span style="font-family:'Sora',sans-serif;font-weight:800;
+                             color:var(--primary);font-size:1rem;white-space:nowrap">
+                    <?= htmlspecialchars($b['price']) ?>
+                </span>
+            </div>
+        </div>
+        <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
+<!-- ── END BOOKINGS TAB ── -->
 
       <!-- PREFERENCES -->
       <div id="tab-preferences" class="tab-panel <?= $tab==='preferences'?'active':'' ?>">
