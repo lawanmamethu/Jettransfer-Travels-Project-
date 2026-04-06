@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,233 +25,813 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Manrope', sans-serif; color: var(--text-dark); line-height: 1.6; overflow-x: hidden; background: var(--bg-light); }
 
-        /* ========== CONSISTENT NAVBAR STYLES (matches destination page) ========== */
-        .logo-img { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(2,6,23,.10); box-shadow: 0 10px 22px rgba(10,126,164,.15); background: #fff; }
-        .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: var(--shadow-sm); z-index: 1000; transition: all 0.3s ease; }
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: var(--bg-light);
+        }
+
+        /* ── Logo (matching index.php size) ── */
+        .logo-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid rgba(2,6,23,.10);
+            box-shadow: 0 10px 22px rgba(10,126,164,.15);
+            background: #fff;
+        }
+
+        /* ── Header (matching index.php exactly) ── */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
         .header.scrolled { box-shadow: var(--shadow-md); }
-        .nav-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: .6rem; white-space: nowrap; }
-        .nav-menu { display: flex; list-style: none; gap: 1.6rem; align-items: center; }
-        .nav-menu a { color: var(--text-dark); text-decoration: none; font-weight: 500; font-size: 0.88rem; transition: color 0.3s ease; position: relative; }
-        .nav-menu a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s ease; }
-        .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
-        .nav-menu a:hover, .nav-menu a.active { color: var(--primary); }
-        .nav-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-        .nav-auth { display: flex; align-items: center; gap: 0.4rem; }
-        .btn-login { padding: 0.5rem 1.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.88rem; color: var(--primary); border: 2px solid var(--primary); transition: all 0.3s; white-space: nowrap; }
-        .btn-login:hover { background: var(--primary); color: white; transform: translateY(-2px); }
-        .btn-register { padding: 0.5rem 1.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.88rem; background: var(--primary); color: white; border: 2px solid var(--primary); transition: all 0.3s; box-shadow: 0 4px 12px rgba(10,126,164,0.3); white-space: nowrap; }
-        .btn-register:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
-        .mobile-toggle span { width: 25px; height: 3px; background: var(--text-dark); border-radius: 2px; transition: all 0.3s ease; }
-        .mobile-auth { display: none; }
-        .mobile-auth-btns { display: flex; gap: 0.8rem; width: 100%; }
-        .mobile-auth-btns a { flex: 1; }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.6rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.88rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .nav-menu a:hover::after,
+        .nav-menu a.active::after {
+            width: 100%;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--primary);
+        }
+
+        /* ── Nav Actions (search removed, only auth buttons) ── */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-login {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-login:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-register {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
+            white-space: nowrap;
+        }
+        .btn-register:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ── Mobile toggle ── */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+        }
+        .mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* ── Mobile auth (matches index.php) ── */
+        .mobile-auth {
+            display: none;
+        }
 
         @media (max-width: 768px) {
-            .mobile-toggle { display: flex; }
-            .nav-actions { display: none; }
-            .nav-menu { position: fixed; top: 80px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; box-shadow: var(--shadow-lg); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 999; }
-            .nav-menu.active { transform: translateX(0); }
-            .mobile-auth { display: flex !important; flex-direction: column; align-items: center; gap: 0.8rem; padding-top: 1.2rem; border-top: 1px solid #E2E8F0; width: 100%; }
+            .mobile-toggle {
+                display: flex;
+            }
+            .nav-actions {
+                display: none;
+            }
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 999;
+            }
+            .nav-menu.active {
+                transform: translateX(0);
+            }
+            .mobile-auth {
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                padding-top: 1.2rem;
+                border-top: 1px solid #E2E8F0;
+                width: 100%;
+            }
         }
 
-        /* ========== REST OF YOUR EXISTING STYLES ========== */
-        .page-header { margin-top: 80px; padding: 4rem 2rem 3rem; position: relative; overflow: hidden; text-align: center; }
-        .page-title { font-family: 'Sora', sans-serif; font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 1rem; animation: fadeInUp 0.8s ease; }
-        .page-description { font-size: 1.2rem; color: rgba(255,255,255,0.9); max-width: 700px; margin: 0 auto; animation: fadeInUp 0.8s ease 0.2s both; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .vehicles-section { max-width: 1400px; margin: 3rem auto; padding: 0 2rem 2rem; }
-        .vehicles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-        .loading-state { grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1.1rem; }
-        .loading-spinner { width: 48px; height: 48px; border: 4px solid var(--bg-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        /* ── Page Header ── */
+        .page-header {
+            margin-top: 80px;
+            padding: 5rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .page-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            margin-bottom: 1.2rem;
+            letter-spacing: 1px;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease both;
+            letter-spacing: -1px;
+        }
+
+        .page-description {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.88);
+            max-width: 650px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            line-height: 1.8;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Stats Bar ── */
+        .stats-bar-section {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stats-bar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.8rem 2.5rem;
+            text-align: center;
+        }
+
+        .stat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .stat-dot.green { background: #10B981; }
+        .stat-dot.amber { background: #F59E0B; }
+        .stat-dot.red   { background: #EF4444; }
+
+        .stat-number {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 40px;
+            background: #E2E8F0;
+            flex-shrink: 0;
+        }
+
+        /* ── Filter Bar ── */
+        .filter-section {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 0 2rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.55rem 1.4rem;
+            border-radius: 50px;
+            border: 2px solid #E2E8F0;
+            background: white;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
+        }
+
+        /* ── No Results ── */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+            grid-column: 1 / -1;
+        }
+        .no-results h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 1rem 0 0.5rem;
+        }
+        .no-results p { font-size: 0.9rem; }
+
+        /* ── Vehicles Section ── */
+        .vehicles-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem 2rem;
+        }
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ── Loading & Error states ── */
+        .loading-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--bg-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .error-state { grid-column: 1 / -1; text-align: center; padding: 3rem 2rem; color: #EF4444; font-size: 1rem; }
-        .vehicle-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-md); transition: all 0.4s ease; opacity: 0; animation: fadeInUp 0.6s ease forwards; }
-        .vehicle-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
-        .vehicle-image { width: 100%; height: 240px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .vehicle-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-        .vehicle-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: white; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 2; }
-        .badge-available { background: rgba(16,185,129,0.9); }
-        .badge-booked { background: rgba(100,116,139,0.9); }
-        .badge-maintenance { background: rgba(245,158,11,0.9); }
-        .vehicle-content { padding: 2rem; }
-        .vehicle-header { margin-bottom: 1.5rem; }
-        .vehicle-type { display: inline-block; background: var(--bg-light); color: var(--primary); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
-        .vehicle-name { font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; }
-        .vehicle-plate { font-size: 0.82rem; color: var(--text-light); margin-top: 0.3rem; }
-        .vehicle-specs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--bg-light); }
-        .spec-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); font-size: 0.9rem; font-weight: 500; }
-        .spec-icon { font-size: 1.1rem; }
-        .status-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--bg-light); }
-        .status-pill { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; background: var(--bg-light); color: var(--text-dark); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-        .status-dot.green { background: #10B981; }
+        .error-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #EF4444;
+            font-size: 1rem;
+        }
+
+        /* ── Vehicle Card ── */
+        .vehicle-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+            position: relative;
+        }
+        .vehicle-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        .vehicle-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.6s ease;
+        }
+        .vehicle-card:hover .vehicle-img { transform: scale(1.08); }
+
+        .vehicle-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+            z-index: 1;
+        }
+
+        .vehicle-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            z-index: 2;
+        }
+        .vehicle-type-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 0.3rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .vehicle-name-overlay {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+        }
+        .vehicle-plate-overlay {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .vehicle-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.45rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            z-index: 3;
+        }
+        .badge-available  { background: rgba(16, 185, 129, 0.92); }
+        .badge-booked     { background: rgba(100, 116, 139, 0.92); }
+        .badge-maintenance{ background: rgba(245, 158, 11, 0.92); }
+
+        .vehicle-content { padding: 1.5rem; }
+
+        .vehicle-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg-light);
+            padding: 0.4rem 0.85rem;
+            border-radius: 50px;
+            color: var(--text-dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .spec-icon { font-size: 0.95rem; }
+
+        .status-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            padding-top: 1rem;
+            border-top: 2px solid var(--bg-light);
+        }
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .status-dot.green  { background: #10B981; }
         .status-dot.yellow { background: #F59E0B; }
-        .status-dot.red { background: #EF4444; }
-        .footer { background: var(--text-dark); color: white; padding: 4rem 2rem 2rem; }
-        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem; }
-        .footer-section h3 { font-family: 'Sora', sans-serif; font-size: 1.3rem; margin-bottom: 1.5rem; }
-        .footer-section p, .footer-section a { color: rgba(255,255,255,0.7); text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s ease; }
+        .status-dot.red    { background: #EF4444; }
+
+        /* ── Footer (matching index.php) ── */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        .footer-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+        }
         .footer-section a:hover { color: var(--secondary); }
-        .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
-        .social-link { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; object-fit: cover; }
-        .social-link:hover { background: var(--primary); transform: translateY(-3px); }
-        .footer-bottom { max-width: 1400px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.5); }
-        @media (max-width: 768px) { .page-title { font-size: 2.5rem; } .page-description { font-size: 1.05rem; } .vehicles-grid { grid-template-columns: 1fr; } .footer-content { grid-template-columns: 1fr; gap: 2rem; } }
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            object-fit: cover;
+        }
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.5rem; }
+            .page-description { font-size: 1.05rem; }
+            .vehicles-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+            .stat-item { padding: 0.8rem 1rem; }
+            .stat-number { font-size: 1.2rem; }
+        }
     </style>
 </head>
-
 <body>
 
-    <header class="header" id="header">
-        <nav class="nav-container">
-            <a href="index.php" class="logo">
-                <img src="images/logo.jpeg" alt="Jettransfer Logo" class="logo-img">
-                Jettransfer
-            </a>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Home</a></li>
-                <li><a href="destination.php">Destinations</a></li>
-                <li><a href="packages.php">Packages</a></li>
-                <li><a href="vehicles.html" class="active">Vehicles</a></li>
-                <li><a href="service.php">Services & Gallery</a></li>
-                <li><a href="aboutus.php">About Us</a></li>
-                <li><a href="contact.php">Contact Us</a></li>
-                <li class="mobile-auth">
-                    <div class="mobile-auth-btns">
-                        <a href="login.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
-                        <a href="register.php" style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
-                    </div>
-                </li>
-            </ul>
-            <div class="nav-actions">
-                <div class="nav-auth">
-                    <a href="login.php" class="btn-login">Login</a>
-                    <a href="register.php" class="btn-register">Register</a>
+<!-- Header - Search bar removed, navbar size matches index.php exactly -->
+<header class="header" id="header">
+    <nav class="nav-container">
+        <a href="index.php" class="logo">
+            <img src="logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+            Jettransfer
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.php">Home</a></li>
+            <li><a href="destination.php">Destinations</a></li>
+            <li><a href="packages.php">Packages</a></li>
+            <li><a href="vehicles.html" class="active">Vehicles</a></li>
+            <li><a href="service.php">Services &amp; Gallery</a></li>
+            <li><a href="contact.php">Contact Us</a></li>
+            <li><a href="aboutus.php">About Us</a></li>
+            <li class="mobile-auth">
+                <div style="display:flex; gap:0.8rem; width:100%;">
+                    <a href="login.php" style="flex:1; display:block; padding:0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
+                    <a href="register.php" style="flex:1; display:block; padding:0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
                 </div>
-            </div>
-            <div class="mobile-toggle" id="mobileToggle">
-                <span></span><span></span><span></span>
-            </div>
-        </nav>
-    </header>
-
-    <section class="page-header">
-        <img src="southern.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(3px);transform:scale(1.05);">
-        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.82),rgba(16,185,129,0.75));z-index:1;"></div>
-        <h1 class="page-title" style="position:relative;z-index:2;">Our Vehicles</h1>
-        <p class="page-description" style="position:relative;z-index:2;">Choose the best vehicle for your tour based on your group size and comfort needs. All vehicles are well-maintained and driven by professional drivers.</p>
-    </section>
-
-    <section class="vehicles-section">
-        <div class="vehicles-grid" id="vehiclesGrid">
-            <div class="loading-state" id="loadingState">
-                <div class="loading-spinner"></div>
-                <p>Loading vehicles...</p>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            <!-- Search bar completely removed - only login/register buttons -->
+            <div class="nav-auth">
+                <a href="login.php" class="btn-login">Login</a>
+                <a href="register.php" class="btn-register">Register</a>
             </div>
         </div>
-    </section>
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
 
-    <footer class="footer" id="contact">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Jettransfer Travels</h3>
-                <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
-                <div class="social-links">
-                    <img src="images/insta1.webp" alt="Instagram" class="social-link">
-                    <img src="images/fb.avif" alt="Facebook" class="social-link">
-                    <img src="images/tiktok.webp" alt="TikTok" class="social-link">
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="destination.php">Destinations</a>
-                <a href="packages.php">Tour Packages</a>
-                <a href="vehicles.html">Our Vehicles</a>
-                <a href="service.php">Services</a>
-                <a href="service.php">Gallery</a>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>📞 +94 72 403 0499</p>
-                <p>📧 jettransfer@outlook.com</p>
-                <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
-            </div>
-            <div class="footer-section">
-                <h3>Business Hours</h3>
-                <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
-                <p>Saturday: 10:00 AM - 6:00 PM</p>
-                <p>Sunday: 10:00 AM - 6:00 PM</p>
-                <p style="margin-top:1rem;color:var(--secondary);">24/7 Emergency Support Available</p>
+<!-- Page Header -->
+<section class="page-header">
+    <img src="southern.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(1px);transform:scale(1.05);">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.60),rgba(10,126,164,0.50));z-index:1;"></div>
+    <div style="position:relative;z-index:2;">
+        <div class="page-tag"> 🚗 Our Fleet</div>
+        <h1 class="page-title">Our Vehicles</h1>
+        <p class="page-description">Choose the best vehicle for your tour based on your group size and comfort needs. All vehicles are well-maintained and driven by professional drivers.</p>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="stats-bar-section">
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number" id="statTotal">—</span>
+            <span class="stat-label">Total Vehicles</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-dot green"></span>
+            <span class="stat-number" id="statAvailable">—</span>
+            <span class="stat-label">Available</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-dot amber"></span>
+            <span class="stat-number" id="statBooked">—</span>
+            <span class="stat-label">Booked</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-dot red"></span>
+            <span class="stat-number" id="statMaintenance">—</span>
+            <span class="stat-label">Under Maintenance</span>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Bar -->
+<section class="filter-section">
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Luxury Car">Luxury Car</button>
+        <button class="filter-btn" data-filter="SUV">SUV</button>
+        <button class="filter-btn" data-filter="Van">Van</button>
+        <button class="filter-btn" data-filter="Luxury Van">Luxury Van</button>
+        <button class="filter-btn" data-filter="Minibus">Minibus</button>
+        <button class="filter-btn" data-filter="Premium Car">Premium Car</button>
+    </div>
+</section>
+
+<!-- Vehicles Section -->
+<section class="vehicles-section">
+    <div class="vehicles-grid" id="vehiclesGrid">
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p>Loading vehicles...</p>
+        </div>
+    </div>
+    <div id="noResultsState" style="display:none;" class="no-results">
+        <div style="font-size:3rem;">🚗</div>
+        <h3>No vehicles found</h3>
+        <p>Try selecting a different category</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" id="contact">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Jettransfer Travels</h3>
+            <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
+            <div class="social-links">
+                <img src="images/insta1.webp" alt="Instagram" class="social-link">
+                <img src="images/fb.avif" alt="Facebook" class="social-link">
+                <img src="images/tiktok.webp" alt="TikTok" class="social-link">
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="index.php#destinations">Destinations</a>
+            <a href="index.php#packages">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
+            <a href="aboutus.php">About Us</a>
+            <a href="terms.html">Terms & Conditions</a>
+            <a href="service.php">Gallery</a>
         </div>
-    </footer>
+        <div class="footer-section">
+            <h3>Business Hours</h3>
+            <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+            <p>Saturday: 10:00 AM - 6:00 PM</p>
+            <p>Sunday: 10:00 AM - 6:00 PM</p>
+            <p style="margin-top:1rem;color:var(--secondary)">24/7 Emergency Support Available</p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Info</h3>
+            <p>📞 +94 72 403 0499</p>
+            <p>📧 jettransfer@outlook.com</p>
+            <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+    </div>
+</footer>
 
-    <script>
-        const mobileToggle = document.getElementById('mobileToggle');
-        const navMenu = document.getElementById('navMenu');
+<script>
+    // Mobile menu toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (mobileToggle) {
         mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => navMenu.classList.remove('active'));
-        });
-        window.addEventListener('scroll', () => {
-            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
-        });
+    }
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => navMenu.classList.remove('active'));
+    });
 
-        const gradients = {
-            'Luxury Car': 'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(16,185,129,0.85))',
-            'SUV': 'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(245,158,11,0.85))',
-            'Van': 'linear-gradient(135deg, rgba(10,126,164,0.85), rgba(245,158,11,0.85))',
-            'Minibus': 'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(10,126,164,0.85))',
-            'Luxury Van': 'linear-gradient(135deg, rgba(245,158,11,0.85), rgba(16,185,129,0.85))',
-            'Premium Car': 'linear-gradient(135deg, rgba(6,90,122,0.9), rgba(10,126,164,0.85))',
-        };
+    // Scroll effect for header
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('header');
+        if (header) header.classList.toggle('scrolled', window.scrollY > 100);
+    });
 
-        function badgeClass(availability) {
-            if (availability === 'Available') return 'badge-available';
-            if (availability === 'Booked') return 'badge-booked';
-            return 'badge-maintenance';
-        }
+    // Badge class based on availability
+    function badgeClass(availability) {
+        if (availability === 'Available') return 'badge-available';
+        if (availability === 'Booked') return 'badge-booked';
+        return 'badge-maintenance';
+    }
 
-        function availDot(availability) {
-            if (availability === 'Available') return 'green';
-            if (availability === 'Booked') return 'red';
-            return 'yellow';
-        }
+    // Availability dot colour
+    function availDot(availability) {
+        if (availability === 'Available') return 'green';
+        if (availability === 'Booked') return 'red';
+        return 'yellow';
+    }
 
-        function condDot(condition) {
-            if (condition === 'Good Condition') return 'green';
-            if (condition === 'Under Maintenance') return 'yellow';
-            return 'red';
-        }
+    // Condition dot colour
+    function condDot(condition) {
+        if (condition === 'Good Condition') return 'green';
+        if (condition === 'Under Maintenance') return 'yellow';
+        return 'red';
+    }
 
-        function buildCard(v, index) {
-            const bg = gradients[v.type] || gradients['Luxury Car'];
-            const delay = (index * 0.1 + 0.1).toFixed(1);
-            return `
+    // Build card HTML
+    function buildCard(v, index) {
+        const delay = (index * 0.1 + 0.1).toFixed(1);
+        return `
         <div class="vehicle-card" style="animation-delay:${delay}s;">
-            <div class="vehicle-image" style="background:${bg};">
+            <div class="vehicle-image">
                 <img src="${v.image}" alt="${v.name}" class="vehicle-img">
                 <span class="vehicle-badge ${badgeClass(v.availability)}">${v.availability}</span>
+                <div class="vehicle-overlay">
+                    <span class="vehicle-type-badge">${v.type}</span>
+                    <div class="vehicle-name-overlay">${v.name}</div>
+                    <div class="vehicle-plate-overlay">🪪 ${v.plate}</div>
+                </div>
             </div>
             <div class="vehicle-content">
-                <div class="vehicle-header">
-                    <span class="vehicle-type">${v.type}</span>
-                    <h3 class="vehicle-name">${v.name}</h3>
-                    <p class="vehicle-plate">${v.plate}</p>
-                </div>
                 <div class="vehicle-specs">
                     <div class="spec-item"><span class="spec-icon">👤</span><span>${v.seats} Seats</span></div>
                     <div class="spec-item"><span class="spec-icon">❄️</span><span>AC</span></div>
                     <div class="spec-item"><span class="spec-icon">🧳</span><span>${v.luggage}</span></div>
                     <div class="spec-item"><span class="spec-icon">⛽</span><span>${v.fuel}</span></div>
-                    <div class="spec-item"><span class="spec-icon">🛡</span><span>Insured</span></div>
+                    <div class="spec-item"><span class="spec-icon">🛡️</span><span>Insured</span></div>
                 </div>
                 <div class="status-row">
                     <div class="status-pill">
@@ -264,23 +843,78 @@
                 </div>
             </div>
         </div>`;
-        }
+    }
 
-        async function loadVehicles() {
-            const grid = document.getElementById('vehiclesGrid');
-            try {
-                const response = await fetch('vehicles.php?action=get');
-                const data = await response.json();
-                if (!data.success) throw new Error(data.message);
+    let allVehicles = [];
+
+    // Fetch vehicles from database
+    async function loadVehicles() {
+        const grid = document.getElementById('vehiclesGrid');
+        if (!grid) return;
+        try {
+            const response = await fetch('vehicles.php?action=get');
+            const data = await response.json();
+            if (!data.success) throw new Error(data.message);
+            allVehicles = data.vehicles;
+            updateStats(allVehicles);
+            grid.innerHTML = '';
+            allVehicles.forEach((vehicle, index) => {
+                grid.innerHTML += buildCard(vehicle, index);
+            });
+        } catch (error) {
+            grid.innerHTML = `
+                <div class="error-state">
+                    <p>⚠️ Could not load vehicles. Please try again.</p>
+                    <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-light);">${error.message}</p>
+                </div>`;
+        }
+    }
+
+    // Update stats bar
+    function updateStats(vehicles) {
+        const available = vehicles.filter(v => v.availability === 'Available').length;
+        const booked = vehicles.filter(v => v.availability === 'Booked').length;
+        const maintenance = vehicles.filter(v => v.condition_status === 'Under Maintenance').length;
+        const statTotal = document.getElementById('statTotal');
+        const statAvailable = document.getElementById('statAvailable');
+        const statBooked = document.getElementById('statBooked');
+        const statMaintenance = document.getElementById('statMaintenance');
+        if (statTotal) statTotal.textContent = vehicles.length;
+        if (statAvailable) statAvailable.textContent = available;
+        if (statBooked) statBooked.textContent = booked;
+        if (statMaintenance) statMaintenance.textContent = maintenance;
+    }
+
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    if (filterBtns.length) {
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+                const grid = document.getElementById('vehiclesGrid');
+                const noResult = document.getElementById('noResultsState');
+                if (!grid) return;
+                const filtered = filter === 'all'
+                    ? allVehicles
+                    : allVehicles.filter(v => v.type === filter);
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    if (noResult) noResult.style.display = 'block';
+                    return;
+                }
+                if (noResult) noResult.style.display = 'none';
                 grid.innerHTML = '';
-                data.vehicles.forEach((vehicle, index) => {
+                filtered.forEach((vehicle, index) => {
                     grid.innerHTML += buildCard(vehicle, index);
                 });
-            } catch (error) {
-                grid.innerHTML = `<div class="error-state"><p>⚠️ Could not load vehicles. Please try again.</p><p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-light);">${error.message}</p></div>`;
-            }
-        }
-        loadVehicles();
-    </script>
+            });
+        });
+    }
+
+    // Load vehicles on page load
+    loadVehicles();
+</script>
 </body>
 </html>

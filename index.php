@@ -1,14 +1,39 @@
 <?php
 $conn = new mysqli('localhost', 'root', '', 'jettransfer');
+
 $featuredDestinations = [];
+$reviews = [];
+
 if (!$conn->connect_error) {
+
     $conn->set_charset('utf8mb4');
-    // Get 3 featured destinations for homepage
+
+    // =========================
+    // DESTINATIONS
+    // =========================
     $r = $conn->query("SELECT * FROM destinations WHERE is_active=1 ORDER BY id ASC LIMIT 3");
-    if ($r) while ($row = $r->fetch_assoc()) $featuredDestinations[] = $row;
+    if ($r) {
+        while ($row = $r->fetch_assoc()) {
+            $featuredDestinations[] = $row;
+        }
+    }
+
+    // =========================
+    // REVIEWS (NEW PART)
+    // =========================
+    $res = $conn->query("SELECT name, review_text, rating FROM reviews ORDER BY id DESC LIMIT 3");
+
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $reviews[] = $row;
+        }
+    }
+
+    // ✅ CLOSE ONLY AFTER EVERYTHING
     $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -616,7 +641,7 @@ if (!$conn->connect_error) {
 
 <!-- CUSTOMER REVIEWS WITH FLYING EMOJIS -->
 <section class="section" id="reviews">
-    <!-- Flying Travel Emojis Background -->
+    <!-- Flying Emojis Background -->
     <div class="flying-emojis-bg">
         <div class="emoji" style="top: 8%; left: -6%;">⭐</div>
         <div class="emoji" style="top: 18%; left: -4%;">😊</div>
@@ -627,32 +652,70 @@ if (!$conn->connect_error) {
         <div class="emoji" style="top: 68%; left: -12%;">🎉</div>
         <div class="emoji" style="top: 78%; left: -8%;">🏆</div>
         <div class="emoji" style="top: 88%; left: -10%;">✨</div>
-        <div class="emoji" style="top: 12%; left: -13%;">😍</div>
-        <div class="emoji" style="top: 22%; left: -3%;">💯</div>
-        <div class="emoji" style="top: 32%; left: -14%;">🎯</div>
-        <div class="emoji" style="top: 42%; left: -5%;">📝</div>
-        <div class="emoji" style="top: 52%; left: -9%;">👏</div>
     </div>
-    
+
     <div class="container">
         <div class="section-header fade-in">
             <span class="section-tag">Testimonials</span>
             <h2 class="section-title">What Our Clients Say</h2>
-            <p class="section-description">Read about experiences from our happy travelers</p>
+            <p class="section-description">Real reviews from our happy travelers</p>
         </div>
+
         <div class="card-grid">
+
+        <?php if (empty($reviews)): ?>
+
+            <!-- No reviews -->
             <div class="review-card fade-in">
-                <div class="review-header"><div class="review-avatar">SJ</div><div class="review-info"><h4>Sarah Johnson</h4><div class="stars">★★★★★</div></div></div>
-                <p class="review-text">"Absolutely wonderful experience! Our driver was knowledgeable and friendly, the vehicle was spotless, and every detail was perfectly organized. Jettransfer made our Sri Lanka vacation unforgettable!"</p>
+                <div class="review-header">
+                    <div class="review-avatar">U</div>
+                    <div class="review-info">
+                        <h4>Guest User</h4>
+                        <div class="stars">★★★★★</div>
+                    </div>
+                </div>
+                <p class="review-text">
+                    "No reviews yet. Be the first to share your experience!"
+                </p>
             </div>
-            <div class="review-card fade-in">
-                <div class="review-header"><div class="review-avatar">MP</div><div class="review-info"><h4>Rohit Patel</h4><div class="stars">★★★★★</div></div></div>
-                <p class="review-text">"Professional service from start to finish. The custom tour plan was exactly what we wanted, and the team went above and beyond to ensure we had the best experience. Highly recommended!"</p>
-            </div>
-            <div class="review-card fade-in">
-                <div class="review-header"><div class="review-avatar">EW</div><div class="review-info"><h4>Emma Williams</h4><div class="stars">★★★★★</div></div></div>
-                <p class="review-text">"Best travel decision we made! The vehicles were luxurious, drivers were punctual and courteous, and the entire journey was smooth. Will definitely book with Jettransfer again on our next visit!"</p>
-            </div>
+
+        <?php else: ?>
+
+            <?php foreach ($reviews as $r): ?>
+                <div class="review-card fade-in">
+
+                    <div class="review-header">
+
+                        <!-- Avatar (first letter) -->
+                        <div class="review-avatar">
+                            <?= strtoupper(substr($r['name'], 0, 1)) ?>
+                        </div>
+
+                        <div class="review-info">
+                            <h4><?= htmlspecialchars($r['name']) ?></h4>
+
+                            <!-- Stars -->
+                            <div class="stars">
+                                <?php
+                                $rating = (int)$r['rating'];
+                                for ($i = 1; $i <= 5; $i++) {
+                                    echo $i <= $rating ? "★" : "☆";
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review text -->
+                    <p class="review-text">
+                        "<?= htmlspecialchars($r['review_text']) ?>"
+                    </p>
+
+                </div>
+            <?php endforeach; ?>
+
+        <?php endif; ?>
+
         </div>
     </div>
 </section>

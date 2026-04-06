@@ -71,6 +71,8 @@ if ($r2) while ($row = $r2->fetch_assoc()) $categories[] = $row['category'];
 $conn->close();
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -479,6 +481,8 @@ $conn->close();
             <p style="font-size:.9rem;margin-top:.5rem">Add destinations from the <a href="admin/destinations.php" style="color:var(--primary);font-weight:600">Admin Panel</a>.</p>
         </div>
         <?php else: ?>
+
+  
         <?php 
         // Define nearby attractions data for each destination
         $nearbyAttractions = [
@@ -498,6 +502,8 @@ $conn->close();
             'Yala' => ['🐆 Leopard Safari', '🦚 Bird Watching', '🏞️ Buttuwa Lake']
         ];
         ?>
+
+        
         <?php foreach($destinations as $i => $d): 
             $attractions = isset($nearbyAttractions[$d['name']]) ? $nearbyAttractions[$d['name']] : ['⭐ Nearby gems to explore', '📍 Local highlights', '🌟 Must-visit spots'];
         ?>
