@@ -1,19 +1,3 @@
-<?php
-session_start();
-if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
-
-require_once '../db.php';
-
-// Fetch admin info (same as index.php)
-$ar  = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
-$adm = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
-$admName  = htmlspecialchars($adm['name']);
-$admEmail = htmlspecialchars($adm['email']);
-$admInit  = strtoupper(substr($adm['name'],0,1));
-
-// Note: The actual vehicle CRUD operations are handled by ../vehicles.php API endpoint
-// This file is just the admin interface
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,6 +5,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Vehicles – Jettransfer Admin</title>
+    <link rel="icon" type="image/jpeg" href="../logo.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap"
@@ -212,7 +197,6 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             background: none;
             width: 100%;
             font-family: 'Manrope', sans-serif;
-            text-decoration: none;
         }
 
         .btn-logout:hover {
@@ -443,6 +427,49 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             background: var(--danger);
         }
 
+        /* ── Report buttons ── */
+        .btn-report-csv {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .42rem .85rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-report-csv:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-report-pdf {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .42rem .85rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-report-pdf:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
         /* ── Add button ── */
         .btn-add {
             display: inline-flex;
@@ -487,6 +514,28 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             color: #fff;
         }
 
+        /* ── Edit button (red) ── */
+        .btn-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .45rem 1rem;
+            border-radius: 50px;
+            background: var(--danger-light);
+            color: var(--danger);
+            border: none;
+            font-family: 'Manrope', sans-serif;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-edit:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
         /* ── Form input style for add modal ── */
         .form-row input[type=text],
         .form-row input[type=number] {
@@ -507,26 +556,98 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             border-color: var(--primary);
         }
 
-        /* ── Edit button ── */
-        .btn-edit {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding: .45rem 1rem;
-            border-radius: 50px;
-            background: var(--primary-light);
-            color: var(--primary);
-            border: none;
-            font-family: 'Manrope', sans-serif;
-            font-size: .8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
+        /* ── Tab bar ── */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .btn-edit:hover {
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: white;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
             background: var(--primary);
-            color: #fff;
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tab-badge {
+            background: #EF4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 50px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* ── Enquiry status pills ── */
+        .pill-pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .pill-pending .pill-dot {
+            background: #D97706;
+        }
+
+        .pill-responded {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .pill-responded .pill-dot {
+            background: #059669;
+        }
+
+        .btn-respond {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            background: #D1FAE5;
+            color: #059669;
+            border: none;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-respond:hover {
+            background: #059669;
+            color: white;
+        }
+
+        .msg-cell {
+            max-width: 160px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-light);
+            font-size: 0.82rem;
         }
 
         /* ── Loading / empty ── */
@@ -821,16 +942,21 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
         </nav>
         <div class="sidebar-footer">
             <div class="admin-profile">
-                <div class="admin-avatar"><?= $admInit ?></div>
+                <div class="admin-avatar" id="sidebarAvatar">A</div>
                 <div class="admin-info">
-                    <h4><?= $admName ?></h4>
-                    <p><?= $admEmail ?></p>
+                    <h4 id="adminName">Admin</h4>
+                    <p id="adminEmail">admin@jettransfer.com</p>
                 </div>
             </div>
-            <a href="logout.php" class="btn-logout">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <button class="btn-logout" onclick="logout()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
                 Logout
-            </a>
+            </button>
         </div>
     </aside>
 
@@ -852,15 +978,49 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                 </div>
             </div>
             <div class="topbar-right">
-                <div class="topbar-avatar" id="topbarAvatar"><?= $admInit ?></div>
+                <div class="topbar-avatar" id="topbarAvatar">A</div>
             </div>
         </header>
 
         <div class="content">
-            <div class="panel">
+
+            <!-- ── Tab Buttons ── -->
+            <div class="tab-bar">
+                <button class="tab-btn active" id="tabVehicles" onclick="switchTab('vehicles')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="3" width="15" height="13" />
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                        <circle cx="5.5" cy="18.5" r="2.5" />
+                        <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                    Vehicles
+                </button>
+                <button class="tab-btn" id="tabEnquiries" onclick="switchTab('enquiries')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Enquiries
+                    <span class="tab-badge" id="enquiryBadge" style="display:none">0</span>
+                </button>
+            </div>
+
+            <!-- ── Vehicles Panel ── -->
+            <div class="panel" id="panelVehicles">
                 <div class="panel-header">
                     <h2>All Vehicles</h2>
-                    <button class="btn-add" onclick="openAddModal()">+ Add Vehicle</button>
+                    <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                        <button class="btn-report-csv" onclick="exportCSV()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export CSV
+                        </button>
+                        <button class="btn-report-pdf" onclick="printPDF()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            Print / PDF
+                        </button>
+                        <button class="btn-add" onclick="openAddModal()">+ Add Vehicle</button>
+                    </div>
                 </div>
                 <div class="table-wrap">
                     <table id="vehicleTable" style="display:none">
@@ -890,6 +1050,43 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                     <p id="errorMsg">Could not load vehicles.</p>
                 </div>
             </div>
+
+            <!-- ── Enquiries Panel ── -->
+            <div class="panel" id="panelEnquiries" style="display:none">
+                <div class="panel-header">
+                    <h2>Vehicle Enquiries</h2>
+                    <span style="font-size:0.85rem; color:var(--text-light);" id="enquiryCount">Loading...</span>
+                </div>
+                <div class="table-wrap">
+                    <table id="enquiryTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Vehicle Type</th>
+                                <th>Travel Date</th>
+                                <th>Passengers</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enquiryTbody"></tbody>
+                    </table>
+                </div>
+                <div id="enquiryLoadingState" class="state-box">
+                    <div class="spinner"></div>
+                    <p>Loading enquiries...</p>
+                </div>
+                <div id="enquiryEmptyState" class="state-box" style="display:none">
+                    <div class="icon">📋</div>
+                    <p>No enquiries yet.</p>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -1002,12 +1199,20 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
     <div class="toast" id="toast"></div>
 
     <script>
-        // Admin info from PHP
-        const adminName = '<?= $admName ?>';
-        const adminEmail = '<?= $admEmail ?>';
-        const adminInit = '<?= $admInit ?>';
+        // ── Session check ──
+        fetch('check-session.php')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.loggedIn) { window.location.href = 'login.php'; return; }
+                const name = data.name || 'Admin';
+                const ini = name.charAt(0).toUpperCase();
+                document.getElementById('adminName').textContent = name;
+                document.getElementById('adminEmail').textContent = data.email || '';
+                document.getElementById('sidebarAvatar').textContent = ini;
+                document.getElementById('topbarAvatar').textContent = ini;
+            });
 
-        // ── Pill HTML helpers ────────────────────────────────────
+        // ── Pill HTML helpers ──
         function availPill(val) {
             if (val === 'Available') return `<span class="pill pill-available"><span class="pill-dot"></span>Available</span>`;
             return `<span class="pill pill-booked"><span class="pill-dot"></span>Booked</span>`;
@@ -1018,13 +1223,13 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             return `<span class="pill pill-maintenance"><span class="pill-dot"></span>Under Maintenance</span>`;
         }
 
-        // ── Render table ─────────────────────────────────────────
+        // ── Render table ──
         function renderTable(vehicles) {
             const tbody = document.getElementById('vehicleTbody');
             tbody.innerHTML = '';
             vehicles.forEach((v, i) => {
                 const imgCell = v.image
-                    ? `<img src="../${v.image}" alt="${v.name}" class="vehicle-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    ? `<img src="${v.image}" alt="${v.name}" class="vehicle-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
                     : '';
                 tbody.innerHTML += `
             <tr>
@@ -1034,48 +1239,37 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                         ${imgCell}
                         <div class="vehicle-thumb-placeholder" style="${v.image ? 'display:none' : ''}">🚗</div>
                         <div>
-                            <div class="vehicle-name">${escapeHtml(v.name)}</div>
-                            <div class="vehicle-plate">${escapeHtml(v.plate)}</div>
+                            <div class="vehicle-name">${v.name}</div>
+                            <div class="vehicle-plate">${v.plate}</div>
                         </div>
                     </div>
-                 </td>
-                <td>${escapeHtml(v.type)}</td>
+                </td>
+                <td>${v.type}</td>
                 <td>${v.seats}</td>
-                <td>${escapeHtml(v.fuel)}</td>
-                <td>${escapeHtml(v.luggage)}</td>
+                <td>${v.fuel}</td>
+                <td>${v.luggage}</td>
                 <td>${availPill(v.availability)}</td>
                 <td>${condPill(v.condition_status)}</td>
                 <td>
-                    <button class="btn-edit" onclick="openModal(${v.id}, '${escapeHtml(v.name)}', '${escapeHtml(v.plate)}', '${v.availability}', '${v.condition_status}')">
+                    <button class="btn-edit" onclick="openModal(${v.id}, '${v.name}', '${v.plate}', '${v.availability}', '${v.condition_status}')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         Edit
                     </button>
-                 </td>
+                </td>
                 <td>
-                    <button class="btn-delete" onclick="deleteVehicle(${v.id}, '${escapeHtml(v.name)}')">
+                    <button class="btn-delete" onclick="deleteVehicle(${v.id}, '${v.name}')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                         Delete
                     </button>
-                 </td>
-             </tr>`;
+                </td>
+            </tr>`;
             });
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('vehicleTable').style.display = 'table';
         }
 
-        // Helper to escape HTML
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // ── Load vehicles ────────────────────────────────────────
+        // ── Load vehicles ──
         function loadVehicles() {
             fetch('../vehicles.php?action=get')
                 .then(r => r.json())
@@ -1092,7 +1286,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
 
         loadVehicles();
 
-        // ── Modal ────────────────────────────────────────────────
+        // ── Modal ──
         function openModal(id, name, plate, availability, condition) {
             document.getElementById('editVehicleId').value = id;
             document.getElementById('modalVehicleName').textContent = name;
@@ -1113,7 +1307,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             if (e.target === this) closeModal('addModal');
         });
 
-        // ── Save changes → update_vehicle.php ───────────────────
+        // ── Save changes ──
         function saveChanges() {
             const id = document.getElementById('editVehicleId').value;
             const availability = document.getElementById('editAvailability').value;
@@ -1147,7 +1341,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                 });
         }
 
-        // ── Open Add Modal ───────────────────────────────────────
+        // ── Open Add Modal ──
         function openAddModal() {
             document.getElementById('addName').value = '';
             document.getElementById('addPlate').value = '';
@@ -1161,7 +1355,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             document.getElementById('addModal').classList.add('show');
         }
 
-        // ── Add Vehicle ──────────────────────────────────────────
+        // ── Add Vehicle ──
         function addVehicle() {
             const name = document.getElementById('addName').value.trim();
             const plate = document.getElementById('addPlate').value.trim();
@@ -1212,7 +1406,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                 });
         }
 
-        // ── Delete Vehicle ───────────────────────────────────────
+        // ── Delete Vehicle ──
         function deleteVehicle(id, name) {
             if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
 
@@ -1233,7 +1427,7 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
                 .catch(() => showToast('❌ Network error. Try again.', 'error'));
         }
 
-        // ── Toast notification ───────────────────────────────────
+        // ── Toast notification ──
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
@@ -1241,16 +1435,266 @@ $admInit  = strtoupper(substr($adm['name'],0,1));
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // ── Sidebar ──────────────────────────────────────────────
+        // ── Sidebar ──
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
-        
         document.getElementById('sidebarOverlay').addEventListener('click', () => {
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('sidebarOverlay').classList.remove('show');
         });
+
+        function logout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            window.location.href = 'logout.php';
+        }
+
+        // ── Tab switching ──
+        function switchTab(tab) {
+            const isVehicles = tab === 'vehicles';
+
+            document.getElementById('panelVehicles').style.display = isVehicles ? 'block' : 'none';
+            document.getElementById('panelEnquiries').style.display = isVehicles ? 'none' : 'block';
+
+            document.getElementById('tabVehicles').classList.toggle('active', isVehicles);
+            document.getElementById('tabEnquiries').classList.toggle('active', !isVehicles);
+
+            if (!isVehicles) loadEnquiries();
+        }
+
+        // ── Load enquiries ──
+        function loadEnquiries() {
+            const formData = new FormData();
+            formData.append('action', 'get_enquiries');
+
+            fetch('../vehicles.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) throw new Error(data.message);
+                    renderEnquiries(data.enquiries);
+                })
+                .catch(err => {
+                    document.getElementById('enquiryLoadingState').style.display = 'none';
+                    showToast('❌ Could not load enquiries', 'error');
+                });
+        }
+
+        // ── Render enquiries table ──
+        function renderEnquiries(enquiries) {
+            const tbody = document.getElementById('enquiryTbody');
+            const loadingState = document.getElementById('enquiryLoadingState');
+            const emptyState = document.getElementById('enquiryEmptyState');
+            const table = document.getElementById('enquiryTable');
+            const countEl = document.getElementById('enquiryCount');
+            const badge = document.getElementById('enquiryBadge');
+
+            loadingState.style.display = 'none';
+            tbody.innerHTML = '';
+
+            const pending = enquiries.filter(e => e.status === 'Pending').length;
+
+            if (pending > 0) {
+                badge.textContent = pending;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            countEl.textContent = `${enquiries.length} total · ${pending} pending`;
+
+            if (enquiries.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+
+            enquiries.forEach((e, i) => {
+                const isPending = e.status === 'Pending';
+                const statusPill = isPending
+                    ? `<span class="pill pill-pending"><span class="pill-dot"></span>Pending</span>`
+                    : `<span class="pill pill-responded"><span class="pill-dot"></span>Responded</span>`;
+
+                const respondBtn = isPending
+                    ? `<button class="btn-respond" onclick="updateEnquiry(${e.id}, 'Responded')">✅ Mark Responded</button>`
+                    : `<button class="btn-respond" onclick="updateEnquiry(${e.id}, 'Pending')" style="background:#FEF3C7;color:#D97706;">↩ Mark Pending</button>`;
+
+                const date = new Date(e.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                tbody.innerHTML += `
+            <tr>
+                <td style="color:var(--text-light);font-size:0.8rem">${i + 1}</td>
+                <td style="font-weight:700">${e.name}</td>
+                <td style="font-size:0.82rem;color:var(--text-mid)">${e.email}</td>
+                <td style="font-size:0.82rem">${e.phone || '—'}</td>
+                <td><span style="background:var(--primary-light);color:var(--primary);padding:0.2rem 0.7rem;border-radius:50px;font-size:0.78rem;font-weight:600">${e.vehicle_type}</span></td>
+                <td style="font-size:0.85rem">${e.travel_date}</td>
+                <td style="text-align:center">${e.passengers || '—'}</td>
+                <td><div class="msg-cell" title="${e.message || ''}">${e.message || '—'}</div></td>
+                <td>${statusPill}</td>
+                <td style="font-size:0.8rem;color:var(--text-light)">${date}</td>
+                <td style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap">
+                    ${respondBtn}
+                    <button class="btn-delete" onclick="deleteEnquiry(${e.id})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    </button>
+                </td>
+            </tr>`;
+            });
+        }
+
+        // ── Update enquiry status ──
+        function updateEnquiry(id, status) {
+            const formData = new FormData();
+            formData.append('action', 'update_enquiry');
+            formData.append('id', id);
+            formData.append('status', status);
+
+            fetch('../vehicles.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        loadEnquiries();
+                        showToast(`✅ Marked as ${status}!`, 'success');
+                    } else {
+                        showToast('❌ ' + data.message, 'error');
+                    }
+                });
+        }
+
+        // ── Delete enquiry ──
+        function deleteEnquiry(id) {
+            if (!confirm('Delete this enquiry?')) return;
+
+            const formData = new FormData();
+            formData.append('action', 'delete_enquiry');
+            formData.append('id', id);
+
+            fetch('../vehicles.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        loadEnquiries();
+                        showToast('✅ Enquiry deleted!', 'success');
+                    } else {
+                        showToast('❌ ' + data.message, 'error');
+                    }
+                });
+        }
+
+        // ── Load pending count on page load for badge ──
+        (function checkPendingBadge() {
+            const formData = new FormData();
+            formData.append('action', 'get_enquiries');
+            fetch('../vehicles.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) return;
+                    const pending = data.enquiries.filter(e => e.status === 'Pending').length;
+                    const badge = document.getElementById('enquiryBadge');
+                    if (pending > 0) {
+                        badge.textContent = pending;
+                        badge.style.display = 'inline-block';
+                    }
+                });
+        })();
+
+        // ── Export CSV ──
+        function exportCSV() {
+            const headers = ['#', 'Name', 'Plate', 'Type', 'Seats', 'Fuel', 'Luggage', 'Availability', 'Condition'];
+            const rows = [headers];
+
+            document.querySelectorAll('#vehicleTbody tr').forEach((row, i) => {
+                const cells = row.querySelectorAll('td');
+                const esc = v => '"' + (v || '').replace(/"/g, '""') + '"';
+                rows.push([
+                    esc(String(i + 1)),
+                    esc(row.querySelector('.vehicle-name')?.textContent.trim()),
+                    esc(row.querySelector('.vehicle-plate')?.textContent.trim()),
+                    esc(cells[2]?.textContent.trim()),
+                    esc(cells[3]?.textContent.trim()),
+                    esc(cells[4]?.textContent.trim()),
+                    esc(cells[5]?.textContent.trim()),
+                    esc(cells[6]?.querySelector('.pill')?.textContent.trim()),
+                    esc(cells[7]?.querySelector('.pill')?.textContent.trim())
+                ]);
+            });
+
+            const csv  = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a    = Object.assign(document.createElement('a'), {
+                href: URL.createObjectURL(blob),
+                download: 'vehicles_' + new Date().toISOString().slice(0, 10) + '.csv'
+            });
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ── Print / PDF ──
+        function printPDF() {
+            const rows = [...document.querySelectorAll('#vehicleTbody tr')].map((row, i) => {
+                const cells = row.querySelectorAll('td');
+                const avail = cells[6]?.querySelector('.pill')?.textContent.trim();
+                const cond  = cells[7]?.querySelector('.pill')?.textContent.trim();
+                const availColor = avail === 'Available' ? '#065F46' : '#D97706';
+                const condColor  = cond  === 'Good Condition' ? '#065F46' : '#EF4444';
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td><strong>${row.querySelector('.vehicle-name')?.textContent.trim()}</strong><br>
+                        <span style="color:#94A3B8;font-size:.75rem">${row.querySelector('.vehicle-plate')?.textContent.trim()}</span></td>
+                    <td>${cells[2]?.textContent.trim()}</td>
+                    <td style="text-align:center">${cells[3]?.textContent.trim()}</td>
+                    <td>${cells[4]?.textContent.trim()}</td>
+                    <td>${cells[5]?.textContent.trim()}</td>
+                    <td style="color:${availColor};font-weight:700">${avail}</td>
+                    <td style="color:${condColor};font-weight:700">${cond}</td>
+                </tr>`;
+            }).join('');
+
+            const total = document.querySelectorAll('#vehicleTbody tr').length;
+
+            const w = window.open('', '_blank');
+            w.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Vehicles Report – Jettransfer</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;padding:2rem;color:#0F172A;font-size:13px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #0A7EA4}
+  .header h1{font-size:1.3rem;color:#0A7EA4;margin-bottom:.2rem}
+  .header p{font-size:.78rem;color:#64748B}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{text-align:left;padding:.55rem .7rem;background:#0A7EA4;color:#fff;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:.6rem .7rem;border-bottom:1px solid #E2E8F0;vertical-align:middle}
+  tr:nth-child(even) td{background:#F8FAFC}
+  .footer{margin-top:1.5rem;font-size:.72rem;color:#94A3B8;text-align:center;border-top:1px solid #E2E8F0;padding-top:.75rem}
+  @media print{body{padding:.5rem}}
+</style></head><body>
+<div class="header">
+  <div><h1>✈️ Jettransfer – Vehicles Report</h1><p>Fleet Management Export</p></div>
+  <div style="text-align:right;font-size:.75rem;color:#64748B">
+    Generated: ${new Date().toLocaleString()}<br>
+    Total: ${total} vehicles
+  </div>
+</div>
+<table>
+  <thead>
+    <tr><th>#</th><th>Vehicle</th><th>Type</th><th>Seats</th><th>Fuel</th><th>Luggage</th><th>Availability</th><th>Condition</th></tr>
+  </thead>
+  <tbody>${rows || '<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:#94A3B8">No vehicles found.</td></tr>'}</tbody>
+</table>
+<div class="footer">Jettransfer Admin Panel &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; ${new Date().toLocaleDateString()}</div>
+<script>window.onload=()=>{window.print();window.onafterprint=()=>window.close()}<\/script>
+</body></html>`);
+            w.document.close();
+        }
+
     </script>
 </body>
 

@@ -146,6 +146,11 @@ $todayBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE DATE(crea
 $totalGuests   = (int)$pdo->query('SELECT SUM(guests) FROM bookings')->fetchColumn();
 $customBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE booking_type = 'custom'")->fetchColumn();
 $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE booking_type = 'standard' OR booking_type IS NULL")->fetchColumn();
+
+// Store all bookings for export (without pagination limit for full report)
+$stmtAll = $pdo->prepare("SELECT * FROM bookings ORDER BY created_at DESC");
+$stmtAll->execute();
+$allBookings = $stmtAll->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -252,9 +257,14 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
         .filter-btn:hover, .filter-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
         .toolbar-right { display:flex; gap:.8rem; align-items:center; }
 
+        /* Report buttons */
+        .report-buttons { display:flex; gap:0.5rem; }
+        .btn-report { display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.9rem; border-radius:50px; font-size:0.75rem; font-weight:600; font-family:'Manrope',sans-serif; cursor:pointer; transition:all 0.2s ease; border:1px solid var(--border); background:#fff; color:var(--text-dark); }
+        .btn-report:hover { background:var(--bg); border-color:var(--primary); color:var(--primary); }
+
         /* ── TABLE ── */
         .table-card { background:white; border-radius:20px; box-shadow:var(--shadow-sm); overflow:hidden; border:1px solid var(--border); }
-        .table-header { padding:1.2rem 1.5rem; border-bottom:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center; }
+        .table-header { padding:1.2rem 1.5rem; border-bottom:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
         .table-header h3 { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; }
         .table-header span { font-size:0.85rem; color:var(--text-light); }
         .table-wrap { overflow-x:auto; }
@@ -418,24 +428,7 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
                 <p>View and manage all customer bookings (including custom packages)</p>
             </div>
         </div>
-        <div class="admin-dropdown" id="adminDropdown">
-            <button class="admin-pill" onclick="toggleAdminDD()">
-                <div class="admin-pill-avatar"><?= $admInit ?></div>
-                <span><?= htmlspecialchars($admName) ?></span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="admin-dd-menu" id="adminDDMenu">
-                <div class="adm-header">
-                    <div class="adm-avatar"><?= $admInit ?></div>
-                    <div><div class="adm-name"><?= htmlspecialchars($admName) ?></div><div class="adm-role">Administrator</div></div>
-                </div>
-                <div class="adm-divider"></div>
-                <a href="../index.php" target="_blank" class="adm-item site">🌐 View Website</a>
-                <a href="index.php" class="adm-item">📊 Dashboard</a>
-                <div class="adm-divider"></div>
-                <a href="logout.php" class="adm-item logout">🚪 Logout</a>
-            </div>
-        </div>
+        
     </header>
 
     <div class="page-body">
@@ -521,7 +514,10 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
         <div class="table-card">
             <div class="table-header">
                 <h3>All Bookings</h3>
-                <span><?= $total ?> booking<?= $total !== 1 ? 's' : '' ?></span>
+                <div class="report-buttons">
+                    <button type="button" class="btn-report" onclick="exportBookingsCSV()">📎 Export CSV</button>
+                    <button type="button" class="btn-report" onclick="printBookings()">🖨️ Print/PDF</button>
+                </div>
             </div>
 
             <?php if (empty($bookings)): ?>
@@ -532,7 +528,7 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
             </div>
             <?php else: ?>
             <div class="table-wrap">
-                <table>
+                <table id="bookingsTable">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -674,6 +670,9 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
 </style>
 
 <script>
+    // Store all bookings data for export (full dataset)
+    const allBookings = <?php echo json_encode($allBookings); ?>;
+
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarOverlay').classList.toggle('show');
@@ -754,9 +753,92 @@ $standardBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE bookin
         if (e.target === this) closeDetailsModal();
     });
 
+    // Export to CSV
+    function exportBookingsCSV() {
+        if (!allBookings.length) {
+            alert('No bookings to export.');
+            return;
+        }
+        let rows = [['ID', 'Customer Name', 'Email', 'Phone', 'Package Name', 'Booking Type', 'Travel Date', 'Guests', 'Price', 'Created Date', 'Custom Duration', 'Custom Hotel', 'Custom Vehicle', 'Custom Group Size']];
+        allBookings.forEach(b => {
+            rows.push([
+                b.id,
+                b.customer_name,
+                b.email,
+                b.phone || '',
+                b.package_name,
+                (b.booking_type || 'standard'),
+                b.travel_date,
+                b.guests,
+                b.price,
+                b.created_at,
+                b.custom_duration || '',
+                b.custom_hotel || '',
+                b.custom_vehicle || '',
+                b.custom_group_size || ''
+            ]);
+        });
+        let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', 'jettransfer_bookings.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // Print/PDF
+    function printBookings() {
+        if (!allBookings.length) {
+            alert('No bookings to print.');
+            return;
+        }
+        const printWindow = window.open('', '_blank');
+        let html = `
+            <html>
+            <head><title>Jettransfer - Bookings Report</title>
+            <style>
+                body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+                h1 { color: #0A7EA4; }
+                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+                th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+                th { background: #f2f2f2; }
+            </style>
+            </head>
+            <body>
+            <h1>Jettransfer - Bookings Report</h1>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+            <table><thead><tr>
+                <th>ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Package</th><th>Type</th><th>Travel Date</th><th>Guests</th><th>Price</th><th>Booked On</th>
+            </tr></thead><tbody>
+        `;
+        allBookings.forEach(b => {
+            html += `<tr>
+                <td>${escapeHtml(b.id)}</td>
+                <td>${escapeHtml(b.customer_name)}</td>
+                <td>${escapeHtml(b.email)}</td>
+                <td>${escapeHtml(b.phone || '—')}</td>
+                <td>${escapeHtml(b.package_name)}</td>
+                <td>${(b.booking_type || 'standard') === 'custom' ? 'Custom' : 'Standard'}</td>
+                <td>${escapeHtml(b.travel_date)}</td>
+                <td>${b.guests}</td>
+                <td>${escapeHtml(b.price)}</td>
+                <td>${escapeHtml(b.created_at)}</td>
+            </tr>`;
+        });
+        html += `</tbody></table></body></html>`;
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.onafterprint = () => printWindow.close();
+    }
+
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
+        return String(str).replace(/[&<>]/g, function(m) {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';

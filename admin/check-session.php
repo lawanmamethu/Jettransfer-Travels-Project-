@@ -1,5 +1,5 @@
 <?php
-// ── Returns whether admin is logged in 
+// ── Returns whether admin is logged in ──
 session_start();
 header('Content-Type: application/json');
 

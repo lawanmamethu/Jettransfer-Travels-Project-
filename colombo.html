@@ -22,6 +22,7 @@
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --rating-gold: #FFB800;
         }
 
         * {
@@ -590,6 +591,278 @@
             font-weight: 600;
         }
 
+        /* ===== User Rating Section ===== */
+        .rating-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(10,126,164,0.1);
+        }
+        .rating-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .rating-stars {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .stars-display {
+            display: flex;
+            gap: 0.2rem;
+        }
+        .star {
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #ddd;
+        }
+        .star:hover,
+        .star.hovered {
+            transform: scale(1.1);
+        }
+        .star.selected {
+            color: var(--rating-gold);
+        }
+        .rating-average {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .rating-count {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        .rating-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .rating-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E2E8F0;
+        }
+        .rating-name-input {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .rating-name-input input {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 50px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .rating-name-input input:focus {
+            border-color: var(--primary);
+        }
+        .rating-comment {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 16px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .rating-comment:focus {
+            border-color: var(--primary);
+        }
+        .submit-rating-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-self: flex-start;
+        }
+        .submit-rating-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .reviews-list {
+            margin-top: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .review-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .review-name {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .review-stars {
+            display: flex;
+            gap: 0.2rem;
+        }
+        .review-stars .star-static {
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+        .review-stars .star-static.filled {
+            color: var(--rating-gold);
+        }
+        .review-date {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+        .review-comment {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-top: 0.3rem;
+        }
+        .delete-review-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-left: auto;
+            opacity: 0.6;
+        }
+        .delete-review-btn:hover {
+            background: #FEE2E2;
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .no-reviews {
+            text-align: center;
+            color: var(--text-light);
+            padding: 1rem;
+            font-style: italic;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== Currency Converter Widget ===== */
+        .currency-widget {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        .currency-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .currency-converter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .currency-input-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .currency-input-group label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+            opacity: 0.8;
+        }
+        .currency-input-group input,
+        .currency-input-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            background: white;
+            color: var(--text-dark);
+        }
+        .currency-input-group input:focus,
+        .currency-input-group select:focus {
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+        }
+        .currency-result {
+            background: rgba(255,255,255,0.2);
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 180px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .exchange-note {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.8rem;
+            text-align: right;
+        }
+        @media (max-width: 768px) {
+            .currency-converter {
+                flex-direction: column;
+            }
+            .currency-result {
+                width: 100%;
+            }
+        }
+
         /* EXPERIENCES SECTION */
         .experiences-header {
             text-align: center;
@@ -904,19 +1177,7 @@
 
         <!-- Right Side Actions -->
         <div class="nav-actions">
-            <!-- Search -->
-            <div class="nav-search" id="navSearch">
-                <button class="search-toggle" id="searchToggle" aria-label="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </button>
-                <div class="search-box" id="searchBox">
-                    <input type="text" placeholder="Search destinations, packages…" id="searchInput">
-                    <button class="search-submit">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </button>
-                </div>
-            </div>
-
+            
             <!-- Login / Register -->
             <div class="nav-auth">
                 <a href="login.php" class="btn-login">Login</a>
@@ -955,11 +1216,86 @@
 
     <div class="desc-card">
         <p>
-            A vibrant mix of modern skyscrapers, colonial buildings, ocean views, and busy streets — <strong>Colombo</strong> is Sri Lanka’s commercial heart. From the scenic <strong>Galle Face Green</strong> promenade to the lively markets of <strong>Pettah</strong>, the city blends history and modern lifestyle beautifully.<br><br>
+            A vibrant mix of modern skyscrapers, colonial buildings, ocean views, and busy streets — <strong>Colombo</strong> is Sri Lanka's commercial heart. From the scenic <strong>Galle Face Green</strong> promenade to the lively markets of <strong>Pettah</strong>, the city blends history and modern lifestyle beautifully.<br><br>
             Explore luxury shopping malls, cultural landmarks, and delicious local cuisine while enjoying the energy of this fast-growing metropolis.
         </p>
     </div>
 </div>
+
+    <!-- Currency Converter Widget -->
+    <div class="currency-widget fade-in">
+        <div class="currency-title">
+            💱 Currency Converter
+        </div>
+        <div class="currency-converter">
+            <div class="currency-input-group">
+                <label>Amount</label>
+                <input type="number" id="amountInput" value="100" step="any">
+            </div>
+            <div class="currency-input-group">
+                <label>From</label>
+                <select id="fromCurrency">
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="SGD">SGD - Singapore Dollar</option>
+                    <option value="INR">INR - Indian Rupee</option>
+                </select>
+            </div>
+            <div class="currency-input-group">
+                <label>To</label>
+                <select id="toCurrency">
+                    <option value="LKR" selected>LKR - Sri Lankan Rupee</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                </select>
+            </div>
+            <div class="currency-result" id="currencyResult">
+                Loading...
+            </div>
+        </div>
+        <div class="exchange-note">💰 Real-time exchange rates • Updated daily</div>
+    </div>
+
+    <!-- User Rating Section -->
+    <div class="rating-section fade-in">
+        <div class="rating-header">
+            <div class="rating-stars">
+                <div class="stars-display" id="starRatingDisplay">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <div class="rating-average" id="avgRating">0.0</div>
+                <div class="rating-count" id="ratingCount">(0 reviews)</div>
+            </div>
+            <div class="rating-badge">⭐ Top Rated Destination</div>
+        </div>
+        
+        <div class="rating-input-area">
+            <div class="rating-name-input">
+                <input type="text" id="reviewerName" placeholder="Your name">
+                <div class="stars-display" id="ratingInputStars">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+            <textarea id="reviewComment" class="rating-comment" rows="2" placeholder="Share your experience at Colombo..."></textarea>
+            <button class="submit-rating-btn" onclick="submitRating()">Submit Review</button>
+        </div>
+        
+        <div class="reviews-list" id="reviewsList">
+            <div class="no-reviews">Be the first to review Colombo!</div>
+        </div>
+    </div>
 
     <!-- Experiences -->
     <div class="experiences-header fade-in">
@@ -1015,16 +1351,16 @@
                 <h3>Jettransfer Travels</h3>
                 <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
                 <div class="social-links">
-                    <img src="images/insta1.webp" alt="Instagram logo" class="social-link"></a>
-                    <img src="images/fb.avif" alt="Facebook logo" class="social-link"></a>
-                    <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link"></a>
+                    <img src="images/insta1.webp" alt="Instagram logo" class="social-link">
+                    <img src="images/fb.avif" alt="Facebook logo" class="social-link">
+                    <img src="images/tiktok.webp" alt="Tiktok logo" class="social-link">
                 </div>
             </div>
             <div class="footer-section">
             <h3>Quick Links</h3>
             <a href="destination.php">Destinations</a>
-            <a href="package.php">Tour Packages</a>
-            <a href="vehicles.php">Our Vehicles</a>
+            <a href="packages.php">Tour Packages</a>
+            <a href="vehicles.html">Our Vehicles</a>
             <a href="service.php">Services</a>
             <a href="service.php">Gallery</a>
         </div>
@@ -1046,6 +1382,9 @@
             <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
         </div>
     </footer>
+
+    <!-- Toast Message -->
+    <div class="toast-msg" id="toastMsg">✨ Review submitted!</div>
 
     <script>
         const mobileToggle = document.getElementById('mobileToggle');
@@ -1103,38 +1442,288 @@
         });
 
         // Search toggle
-const searchToggle = document.getElementById('searchToggle');
-const searchBox = document.getElementById('searchBox');
-const searchInput = document.getElementById('searchInput');
+        const searchToggle = document.getElementById('searchToggle');
+        const searchBox = document.getElementById('searchBox');
+        const searchInput = document.getElementById('searchInput');
 
-searchToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    searchBox.classList.toggle('open');
-    if (searchBox.classList.contains('open')) {
-        setTimeout(() => searchInput.focus(), 300);
-    }
-});
+        if (searchToggle) {
+            searchToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                searchBox.classList.toggle('open');
+                if (searchBox.classList.contains('open')) {
+                    setTimeout(() => searchInput.focus(), 300);
+                }
+            });
+        }
 
-// Close search when clicking outside
-document.addEventListener('click', (e) => {
-    if (!document.getElementById('navSearch').contains(e.target)) {
-        searchBox.classList.remove('open');
-    }
-});
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            if (searchBox && !document.getElementById('navSearch')?.contains(e.target)) {
+                searchBox?.classList.remove('open');
+            }
+        });
 
-// Active nav link on scroll
-const sections = document.querySelectorAll('section[id]');
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(sec => {
-        if (window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
-    });
-    document.querySelectorAll('.nav-menu a').forEach(a => {
-        a.classList.remove('active');
-        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
-    });
-});
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(sec => {
+                if (window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
+            });
+            document.querySelectorAll('.nav-menu a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+            });
+        });
+
+        // ===== USER RATING SYSTEM (LocalStorage) =====
+        let currentRating = 0;
+
+        // Load reviews from localStorage
+        function loadReviews() {
+            const saved = localStorage.getItem('colombo_reviews');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return [];
+        }
+
+        // Save reviews to localStorage
+        function saveReviews(reviews) {
+            localStorage.setItem('colombo_reviews', JSON.stringify(reviews));
+        }
+
+        // Calculate and update average rating
+        function updateAverageRating() {
+            const reviews = loadReviews();
+            if (reviews.length === 0) {
+                document.getElementById('avgRating').textContent = '0.0';
+                document.getElementById('ratingCount').textContent = '(0 reviews)';
+                return;
+            }
+            const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+            const avg = total / reviews.length;
+            document.getElementById('avgRating').textContent = avg.toFixed(1);
+            document.getElementById('ratingCount').textContent = `(${reviews.length} review${reviews.length !== 1 ? 's' : ''})`;
+        }
+
+        // Delete a review
+        function deleteReview(index) {
+            if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+                const reviews = loadReviews();
+                reviews.splice(index, 1);
+                saveReviews(reviews);
+                renderReviews();
+                showToast('Review deleted successfully 🗑️');
+            }
+        }
+
+        // Render reviews list with delete buttons
+        function renderReviews() {
+            const reviews = loadReviews();
+            const container = document.getElementById('reviewsList');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<div class="no-reviews">Be the first to review Colombo!</div>';
+                updateAverageRating();
+                return;
+            }
+            
+            // Sort by date (newest first)
+            reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            container.innerHTML = reviews.map((review, idx) => `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-name">${escapeHtml(review.name)}</span>
+                        <div class="review-stars">
+                            ${Array(5).fill().map((_, i) => `<span class="star-static ${i < review.rating ? 'filled' : ''}">★</span>`).join('')}
+                        </div>
+                        <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
+                        <button class="delete-review-btn" onclick="deleteReview(${idx})" title="Delete review">
+                            🗑️
+                        </button>
+                    </div>
+                    ${review.comment ? `<div class="review-comment">${escapeHtml(review.comment)}</div>` : ''}
+                </div>
+            `).join('');
+            
+            updateAverageRating();
+        }
+
+        // Submit a new rating
+        function submitRating() {
+            const name = document.getElementById('reviewerName').value.trim();
+            const rating = currentRating;
+            const comment = document.getElementById('reviewComment').value.trim();
+            
+            if (!name) {
+                showToast('Please enter your name');
+                return;
+            }
+            if (rating === 0) {
+                showToast('Please select a rating');
+                return;
+            }
+            
+            const reviews = loadReviews();
+            reviews.push({
+                name: name,
+                rating: rating,
+                comment: comment,
+                date: new Date().toISOString()
+            });
+            
+            saveReviews(reviews);
+            renderReviews();
+            
+            // Reset form
+            document.getElementById('reviewerName').value = '';
+            document.getElementById('reviewComment').value = '';
+            currentRating = 0;
+            updateStarSelection('ratingInputStars', 0);
+            document.querySelectorAll('#ratingInputStars .star').forEach(s => s.classList.remove('selected'));
+            
+            showToast('Thank you for your review! ⭐');
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Show toast message
+        function showToast(message) {
+            const toast = document.getElementById('toastMsg');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Star rating hover/click handlers
+        function initStarRating(containerId, onRatingChange) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const stars = container.querySelectorAll('.star');
+            let currentVal = 0;
+            
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => {
+                    const val = parseInt(star.dataset.value);
+                    stars.forEach((s, i) => {
+                        if (i < val) {
+                            s.classList.add('hovered');
+                        } else {
+                            s.classList.remove('hovered');
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach(s => s.classList.remove('hovered'));
+                    stars.forEach((s, i) => {
+                        if (i < currentVal) {
+                            s.classList.add('selected');
+                        } else {
+                            s.classList.remove('selected');
+                        }
+                    });
+                });
+                
+                star.addEventListener('click', () => {
+                    currentVal = parseInt(star.dataset.value);
+                    stars.forEach((s, i) => {
+                        if (i < currentVal) {
+                            s.classList.add('selected');
+                        } else {
+                            s.classList.remove('selected');
+                        }
+                    });
+                    if (onRatingChange) onRatingChange(currentVal);
+                });
+            });
+        }
+
+        // Update star selection programmatically
+        function updateStarSelection(containerId, rating) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const stars = container.querySelectorAll('.star');
+            stars.forEach((star, i) => {
+                if (i < rating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        // Initialize rating system
+        initStarRating('ratingInputStars', (rating) => {
+            currentRating = rating;
+        });
+
+        // Load existing reviews on page load
+        renderReviews();
+
+        // ===== CURRENCY CONVERTER =====
+        // Exchange rates (approximate)
+        const toUSDRate = {
+            USD: 1,
+            EUR: 1 / 0.92,
+            GBP: 1 / 0.79,
+            AUD: 1 / 1.52,
+            CAD: 1 / 1.37,
+            SGD: 1 / 1.35,
+            INR: 1 / 83.5,
+            LKR: 1 / 300
+        };
+
+        function convertCurrency() {
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const from = document.getElementById('fromCurrency').value;
+            const to = document.getElementById('toCurrency').value;
+            
+            if (isNaN(amount)) {
+                document.getElementById('currencyResult').innerHTML = 'Invalid amount';
+                return;
+            }
+            
+            // Convert to USD first, then to target
+            const usdAmount = amount * toUSDRate[from];
+            let converted;
+            
+            if (to === 'LKR') {
+                converted = usdAmount * 300;
+            } else {
+                converted = usdAmount / toUSDRate[to];
+            }
+            
+            const formatted = converted.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            const toSymbol = {
+                USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$', SGD: 'S$', INR: '₹', LKR: 'Rs'
+            };
+            
+            document.getElementById('currencyResult').innerHTML = `${toSymbol[to] || ''} ${formatted} ${to}`;
+        }
+
+        // Add event listeners for currency converter
+        document.getElementById('amountInput').addEventListener('input', convertCurrency);
+        document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
+        document.getElementById('toCurrency').addEventListener('change', convertCurrency);
+
+        // Initial conversion
+        convertCurrency();
     </script>
 
 </body>
-</html>         
+</html>

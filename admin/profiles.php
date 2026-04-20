@@ -47,6 +47,8 @@ if ($status === 'active')   $where .= ' AND is_active=1';
 if ($status === 'inactive') $where .= ' AND is_active=0';
 
 $users = $conn->query("SELECT * FROM users WHERE $where ORDER BY id DESC");
+$allUsers = [];
+if ($users) while ($row = $users->fetch_assoc()) $allUsers[] = $row;
 $conn->close();
 ?>
 
@@ -137,8 +139,15 @@ $conn->close();
     .btn-search { padding:.5rem 1.2rem; background:var(--primary); color:white; border:none; border-radius:8px; font-family:'Manrope',sans-serif; font-weight:600; font-size:.85rem; cursor:pointer; }
     .btn-clear  { padding:.5rem 1rem; background:#F1F5F9; color:var(--text-light); border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; }
 
+    /* Report buttons */
+    .report-buttons { display:flex; gap:0.5rem; }
+    .btn-report { display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.9rem; border-radius:50px; font-size:0.75rem; font-weight:600; font-family:'Manrope',sans-serif; cursor:pointer; transition:all 0.2s ease; border:1px solid var(--border); background:#fff; color:var(--text-dark); }
+    .btn-report:hover { background:var(--bg); border-color:var(--primary); color:var(--primary); }
+
     /* ── TABLE ── */
     .table-card { background:white; border-radius:16px; box-shadow:var(--shadow-sm); overflow:hidden; border:1px solid var(--border); }
+    .table-header { padding:1.1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .table-header h3 { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; }
     .table-wrap { overflow-x:auto; }
     table { width:100%; border-collapse:collapse; }
     thead tr { background:#F8FAFC; border-bottom:2px solid var(--border); }
@@ -320,9 +329,16 @@ $conn->close();
 
         <!-- Table -->
         <div class="table-card">
+            <div class="table-header">
+                <h3>All Users</h3>
+                <div class="report-buttons">
+                    <button type="button" class="btn-report" onclick="exportUsersCSV()">📎 Export CSV</button>
+                    <button type="button" class="btn-report" onclick="printUsers()">🖨️ Print/PDF</button>
+                </div>
+            </div>
             <div class="table-wrap">
-                <?php if ($users && $users->num_rows > 0): ?>
-                <table>
+                <?php if (!empty($allUsers)): ?>
+                <table id="usersTable">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -336,7 +352,7 @@ $conn->close();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($u = $users->fetch_assoc()):
+                        <?php foreach ($allUsers as $u):
                             $ini = strtoupper(substr($u['first_name'],0,1) . substr($u['last_name'],0,1));
                         ?>
                         <tr>
@@ -358,7 +374,7 @@ $conn->close();
                                 <span class="badge <?= $u['is_active'] ? 'badge-active' : 'badge-inactive' ?>">
                                     <?= $u['is_active'] ? '✅ Active' : '🚫 Inactive' ?>
                                 </span>
-                            </td>
+                             </td>
                             <td>
                                 <div class="actions">
                                     <a href="view_user.php?id=<?= $u['id'] ?>" class="btn-sm btn-view">View</a>
@@ -375,9 +391,9 @@ $conn->close();
                                         <button type="submit" class="btn-sm btn-delete">Delete</button>
                                     </form>
                                 </div>
-                            </td>
+                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
                 <?php else: ?>
@@ -396,6 +412,9 @@ $conn->close();
 </div><!-- /.main -->
 
 <script>
+    // Store all users data for export/print
+    const allUsers = <?php echo json_encode($allUsers); ?>;
+
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarOverlay').classList.toggle('show');
@@ -404,6 +423,95 @@ $conn->close();
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebarOverlay').classList.remove('show');
     });
+
+    // Export to CSV
+    function exportUsersCSV() {
+        if (!allUsers.length) {
+            alert('No users to export.');
+            return;
+        }
+        let rows = [['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Nationality', 'Status', 'Registered Date', 'Last Login']];
+        allUsers.forEach(user => {
+            rows.push([
+                user.id,
+                user.first_name,
+                user.last_name,
+                user.email,
+                user.phone || '',
+                user.nationality || '',
+                user.is_active ? 'Active' : 'Inactive',
+                user.created_at,
+                user.last_login || ''
+            ]);
+        });
+        let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', 'jettransfer_users.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // Print/PDF
+    function printUsers() {
+        if (!allUsers.length) {
+            alert('No users to print.');
+            return;
+        }
+        const printWindow = window.open('', '_blank');
+        let html = `
+            <html>
+            <head><title>Jettransfer - Users Report</title>
+            <style>
+                body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+                h1 { color: #0A7EA4; }
+                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+                th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+                th { background: #f2f2f2; }
+                .status-active { color: green; font-weight: bold; }
+                .status-inactive { color: red; }
+            </style>
+            </head>
+            <body>
+            <h1>Jettransfer - Registered Users Report</h1>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+            <table><thead><tr>
+                <th>ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th><th>Nationality</th><th>Status</th><th>Registered</th><th>Last Login</th>
+            </tr></thead><tbody>
+        `;
+        allUsers.forEach(user => {
+            html += `<tr>
+                <td>${escapeHtml(user.id)}</td>
+                <td>${escapeHtml(user.first_name)}</td>
+                <td>${escapeHtml(user.last_name)}</td>
+                <td>${escapeHtml(user.email)}</td>
+                <td>${escapeHtml(user.phone || '—')}</td>
+                <td>${escapeHtml(user.nationality || '—')}</td>
+                <td class="${user.is_active ? 'status-active' : 'status-inactive'}">${user.is_active ? 'Active' : 'Inactive'}</td>
+                <td>${escapeHtml(user.created_at)}</td>
+                <td>${escapeHtml(user.last_login || '—')}</td>
+            </tr>`;
+        });
+        html += `</tbody></table></body></html>`;
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.onafterprint = () => printWindow.close();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
 </script>
 </body>
 </html>

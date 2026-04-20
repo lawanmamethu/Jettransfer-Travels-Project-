@@ -201,6 +201,10 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
 .btn-clear{padding:.65rem 1.1rem;background:#F1F5F9;color:var(--text-light);border:none;border-radius:50px;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-add{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;background:var(--primary);color:white;border:none;border-radius:50px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 12px rgba(10,126,164,.3)}
 .btn-add:hover{background:var(--primary-dark);transform:translateY(-2px)}
+/* Report buttons */
+.report-buttons{display:flex;gap:0.5rem}
+.btn-report{display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:600;font-family:'Manrope',sans-serif;cursor:pointer;transition:all 0.2s ease;border:1px solid var(--border);background:#fff;color:var(--text-dark)}
+.btn-report:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
 /* Table */
 .table-card{background:white;border-radius:18px;box-shadow:var(--shadow-sm);overflow:hidden;border:1px solid var(--border)}
 .table-hdr{padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
@@ -366,25 +370,7 @@ td{padding:.9rem 1.2rem;font-size:.88rem;vertical-align:middle}
       <button class="hamburger" onclick="toggleSB()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <div class="page-title"><h1>Packages Management</h1><p>Add, edit, and delete tour packages — changes show on the website instantly</p></div>
     </div>
-    <div class="admin-dropdown" id="adminDD">
-      <button class="admin-pill" onclick="toggleAdminDD()">
-        <div class="admin-pill-av"><?= $admInit ?></div>
-        <span><?= $admName ?></span>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="admin-dd" id="adminDDMenu">
-        <div class="adm-hdr">
-          <div class="adm-av"><?= $admInit ?></div>
-          <div><div class="adm-n"><?= $admName ?></div><div class="adm-r">Administrator</div></div>
-        </div>
-        <div class="adm-div"></div>
-        <a href="../index.php" target="_blank" class="adm-itm">🌐 View Website</a>
-        <a href="index.php" class="adm-itm">📊 Dashboard</a>
-        <a href="profiles.php" class="adm-itm">👥 User Management</a>
-        <div class="adm-div"></div>
-        <a href="logout.php" class="adm-itm adm-out">🚪 Logout</a>
-      </div>
-    </div>
+    
   </header>
 
   <div class="content">
@@ -434,13 +420,16 @@ td{padding:.9rem 1.2rem;font-size:.88rem;vertical-align:middle}
     <div class="table-card">
       <div class="table-hdr">
         <h3>All Packages</h3>
-        <span><?= $total ?> package<?= $total!==1?'s':'' ?></span>
+        <div class="report-buttons">
+          <button type="button" class="btn-report" onclick="exportPackagesCSV()">📎 Export CSV</button>
+          <button type="button" class="btn-report" onclick="printPackages()">🖨️ Print/PDF</button>
+        </div>
       </div>
       <?php if (empty($packages)): ?>
         <div class="empty-state"><div class="icon">📦</div><p style="font-weight:600;font-size:1rem">No packages found</p><p style="font-size:.85rem;margin-top:.3rem">Try a different search or add a new package.</p></div>
       <?php else: ?>
       <div class="tw">
-        <table>
+        <table id="packagesTable">
           <thead>
             <tr>
               <th>Image</th>
@@ -610,6 +599,9 @@ td{padding:.9rem 1.2rem;font-size:.88rem;vertical-align:middle}
 </div>
 
 <script>
+// Store packages data for export/print
+const allPackages = <?php echo json_encode($packages); ?>;
+
 function toggleSB(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
 document.getElementById('sbOverlay').addEventListener('click',()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')});
 function toggleAdminDD(){document.getElementById('adminDDMenu').classList.toggle('open')}
@@ -619,6 +611,100 @@ function closeModal(id){document.getElementById(id).classList.remove('open')}
 function openDelModal(id,name){document.getElementById('delId').value=id;document.getElementById('delMsg').textContent='"'+name+'" will be permanently removed.';document.getElementById('delModal').classList.add('open')}
 document.getElementById('addModal').addEventListener('click',function(e){if(e.target===this)closeModal('addModal')});
 document.getElementById('delModal').addEventListener('click',function(e){if(e.target===this)closeModal('delModal')});
+
+// Export to CSV
+function exportPackagesCSV() {
+    if (!allPackages.length) {
+        alert('No packages to export.');
+        return;
+    }
+    let rows = [['ID', 'Name', 'Description', 'Duration (Days)', 'Price (LKR)', 'Price Tier', 'Locations', 'Vehicle', 'Hotel Rating', 'Group Size', 'Image Path', 'Status']];
+    allPackages.forEach(pkg => {
+        rows.push([
+            pkg.id,
+            pkg.name,
+            pkg.description.replace(/\n/g, ' '),
+            pkg.duration,
+            pkg.price,
+            pkg.price_tier,
+            pkg.locations,
+            pkg.vehicle,
+            pkg.hotel_rating,
+            pkg.group_size,
+            pkg.image || '',
+            pkg.is_active ? 'Active' : 'Hidden'
+        ]);
+    });
+    let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'jettransfer_packages.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Print/PDF
+function printPackages() {
+    if (!allPackages.length) {
+        alert('No packages to print.');
+        return;
+    }
+    const printWindow = window.open('', '_blank');
+    let html = `
+        <html>
+        <head><title>Jettransfer - Packages Report</title>
+        <style>
+            body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+            h1 { color: #0A7EA4; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+            th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+            th { background: #f2f2f2; }
+            .status-active { color: green; font-weight: bold; }
+            .status-hidden { color: red; }
+        </style>
+        </head>
+        <body>
+        <h1>Jettransfer - Tour Packages Report</h1>
+        <p>Generated on: ${new Date().toLocaleString()}</p>
+        <table><thead><tr>
+            <th>ID</th><th>Name</th><th>Description</th><th>Days</th><th>Price (LKR)</th><th>Tier</th><th>Locations</th><th>Vehicle</th><th>Hotel</th><th>Group</th><th>Status</th>
+        </tr></thead><tbody>
+    `;
+    allPackages.forEach(pkg => {
+        html += `<tr>
+            <td>${escapeHtml(pkg.id)}</td>
+            <td>${escapeHtml(pkg.name)}</td>
+            <td>${escapeHtml(pkg.description)}</td>
+            <td>${escapeHtml(pkg.duration)}</td>
+            <td>${escapeHtml(pkg.price.toLocaleString())}</td>
+            <td>${escapeHtml(pkg.price_tier)}</td>
+            <td>${escapeHtml(pkg.locations)}</td>
+            <td>${escapeHtml(pkg.vehicle)}</td>
+            <td>${escapeHtml(pkg.hotel_rating)}</td>
+            <td>${escapeHtml(pkg.group_size)}</td>
+            <td class="${pkg.is_active ? 'status-active' : 'status-hidden'}">${pkg.is_active ? 'Active' : 'Hidden'}</td>
+        </tr>`;
+    });
+    html += `</tbody></table></body></html>`;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
 </script>
 </body>
 </html>

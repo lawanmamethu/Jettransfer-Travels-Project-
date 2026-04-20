@@ -33,6 +33,20 @@ if ($r2) {
     }
 }
 
+// Helper function to extract screenshot from message
+function extractScreenshotFromMessage($message) {
+    $screenshot = null;
+    $cleanMessage = $message;
+    
+    // Look for screenshot marker
+    if (preg_match('/--- 📸 SCREENSHOT ATTACHED \(Base64\) ---\n(.*?)$/s', $message, $matches)) {
+        $screenshot = $matches[1];
+        $cleanMessage = trim(preg_replace('/--- 📸 SCREENSHOT ATTACHED \(Base64\) ---\n.*?$/s', '', $message));
+    }
+    
+    return ['clean_message' => $cleanMessage, 'screenshot' => $screenshot];
+}
+
 // AJAX handlers
 if (isset($_POST['ajax_action'])) {
     header('Content-Type: application/json');
@@ -57,7 +71,17 @@ if (isset($_POST['ajax_action'])) {
             $sql .= ' ORDER BY created_at DESC';
             $res  = $conn->query($sql);
             $msgs = [];
-            if ($res) while ($row = $res->fetch_assoc()) $msgs[] = $row;
+            if ($res) {
+                while ($row = $res->fetch_assoc()) {
+                    // Extract screenshot info for each message (but don't send full base64 in list)
+                    $extracted = extractScreenshotFromMessage($row['message']);
+                    $row['has_screenshot'] = !is_null($extracted['screenshot']);
+                    $row['message_preview'] = substr($extracted['clean_message'], 0, 100) . (strlen($extracted['clean_message']) > 100 ? '...' : '');
+                    $row['clean_message'] = $extracted['clean_message'];
+                    $row['screenshot_data'] = $extracted['screenshot']; // Keep for modal
+                    $msgs[] = $row;
+                }
+            }
             echo json_encode(['success' => true, 'messages' => $msgs]);
             break;
 
@@ -89,6 +113,11 @@ if (isset($_POST['ajax_action'])) {
             $res = $conn->query("SELECT * FROM contact_messages WHERE id=$id LIMIT 1");
             if ($res && $res->num_rows > 0) {
                 $msg = $res->fetch_assoc();
+                $extracted = extractScreenshotFromMessage($msg['message']);
+                $msg['clean_message'] = $extracted['clean_message'];
+                $msg['screenshot_data'] = $extracted['screenshot'];
+                $msg['has_screenshot'] = !is_null($extracted['screenshot']);
+                
                 if ($msg['status'] === 'New') {
                     $conn->query("UPDATE contact_messages SET status='Read' WHERE id=$id");
                     $msg['status'] = 'Read';
@@ -260,6 +289,28 @@ td{padding:.85rem 1.2rem;border-bottom:1px solid #F1F5F9;vertical-align:middle;f
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#FAFBFD}
 
+/* Report buttons */
+.report-buttons{display:flex;gap:0.5rem}
+.btn-report{display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:600;font-family:'Manrope',sans-serif;cursor:pointer;transition:all 0.2s ease;border:1px solid var(--border);background:#fff;color:var(--text-dark)}
+.btn-report:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
+
+/* Screenshot badge */
+.screenshot-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.22rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700;background:#E0F2FA;color:#0A7EA4;margin-left:.5rem}
+.screenshot-badge::before{content:'📸';margin-right:.2rem}
+
+/* Screenshot viewer */
+.screenshot-viewer{background:#F8FAFC;border-radius:12px;padding:1rem;margin-top:1rem;border:1px solid var(--border)}
+.screenshot-viewer .detail-label{margin-bottom:.5rem}
+.screenshot-viewer img{max-width:100%;max-height:400px;border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow-sm);cursor:pointer}
+.screenshot-viewer .no-screenshot{color:var(--text-light);font-style:italic;padding:.5rem 0}
+.screenshot-download{display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;padding:.3rem .8rem;background:var(--primary);color:#fff;border-radius:6px;font-size:.75rem;text-decoration:none;font-weight:600}
+.screenshot-download:hover{background:var(--primary-dark)}
+
+/* Modal image lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;align-items:center;justify-content:center;cursor:pointer}
+.lightbox img{max-width:90vw;max-height:90vh;object-fit:contain}
+.lightbox.show{display:flex}
+
 /* Status badges */
 .status-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.22rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700}
 .status-badge.new{background:#FEF3C7;color:#92400E}
@@ -291,7 +342,7 @@ tr:hover td{background:#FAFBFD}
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.show{display:flex}
-.modal{background:#fff;border-radius:20px;max-width:620px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.25);animation:modalIn .3s ease}
+.modal{background:#fff;border-radius:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.25);animation:modalIn .3s ease}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal-header{padding:1.3rem 1.6rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
 .modal-header h2{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700}
@@ -395,7 +446,7 @@ tr:hover td{background:#FAFBFD}
         </a>
         <a href="contact.php" class="nav-item active">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            Messages & Enquiries
+            Contact Us / Reviews
         </a>
         <div class="nav-label">Reports</div>
         <a href="admin_monthly_report.php" class="nav-item">
@@ -477,15 +528,18 @@ tr:hover td{background:#FAFBFD}
         <div class="table-card">
           <div class="table-header">
             <h3>Contact Messages</h3>
-            <span id="contactMsgCount">Loading…</span>
+            <div class="report-buttons">
+              <button class="btn-report" onclick="exportContactCSV()">📎 Export CSV</button>
+              <button class="btn-report" onclick="printContactMessages()">🖨️ Print/PDF</button>
+            </div>
           </div>
           <div class="table-wrap">
-            <table>
+            <table id="contactMessagesTableFull">
               <thead>
-                <tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Topic</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+                <tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Topic</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr>
               </thead>
               <tbody id="contactMessagesTable">
-                <tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div><p>Loading messages…</p></div></td></tr>
+                <tr><td colspan="9"><div class="empty-state"><div class="icon">⏳</div><p>Loading messages…</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -521,10 +575,13 @@ tr:hover td{background:#FAFBFD}
         <div class="table-card">
           <div class="table-header">
             <h3>Service Enquiries</h3>
-            <span id="serviceMsgCount">Loading…</span>
+            <div class="report-buttons">
+              <button class="btn-report" onclick="exportServiceCSV()">📎 Export CSV</button>
+              <button class="btn-report" onclick="printServiceEnquiries()">🖨️ Print/PDF</button>
+            </div>
           </div>
           <div class="table-wrap">
-            <table>
+            <table id="serviceEnquiriesTableFull">
               <thead>
                 <tr><th>#</th><th>Customer</th><th>Contact</th><th>Service</th><th>Travel Date</th><th>Travelers</th><th>Status</th><th>Date</th><th>Actions</th></tr>
               </thead>
@@ -556,6 +613,19 @@ tr:hover td{background:#FAFBFD}
       </div>
       <div class="detail-group" style="margin-bottom:1rem"><div class="detail-label">Received</div><div class="detail-value" id="modalDate">—</div></div>
       <div class="detail-group"><div class="detail-label">Message</div><div class="msg-content" id="modalMessage">—</div></div>
+      
+      <!-- Screenshot Viewer -->
+      <div id="screenshotContainer" style="display:none;">
+        <hr class="section-divider">
+        <div class="section-title">📸 Screenshot Attached</div>
+        <div class="screenshot-viewer">
+          <img id="screenshotImage" src="" alt="User submitted screenshot" style="max-width:100%; border-radius:8px; cursor:pointer" onclick="openLightbox(this.src)">
+          <div style="margin-top:.5rem">
+            <a id="screenshotDownload" href="#" class="screenshot-download" download="screenshot.jpg">💾 Download Screenshot</a>
+          </div>
+        </div>
+      </div>
+      
       <hr class="section-divider">
       <div class="section-title">Admin Response</div>
       <div class="form-group">
@@ -583,6 +653,11 @@ tr:hover td{background:#FAFBFD}
       <button class="btn btn-primary" id="saveBtn" onclick="saveMessage()">Save Changes</button>
     </div>
   </div>
+</div>
+
+<!-- Lightbox for fullscreen image -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="">
 </div>
 
 <!-- Service Enquiry Modal -->
@@ -636,6 +711,8 @@ tr:hover td{background:#FAFBFD}
 <script>
 let currentContactFilter = 'all';
 let currentServiceFilter = 'all';
+let allContactMessages = [];
+let allServiceEnquiries = [];
 
 // Sidebar
 function toggleSidebar(){
@@ -659,6 +736,15 @@ function switchTab(tab) {
   } else {
     loadServiceEnquiries();
   }
+}
+
+// Lightbox functions
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
 }
 
 // ==================== CONTACT MESSAGES ====================
@@ -685,15 +771,19 @@ function loadContactMessages() {
   fd.append('search', search);
   fetch('contact.php', {method:'POST', body:fd})
     .then(r => r.json())
-    .then(d => { if(d.success) renderContactMessages(d.messages); })
+    .then(d => { 
+      if(d.success) {
+        allContactMessages = d.messages;
+        renderContactMessages(allContactMessages);
+      }
+    })
     .catch(() => showToast('Failed to load messages', 'error'));
 }
 
 function renderContactMessages(msgs) {
   const tbody = document.getElementById('contactMessagesTable');
-  document.getElementById('contactMsgCount').textContent = msgs.length + ' message' + (msgs.length !== 1 ? 's' : '');
   if (!msgs.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div><h4>No messages found</h4><p>Try adjusting your filters or search.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📭</div><h4>No messages found</h4><p>Try adjusting your filters or search.</p></div></td></tr>`;
     return;
   }
   tbody.innerHTML = msgs.map(m => {
@@ -701,12 +791,14 @@ function renderContactMessages(msgs) {
     const d = new Date(m.created_at);
     const ds = d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
     const ts = d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    const screenshotIndicator = m.has_screenshot ? '<span class="screenshot-badge">📸 Screenshot</span>' : '';
     return `<tr>
       <td style="color:var(--text-light);font-size:.78rem">#${m.id}</td>
       <td style="font-weight:600">${esc(m.name)}</td>
       <td><a href="mailto:${esc(m.email)}" style="color:var(--primary);text-decoration:none">${esc(m.email)}</a></td>
       <td style="color:var(--text-light)">${esc(m.phone || '—')}</td>
       <td><span class="topic-badge">${esc(m.topic)}</span></td>
+      <td>${esc(m.message_preview || m.clean_message?.substring(0, 80) || '')}${screenshotIndicator}</td>
       <td><span class="status-badge ${sc}">${esc(m.status)}</span></td>
       <td style="color:var(--text-light);font-size:.8rem">${ds}<br><span style="font-size:.72rem">${ts}</span></td>
       <td><div class="actions">
@@ -734,10 +826,26 @@ function openModal(m) {
   document.getElementById('modalTopic').textContent = m.topic;
   const d = new Date(m.created_at);
   document.getElementById('modalDate').textContent = d.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
-  document.getElementById('modalMessage').textContent = m.message;
+  document.getElementById('modalMessage').textContent = m.clean_message || m.message;
   document.getElementById('modalStatus').value = m.status;
   document.getElementById('modalNotes').value = m.admin_notes || '';
   document.getElementById('modalReply').value = m.admin_reply || '';
+  
+  // Handle screenshot display
+  const screenshotContainer = document.getElementById('screenshotContainer');
+  if (m.has_screenshot && m.screenshot_data) {
+    screenshotContainer.style.display = 'block';
+    const screenshotImg = document.getElementById('screenshotImage');
+    screenshotImg.src = m.screenshot_data;
+    const downloadLink = document.getElementById('screenshotDownload');
+    downloadLink.href = m.screenshot_data;
+    // Extract filename from timestamp
+    const timestamp = new Date(m.created_at).getTime();
+    downloadLink.download = `screenshot_${m.id}_${timestamp}.jpg`;
+  } else {
+    screenshotContainer.style.display = 'none';
+  }
+  
   document.getElementById('messageModal').classList.add('show');
 }
 
@@ -806,13 +914,17 @@ function loadServiceEnquiries() {
   fd.append('search', search);
   fetch('contact.php', {method:'POST', body:fd})
     .then(r => r.json())
-    .then(d => { if(d.success) renderServiceEnquiries(d.enquiries); })
+    .then(d => { 
+      if(d.success) {
+        allServiceEnquiries = d.enquiries;
+        renderServiceEnquiries(allServiceEnquiries);
+      }
+    })
     .catch(() => showToast('Failed to load enquiries', 'error'));
 }
 
 function renderServiceEnquiries(enquiries) {
   const tbody = document.getElementById('serviceEnquiriesTable');
-  document.getElementById('serviceMsgCount').textContent = enquiries.length + ' enquiry' + (enquiries.length !== 1 ? 's' : '');
   if (!enquiries.length) {
     tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📭</div><h4>No enquiries found</h4><p>Try adjusting your filters or search.</p></div></td></tr>`;
     return;
@@ -902,6 +1014,138 @@ function delServiceEnq(id) {
     });
 }
 
+// ==================== REPORT FUNCTIONS ====================
+function exportContactCSV() {
+  if (!allContactMessages.length) {
+    showToast('No messages to export', 'error');
+    return;
+  }
+  let rows = [['ID', 'Name', 'Email', 'Phone', 'Topic', 'Message', 'Has Screenshot', 'Status', 'Admin Reply', 'Admin Notes', 'Created Date']];
+  allContactMessages.forEach(m => {
+    rows.push([
+      m.id, m.name, m.email, m.phone || '', m.topic, (m.clean_message || m.message || '').replace(/\n/g, ' '), 
+      m.has_screenshot ? 'Yes' : 'No', m.status, 
+      (m.admin_reply || '').replace(/\n/g, ' '), (m.admin_notes || '').replace(/\n/g, ' '), m.created_at
+    ]);
+  });
+  downloadCSV(rows, 'jettransfer_contact_messages.csv');
+}
+
+function exportServiceCSV() {
+  if (!allServiceEnquiries.length) {
+    showToast('No enquiries to export', 'error');
+    return;
+  }
+  let rows = [['ID', 'Customer Name', 'Email', 'Phone', 'Service Name', 'Travel Date', 'Travelers', 'Message', 'Status', 'Admin Notes', 'Created Date']];
+  allServiceEnquiries.forEach(e => {
+    rows.push([
+      e.id, e.customer_name, e.customer_email, e.customer_phone || '', e.service_name, 
+      e.travel_date || '', e.travelers || 1, (e.message || '').replace(/\n/g, ' '), 
+      e.status, (e.admin_notes || '').replace(/\n/g, ' '), e.created_at
+    ]);
+  });
+  downloadCSV(rows, 'jettransfer_service_enquiries.csv');
+}
+
+function downloadCSV(rows, filename) {
+  let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function printContactMessages() {
+  if (!allContactMessages.length) {
+    showToast('No messages to print', 'error');
+    return;
+  }
+  const printWindow = window.open('', '_blank');
+  let html = `
+    <html>
+    <head><title>Jettransfer - Contact Messages Report</title>
+    <style>
+      body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+      h1 { color: #0A7EA4; }
+      table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+      th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+      th { background: #f2f2f2; }
+    </style>
+    </head>
+    <body>
+    <h1>Jettransfer - Contact Messages Report</h1>
+    <p>Generated on: ${new Date().toLocaleString()}</p>
+    <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Topic</th><th>Message</th><th>Screenshot</th><th>Status</th><th>Admin Reply</th><th>Date</th></tr></thead><tbody>
+  `;
+  allContactMessages.forEach(m => {
+    html += `<tr>
+      <td>${esc(m.id)}</td>
+      <td>${esc(m.name)}</td>
+      <td>${esc(m.email)}</td>
+      <td>${esc(m.phone || '—')}</td>
+      <td>${esc(m.topic)}</td>
+      <td>${esc(m.clean_message || m.message || '')}</td>
+      <td>${m.has_screenshot ? '📸 Yes' : '—'}</td>
+      <td>${esc(m.status)}</td>
+      <td>${esc(m.admin_reply || '—')}</td>
+      <td>${esc(m.created_at)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></body></html>`;
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
+  printWindow.onafterprint = () => printWindow.close();
+}
+
+function printServiceEnquiries() {
+  if (!allServiceEnquiries.length) {
+    showToast('No enquiries to print', 'error');
+    return;
+  }
+  const printWindow = window.open('', '_blank');
+  let html = `
+    <html>
+    <head><title>Jettransfer - Service Enquiries Report</title>
+    <style>
+      body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+      h1 { color: #0A7EA4; }
+      table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+      th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+      th { background: #f2f2f2; }
+    </style>
+    </head>
+    <body>
+    <h1>Jettransfer - Service Enquiries Report</h1>
+    <p>Generated on: ${new Date().toLocaleString()}</p>
+    <tr><thead><tr><th>ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Service</th><th>Travel Date</th><th>Travelers</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody>
+  `;
+  allServiceEnquiries.forEach(e => {
+    html += `<tr>
+      <td>${esc(e.id)}</td>
+      <td>${esc(e.customer_name)}</td>
+      <td>${esc(e.customer_email)}</td>
+      <td>${esc(e.customer_phone || '—')}</td>
+      <td>${esc(e.service_name)}</td>
+      <td>${esc(e.travel_date || '—')}</td>
+      <td>${e.travelers || 1}</td>
+      <td>${esc(e.message || '—')}</td>
+      <td>${esc(e.status)}</td>
+      <td>${esc(e.created_at)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></body></html>`;
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
+  printWindow.onafterprint = () => printWindow.close();
+}
+
 // Helper functions
 function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
@@ -916,6 +1160,7 @@ function showToast(msg, type) {
 // Close modals on background click
 document.getElementById('messageModal').addEventListener('click', function(e) { if(e.target === this) closeModal(); });
 document.getElementById('serviceModal').addEventListener('click', function(e) { if(e.target === this) closeServiceModal(); });
+document.getElementById('lightbox').addEventListener('click', closeLightbox);
 
 // Load initial data
 loadContactMessages();

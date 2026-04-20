@@ -155,6 +155,11 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
 .tbl-card{background:#fff;border-radius:18px;box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden}
 .tbl-top{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border)}
 .tbl-top h3{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700}
+.tbl-top-actions{display:flex;gap:.5rem}
+.btn-report{display:flex;align-items:center;gap:.35rem;padding:.42rem .85rem;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-family:'Manrope',sans-serif;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer;transition:all .2s}
+.btn-report:hover{background:var(--bg)}
+.btn-report.csv:hover{border-color:var(--accent);color:var(--accent)}
+.btn-report.pdf:hover{border-color:var(--primary);color:var(--primary)}
 .tbl-search{padding:.7rem 1.4rem;border-bottom:1px solid var(--border)}
 .tbl-search input{width:100%;padding:.52rem .9rem;border:1.5px solid var(--border);border-radius:50px;font-family:'Manrope',sans-serif;font-size:.86rem;outline:none;transition:border-color .25s}
 .tbl-search input:focus{border-color:var(--primary)}
@@ -385,6 +390,16 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
             <div class="tbl-card">
                 <div class="tbl-top">
                     <h3>All Destinations (<?= $total ?>)</h3>
+                    <div class="tbl-top-actions">
+                        <button class="btn-report csv" onclick="exportCSV()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export CSV
+                        </button>
+                        <button class="btn-report pdf" onclick="printPDF()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            Print / PDF
+                        </button>
+                    </div>
                 </div>
                 <div class="tbl-search">
                     <input type="text" id="srch"
@@ -416,6 +431,16 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
                         <?php else: ?>
                         <?php foreach ($all as $d): ?>
                         <tr data-cat="<?= htmlspecialchars($d['category']) ?>"
+                            data-name="<?= htmlspecialchars($d['name']) ?>"
+                            data-slug="<?= htmlspecialchars($d['slug'] ?? '') ?>"
+                            data-district="<?= htmlspecialchars($d['district']) ?>"
+                            data-province="<?= htmlspecialchars($d['province']) ?>"
+                            data-badge="<?= htmlspecialchars($d['badge_label'] ?? '') ?>"
+                            data-desc="<?= htmlspecialchars($d['short_desc'] ?? '') ?>"
+                            data-image="<?= htmlspecialchars($d['image_path'] ?? '') ?>"
+                            data-detail="<?= htmlspecialchars($d['detail_page'] ?? '') ?>"
+                            data-status="<?= $d['is_active'] ? 'Active' : 'Hidden' ?>"
+                            data-id="<?= $d['id'] ?>"
                             data-srch="<?= htmlspecialchars(strtolower($d['name'].' '.$d['district'].' '.$d['category'].' '.($d['badge_label'] ?? ''))) ?>">
                             <td style="color:var(--text-light);font-size:.76rem"><?= $d['id'] ?></td>
                             <td>
@@ -514,6 +539,110 @@ function setCat(btn) {
     btn.classList.add('on');
     activeCat = btn.dataset.cat;
     doFilter();
+}
+
+// ── Export CSV (respects active search/filter)
+function exportCSV() {
+    const headers = ['ID','Name','Slug','Category','District','Province','Badge Label','Short Description','Image Path','Detail Page','Status'];
+    const rows = [headers];
+
+    document.querySelectorAll('#tblBody tr[data-cat]').forEach(row => {
+        if (row.style.display === 'none') return;
+        const esc = v => '"' + (v || '').replace(/"/g, '""') + '"';
+        rows.push([
+            esc(row.dataset.id),
+            esc(row.dataset.name),
+            esc(row.dataset.slug),
+            esc(row.dataset.cat),
+            esc(row.dataset.district),
+            esc(row.dataset.province),
+            esc(row.dataset.badge),
+            esc(row.dataset.desc),
+            esc(row.dataset.image),
+            esc(row.dataset.detail),
+            esc(row.dataset.status)
+        ]);
+    });
+
+    const csv  = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a    = Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(blob),
+        download: 'destinations_' + new Date().toISOString().slice(0, 10) + '.csv'
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// ── Print / PDF (respects active search/filter)
+function printPDF() {
+    const rows = [...document.querySelectorAll('#tblBody tr[data-cat]')]
+        .filter(r => r.style.display !== 'none')
+        .map(r => {
+            const isActive = r.dataset.status === 'Active';
+            return `<tr>
+                <td>${r.dataset.id}</td>
+                <td><strong>${r.dataset.name}</strong></td>
+                <td>${r.dataset.slug || '—'}</td>
+                <td>${r.dataset.cat}</td>
+                <td>${r.dataset.district}</td>
+                <td>${r.dataset.province || '—'}</td>
+                <td style="color:${isActive ? '#065F46' : '#991B1B'};font-weight:700">${r.dataset.status}</td>
+            </tr>`;
+        }).join('');
+
+    const filterNote = activeCat !== 'all'
+        ? `Category filter: <strong>${activeCat}</strong> &nbsp;·&nbsp; `
+        : '';
+    const searchNote = document.getElementById('srch').value.trim()
+        ? `Search: <strong>"${document.getElementById('srch').value.trim()}"</strong> &nbsp;·&nbsp; `
+        : '';
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Destinations Report – Jettransfer</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;padding:2rem;color:#0F172A;font-size:13px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #0A7EA4}
+  .header h1{font-size:1.3rem;color:#0A7EA4;margin-bottom:.2rem}
+  .header p{font-size:.78rem;color:#64748B}
+  .meta{font-size:.75rem;color:#94A3B8;margin-bottom:1.2rem}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{text-align:left;padding:.55rem .7rem;background:#0A7EA4;color:#fff;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:.55rem .7rem;border-bottom:1px solid #E2E8F0;vertical-align:middle}
+  tr:nth-child(even) td{background:#F8FAFC}
+  .footer{margin-top:1.5rem;font-size:.72rem;color:#94A3B8;text-align:center;border-top:1px solid #E2E8F0;padding-top:.75rem}
+  @media print{body{padding:.5rem}.footer{position:fixed;bottom:0;width:100%}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>✈️ Jettransfer – Destinations Report</h1>
+    <p>Admin Panel Export</p>
+  </div>
+  <div style="text-align:right;font-size:.75rem;color:#64748B">
+    Generated: ${new Date().toLocaleString()}<br>
+    Total records: ${rows.length > 0 ? document.querySelectorAll('#tblBody tr[data-cat]:not([style*="display: none"])').length : 0}
+  </div>
+</div>
+<div class="meta">${filterNote}${searchNote}Exported from Jettransfer Admin Panel</div>
+<table>
+  <thead>
+    <tr><th>#</th><th>Name</th><th>Slug</th><th>Category</th><th>District</th><th>Province</th><th>Status</th></tr>
+  </thead>
+  <tbody>${rows || '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#94A3B8">No records found.</td></tr>'}</tbody>
+</table>
+<div class="footer">Jettransfer Admin Panel &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; ${new Date().toLocaleDateString()}</div>
+<script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); }<\/script>
+</body>
+</html>`);
+    w.document.close();
 }
 </script>
 </body>

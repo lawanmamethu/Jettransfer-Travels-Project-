@@ -1,5 +1,3 @@
-
-
 <?php
 session_start();
 if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
@@ -570,6 +568,31 @@ body{
     font-size:.95rem;
     font-weight:700
 }
+/* Report buttons group */
+.report-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-report {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-dark);
+}
+.btn-report:hover {
+    background: var(--bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
 .tbl-search{
     padding:.65rem 1.4rem;
     border-bottom:1px solid var(--border)
@@ -857,12 +880,18 @@ body{
                     <?php if($editService): ?><a href="services.php?tab=services" class="btn-cancel-edit">✕ Cancel editing</a><?php endif; ?>
                 </form>
             </div>
-            <!-- Table -->
+            <!-- Table with report buttons -->
             <div class="tcard">
-                <div class="tcard-top"><h3>All Services (<?= $sTotal ?>)</h3></div>
+                <div class="tcard-top">
+                    <h3>All Services (<?= $sTotal ?>)</h3>
+                    <div class="report-buttons">
+                        <button class="btn-report" onclick="exportServicesCSV()">📎 Export CSV</button>
+                        <button class="btn-report" onclick="printServices()">🖨️ Print/PDF</button>
+                    </div>
+                </div>
                 <div class="tbl-search"><input type="text" id="svcSrch" placeholder="🔍 Search services…" oninput="filterTbl('svcTbody',this.value)"></div>
                 <div class="tbl-wrap">
-                    <table class="tbl"><thead><tr><th>#</th><th>Icon</th><th>Title</th><th>Description</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
+                    <table class="tbl" id="servicesTable"><thead><tr><th>#</th><th>Icon</th><th>Title</th><th>Description</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="svcTbody">
                     <?php if(empty($services)): ?><tr class="empty-msg"><td colspan="7">No services yet.</td></tr>
                     <?php else: foreach($services as $s): ?>
@@ -941,9 +970,15 @@ body{
                     <?php if($editGallery): ?><a href="services.php?tab=gallery" class="btn-cancel-edit">✕ Cancel editing</a><?php endif; ?>
                 </form>
             </div>
-            <!-- Table -->
+            <!-- Table with report buttons -->
             <div class="tcard">
-                <div class="tcard-top"><h3>All Photos (<?= $gTotal ?>)</h3></div>
+                <div class="tcard-top">
+                    <h3>All Photos (<?= $gTotal ?>)</h3>
+                    <div class="report-buttons">
+                        <button class="btn-report" onclick="exportGalleryCSV()">📎 Export CSV</button>
+                        <button class="btn-report" onclick="printGallery()">🖨️ Print/PDF</button>
+                    </div>
+                </div>
                 <div class="tbl-search"><input type="text" id="galSrch" placeholder="🔍 Search gallery…" oninput="filterGal(this.value)"></div>
                 <div class="gal-filters">
                     <button class="gfb on" data-cat="all" onclick="setGalCat(this)">All</button>
@@ -952,7 +987,7 @@ body{
                     <?php endforeach; ?>
                 </div>
                 <div class="tbl-wrap">
-                    <table class="tbl"><thead><tr><th>#</th><th>Img</th><th>Title</th><th>Category</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+                    <table class="tbl" id="galleryTable"><thead><tr><th>#</th><th>Img</th><th>Title</th><th>Category</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="galTbody">
                     <?php if(empty($gallery)): ?><tr class="empty-msg"><td colspan="7">No photos yet.</td></tr>
                     <?php else: foreach($gallery as $g): ?>
@@ -1028,6 +1063,246 @@ function filterGal(q){
     if(n===0){if(!em){em=document.createElement('tr');em.id='galTbodyEmpty';em.innerHTML='<td colspan="7" style="text-align:center;padding:2rem;color:#94A3B8">No results.</td>';document.getElementById('galTbody').appendChild(em);}em.style.display='';}
     else if(em) em.style.display='none';
 }
+
+// Export Services to CSV
+function exportServicesCSV() {
+    let rows = [];
+    // Get visible rows only (respect search filter)
+    const visibleRows = Array.from(document.querySelectorAll('#svcTbody tr[data-srch]')).filter(row => row.style.display !== 'none');
+    if (visibleRows.length === 0) {
+        alert('No services to export.');
+        return;
+    }
+    // Header
+    rows.push(['ID', 'Title', 'Description', 'Modal Text', 'Icon', 'Sort Order', 'Status']);
+    // Data
+    visibleRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 6) {
+            const id = cells[0].innerText.trim();
+            const icon = cells[1].innerText.trim();
+            const title = cells[2].innerText.trim();
+            const desc = cells[3].innerText.trim();
+            const sort = cells[4].innerText.trim();
+            const status = cells[5].innerText.trim();
+            // Modal text not in visible table, we need to fetch from original data? 
+            // We'll use a placeholder or we could pass via data attribute. For simplicity, include empty or fetch from PHP.
+            // Since modal text isn't in the table, we'll get it from the PHP data array.
+            // Let's get service ID from first cell to match with PHP data
+            const serviceId = id;
+            // Find matching service from PHP services array (we'll pass data to JS)
+            const service = window.servicesData?.find(s => s.id == serviceId) || {};
+            const modalText = service.modal_text || '';
+            rows.push([id, title, desc, modalText, icon, sort, status]);
+        }
+    });
+    // Convert to CSV string
+    let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    // Download
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'jettransfer_services.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Export Gallery to CSV
+function exportGalleryCSV() {
+    let rows = [];
+    // Get visible rows (respect filter and search)
+    const visibleRows = Array.from(document.querySelectorAll('#galTbody tr[data-cat]')).filter(row => row.style.display !== 'none');
+    if (visibleRows.length === 0) {
+        alert('No gallery items to export.');
+        return;
+    }
+    rows.push(['ID', 'Title', 'Image Path', 'Category', 'Caption', 'CSS Class', 'Sort Order', 'Status']);
+    visibleRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 6) {
+            const id = cells[0].innerText.trim();
+            const imgCell = cells[1];
+            let imgPath = '';
+            const imgTag = imgCell.querySelector('img');
+            if (imgTag) {
+                const src = imgTag.getAttribute('src');
+                if (src) imgPath = src.replace(/^\.\.\//, '');
+            }
+            const title = cells[2].innerText.trim();
+            const category = cells[3].innerText.trim();
+            const cssClass = cells[4].innerText.trim();
+            const status = cells[5].innerText.trim();
+            // Caption not in visible table, get from PHP data
+            const galleryId = id;
+            const galleryItem = window.galleryData?.find(g => g.id == galleryId) || {};
+            const caption = galleryItem.caption || '';
+            // Sort order from PHP data
+            const sortOrder = galleryItem.sort_order || '';
+            rows.push([id, title, imgPath, category, caption, cssClass, sortOrder, status]);
+        }
+    });
+    let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'jettransfer_gallery.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Print/PDF Services
+function printServices() {
+    const originalTitle = document.title;
+    document.title = 'Jettransfer Services Report';
+    const printContents = getPrintServicesHTML();
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head><title>Jettransfer Services Report</title>
+        <style>
+            body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+            h1 { color: #0A7EA4; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+            th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+            th { background: #f2f2f2; }
+            .status-active { color: green; font-weight: bold; }
+            .status-hidden { color: red; }
+        </style>
+        </head>
+        <body>${printContents}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();
+    document.title = originalTitle;
+}
+
+function getPrintServicesHTML() {
+    const visibleRows = Array.from(document.querySelectorAll('#svcTbody tr[data-srch]')).filter(row => row.style.display !== 'none');
+    if (visibleRows.length === 0) return '<p>No services to display.</p>';
+    let html = '<h1>Jettransfer - Services Report</h1><p>Generated on: ' + new Date().toLocaleString() + '</p>';
+    html += '<table><thead><tr><th>ID</th><th>Icon</th><th>Title</th><th>Description</th><th>Modal Text</th><th>Sort Order</th><th>Status</th></tr></thead><tbody>';
+    visibleRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 6) {
+            const id = cells[0].innerText.trim();
+            const icon = cells[1].innerText.trim();
+            const title = cells[2].innerText.trim();
+            const desc = cells[3].innerText.trim();
+            const sort = cells[4].innerText.trim();
+            const statusText = cells[5].innerText.trim();
+            const statusClass = statusText === 'Active' ? 'status-active' : 'status-hidden';
+            // Fetch modal text from PHP data
+            const service = window.servicesData?.find(s => s.id == id) || {};
+            const modalText = service.modal_text || '';
+            html += `<tr>
+                        <td>${escapeHtml(id)}</td>
+                        <td>${escapeHtml(icon)}</td>
+                        <td>${escapeHtml(title)}</td>
+                        <td>${escapeHtml(desc)}</td>
+                        <td>${escapeHtml(modalText)}</td>
+                        <td>${escapeHtml(sort)}</td>
+                        <td class="${statusClass}">${escapeHtml(statusText)}</td>
+                     </tr>`;
+        }
+    });
+    html += '</tbody></table>';
+    return html;
+}
+
+// Print/PDF Gallery
+function printGallery() {
+    const originalTitle = document.title;
+    document.title = 'Jettransfer Gallery Report';
+    const printContents = getPrintGalleryHTML();
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head><title>Jettransfer Gallery Report</title>
+        <style>
+            body { font-family: 'Manrope', sans-serif; margin: 2rem; }
+            h1 { color: #0A7EA4; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+            th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+            th { background: #f2f2f2; }
+            img { max-width: 80px; height: auto; }
+            .status-active { color: green; font-weight: bold; }
+            .status-hidden { color: red; }
+        </style>
+        </head>
+        <body>${printContents}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();
+    document.title = originalTitle;
+}
+
+function getPrintGalleryHTML() {
+    const visibleRows = Array.from(document.querySelectorAll('#galTbody tr[data-cat]')).filter(row => row.style.display !== 'none');
+    if (visibleRows.length === 0) return '<p>No gallery items to display.</p>';
+    let html = '<h1>Jettransfer - Gallery Report</h1><p>Generated on: ' + new Date().toLocaleString() + '</p>';
+    html += '<table><thead><tr><th>ID</th><th>Image</th><th>Title</th><th>Category</th><th>Caption</th><th>CSS Class</th><th>Sort Order</th><th>Status</th></tr></thead><tbody>';
+    visibleRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 6) {
+            const id = cells[0].innerText.trim();
+            const imgCell = cells[1];
+            let imgHtml = '';
+            const imgTag = imgCell.querySelector('img');
+            if (imgTag && imgTag.src) {
+                imgHtml = `<img src="${escapeHtml(imgTag.src)}" style="max-width:80px;height:auto;" />`;
+            } else {
+                imgHtml = '—';
+            }
+            const title = cells[2].innerText.trim();
+            const category = cells[3].innerText.trim();
+            const cssClass = cells[4].innerText.trim();
+            const statusText = cells[5].innerText.trim();
+            const statusClass = statusText === 'Active' ? 'status-active' : 'status-hidden';
+            // Fetch caption & sort order from PHP data
+            const galleryItem = window.galleryData?.find(g => g.id == id) || {};
+            const caption = galleryItem.caption || '';
+            const sortOrder = galleryItem.sort_order || '';
+            html += `<tr>
+                        <td>${escapeHtml(id)}</td>
+                        <td>${imgHtml}</td>
+                        <td>${escapeHtml(title)}</td>
+                        <td>${escapeHtml(category)}</td>
+                        <td>${escapeHtml(caption)}</td>
+                        <td>${escapeHtml(cssClass)}</td>
+                        <td>${escapeHtml(sortOrder)}</td>
+                        <td class="${statusClass}">${escapeHtml(statusText)}</td>
+                     </tr>`;
+        }
+    });
+    html += '</tbody></table>';
+    return html;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+    });
+}
+
+// Pass PHP data to JS for CSV/Print
+window.servicesData = <?php echo json_encode($services); ?>;
+window.galleryData = <?php echo json_encode($gallery); ?>;
 </script>
 </body>
-</html> 
+</html>

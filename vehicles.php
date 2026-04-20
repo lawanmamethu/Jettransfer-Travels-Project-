@@ -1,13 +1,13 @@
 <?php
-// ── vehicles.php — handles ALL vehicle operations ────────────
+// ── vehicles.php — handles ALL vehicle operations ──
 header('Content-Type: application/json');
 require_once 'db_vehicle.php';
 
 $action = $_GET['action'] ?? $_POST['action'] ?? 'get';
 
-// ════════════════════════════════════════════════════════════
+
 //  GET — fetch all vehicles (no auth needed, public)
-// ════════════════════════════════════════════════════════════
+
 if ($action === 'get') {
     $result   = $conn->query("SELECT * FROM vehicles ORDER BY id ASC");
     $vehicles = [];
@@ -18,9 +18,9 @@ if ($action === 'get') {
     exit;
 }
 
-// ════════════════════════════════════════════════════════════
+
 //  All other actions require admin session
-// ════════════════════════════════════════════════════════════
+
 session_start();
 if (!isset($_SESSION['jt_admin']) || $_SESSION['jt_admin'] !== true) {
     http_response_code(401);
@@ -28,9 +28,9 @@ if (!isset($_SESSION['jt_admin']) || $_SESSION['jt_admin'] !== true) {
     exit;
 }
 
-// ════════════════════════════════════════════════════════════
+
 //  ADD — insert new vehicle
-// ════════════════════════════════════════════════════════════
+
 if ($action === 'add') {
     $name             = trim($_POST['name']             ?? '');
     $plate            = trim($_POST['plate']            ?? '');
@@ -59,9 +59,9 @@ if ($action === 'add') {
     exit;
 }
 
-// ════════════════════════════════════════════════════════════
+
 //  UPDATE — update availability and condition
-// ════════════════════════════════════════════════════════════
+
 if ($action === 'update') {
     $id               = intval($_POST['id']               ?? 0);
     $availability     = trim($_POST['availability']       ?? '');
@@ -92,9 +92,9 @@ if ($action === 'update') {
     exit;
 }
 
-// ════════════════════════════════════════════════════════════
+
 //  DELETE — remove a vehicle
-// ════════════════════════════════════════════════════════════
+
 if ($action === 'delete') {
     $id = intval($_POST['id'] ?? 0);
 
@@ -119,8 +119,106 @@ if ($action === 'delete') {
     exit;
 }
 
-// ── Unknown action ───────────────────────────────────────────
+
+//  ENQUIRE — submit enquiry (public, no auth needed)
+
+if ($action === 'enquire') {
+    // This doesn't need admin session 
+    $name         = trim($_POST['name']         ?? '');
+    $email        = trim($_POST['email']        ?? '');
+    $phone        = trim($_POST['phone']        ?? '');
+    $vehicle_type = trim($_POST['vehicle_type'] ?? '');
+    $travel_date  = trim($_POST['travel_date']  ?? '');
+    $passengers   = intval($_POST['passengers'] ?? 0);
+    $message      = trim($_POST['message']      ?? '');
+
+    if (!$name || !$email || !$vehicle_type || !$travel_date) {
+        echo json_encode(['success' => false, 'message' => 'Please fill in all required fields']);
+        exit;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Please enter a valid email address']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO enquiries (name, email, phone, vehicle_type, travel_date, passengers, message) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('sssssds', $name, $email, $phone, $vehicle_type, $travel_date, $passengers, $message);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Enquiry submitted successfully! We will contact you soon.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
+    }
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+
+//  GET ENQUIRIES — fetch all enquiries 
+
+if ($action === 'get_enquiries') {
+    $result     = $conn->query("SELECT * FROM enquiries ORDER BY created_at DESC");
+    $enquiries  = [];
+    while ($row = $result->fetch_assoc()) {
+        $enquiries[] = $row;
+    }
+    echo json_encode(['success' => true, 'count' => count($enquiries), 'enquiries' => $enquiries]);
+    $conn->close();
+    exit;
+}
+
+
+//  UPDATE ENQUIRY STATUS — mark as Responded 
+
+if ($action === 'update_enquiry') {
+    $id     = intval($_POST['id']     ?? 0);
+    $status = trim($_POST['status']   ?? '');
+
+    if (!$id || !in_array($status, ['Pending', 'Responded'])) {
+        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("UPDATE enquiries SET status = ? WHERE id = ?");
+    $stmt->bind_param('si', $status, $id);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Enquiry status updated']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
+    }
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+
+//  DELETE ENQUIRY — remove an enquiry 
+
+if ($action === 'delete_enquiry') {
+    $id = intval($_POST['id'] ?? 0);
+
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'Invalid enquiry ID']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("DELETE FROM enquiries WHERE id = ?");
+    $stmt->bind_param('i', $id);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Enquiry deleted successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
+    }
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+// ── Unknown action ──
 echo json_encode(['success' => false, 'message' => 'Unknown action']);
 $conn->close();
 ?>
-

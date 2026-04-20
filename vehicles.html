@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Vehicles - Jettransfer Travels</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #0A7EA4;
@@ -24,7 +28,11 @@
             --warning: #F59E0B;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Manrope', sans-serif;
@@ -34,18 +42,194 @@
             background: var(--bg-light);
         }
 
-        /* ── Logo (matching index.php size) ── */
+        /* ── Logo ── */
         .logo-img {
-            width: 42px;
-            height: 42px;
+            width: 80px;
+            height: 80px;
             border-radius: 12px;
-            object-fit: cover;
-            border: 1px solid rgba(2,6,23,.10);
-            box-shadow: 0 10px 22px rgba(10,126,164,.15);
-            background: #fff;
+            object-fit: contain;
         }
 
-        /* ── Header (matching index.php exactly) ── */
+        /* ── Nav Actions ── */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+
+        .nav-search {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #E2E8F0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .search-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .search-box {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            overflow: hidden;
+            width: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: width 0.4s ease, opacity 0.3s ease;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .search-box.open {
+            width: 260px;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 0.55rem 1rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+            width: 100%;
+            background: transparent;
+        }
+
+        .search-submit {
+            background: var(--primary);
+            border: none;
+            padding: 0.55rem 1rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-login:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-register:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ── Mobile auth ── */
+        .mobile-auth {
+            display: none;
+        }
+
+        .mobile-auth-btns {
+            display: flex;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .mobile-auth-btns a {
+            flex: 1;
+        }
+
+        .mobile-search {
+            display: flex;
+            width: 100%;
+            border: 2px solid #E2E8F0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .mobile-search input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0.65rem 1.2rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .mobile-search button {
+            background: var(--primary);
+            border: none;
+            padding: 0.65rem 1rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav-actions {
+                display: none;
+            }
+
+            .mobile-auth {
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                padding-top: 1.2rem;
+                border-top: 1px solid #E2E8F0;
+                width: 100%;
+            }
+        }
+
+        /* ── Header ── */
         .header {
             position: fixed;
             top: 0;
@@ -57,7 +241,11 @@
             z-index: 1000;
             transition: all 0.3s ease;
         }
-        .header.scrolled { box-shadow: var(--shadow-md); }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -66,6 +254,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .logo {
             font-family: 'Sora', sans-serif;
             font-size: 1.5rem;
@@ -76,12 +265,14 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .nav-menu {
             display: flex;
             list-style: none;
             gap: 1.6rem;
             align-items: center;
         }
+
         .nav-menu a {
             color: var(--text-dark);
             text-decoration: none;
@@ -90,6 +281,7 @@
             transition: color 0.3s ease;
             position: relative;
         }
+
         .nav-menu a::after {
             content: '';
             position: absolute;
@@ -100,63 +292,17 @@
             background: var(--primary);
             transition: width 0.3s ease;
         }
+
         .nav-menu a:hover::after,
         .nav-menu a.active::after {
             width: 100%;
         }
+
         .nav-menu a:hover,
         .nav-menu a.active {
             color: var(--primary);
         }
 
-        /* ── Nav Actions (search removed, only auth buttons) ── */
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-shrink: 0;
-        }
-        .nav-auth {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .btn-login {
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .btn-login:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-        .btn-register {
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            background: var(--primary);
-            color: white;
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
-            white-space: nowrap;
-        }
-        .btn-register:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        /* ── Mobile toggle ── */
         .mobile-toggle {
             display: none;
             flex-direction: column;
@@ -164,26 +310,20 @@
             cursor: pointer;
             padding: 8px;
         }
+
         .mobile-toggle span {
             width: 25px;
             height: 3px;
             background: var(--text-dark);
-            transition: all 0.3s ease;
             border-radius: 2px;
-        }
-
-        /* ── Mobile auth (matches index.php) ── */
-        .mobile-auth {
-            display: none;
+            transition: all 0.3s ease;
         }
 
         @media (max-width: 768px) {
             .mobile-toggle {
                 display: flex;
             }
-            .nav-actions {
-                display: none;
-            }
+
             .nav-menu {
                 position: fixed;
                 top: 80px;
@@ -198,17 +338,9 @@
                 transition: transform 0.3s ease;
                 z-index: 999;
             }
+
             .nav-menu.active {
                 transform: translateX(0);
-            }
-            .mobile-auth {
-                display: flex !important;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.8rem;
-                padding-top: 1.2rem;
-                border-top: 1px solid #E2E8F0;
-                width: 100%;
             }
         }
 
@@ -223,9 +355,9 @@
 
         .page-tag {
             display: inline-block;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
             font-size: 0.85rem;
             font-weight: 600;
@@ -248,7 +380,7 @@
 
         .page-description {
             font-size: 1.15rem;
-            color: rgba(255,255,255,0.88);
+            color: rgba(255, 255, 255, 0.88);
             max-width: 650px;
             margin: 0 auto;
             animation: fadeInUp 0.8s ease 0.2s both;
@@ -256,14 +388,21 @@
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ── Stats Bar ── */
         .stats-bar-section {
             background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             position: relative;
             z-index: 10;
         }
@@ -293,9 +432,18 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .stat-dot.green { background: #10B981; }
-        .stat-dot.amber { background: #F59E0B; }
-        .stat-dot.red   { background: #EF4444; }
+
+        .stat-dot.green {
+            background: #10B981;
+        }
+
+        .stat-dot.amber {
+            background: #F59E0B;
+        }
+
+        .stat-dot.red {
+            background: #EF4444;
+        }
 
         .stat-number {
             font-family: 'Sora', sans-serif;
@@ -356,7 +504,7 @@
             background: var(--primary);
             border-color: var(--primary);
             color: white;
-            box-shadow: 0 4px 12px rgba(10,126,164,0.3);
+            box-shadow: 0 4px 12px rgba(10, 126, 164, 0.3);
         }
 
         /* ── No Results ── */
@@ -366,6 +514,7 @@
             color: var(--text-light);
             grid-column: 1 / -1;
         }
+
         .no-results h3 {
             font-family: 'Sora', sans-serif;
             font-size: 1.2rem;
@@ -373,7 +522,10 @@
             color: var(--text-dark);
             margin: 1rem 0 0.5rem;
         }
-        .no-results p { font-size: 0.9rem; }
+
+        .no-results p {
+            font-size: 0.9rem;
+        }
 
         /* ── Vehicles Section ── */
         .vehicles-section {
@@ -381,6 +533,7 @@
             margin: 3rem auto;
             padding: 0 2rem 2rem;
         }
+
         .vehicles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -395,6 +548,7 @@
             color: var(--text-light);
             font-size: 1.1rem;
         }
+
         .loading-spinner {
             width: 48px;
             height: 48px;
@@ -404,7 +558,13 @@
             animation: spin 0.8s linear infinite;
             margin: 0 auto 1rem;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .error-state {
             grid-column: 1 / -1;
             text-align: center;
@@ -424,17 +584,20 @@
             animation: fadeInUp 0.6s ease forwards;
             position: relative;
         }
+
         .vehicle-card:hover {
             transform: translateY(-12px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
         }
 
+        /* ── Big image with overlay ── */
         .vehicle-image {
             width: 100%;
             height: 300px;
             position: relative;
             overflow: hidden;
         }
+
         .vehicle-img {
             width: 100%;
             height: 100%;
@@ -444,8 +607,12 @@
             left: 0;
             transition: transform 0.6s ease;
         }
-        .vehicle-card:hover .vehicle-img { transform: scale(1.08); }
 
+        .vehicle-card:hover .vehicle-img {
+            transform: scale(1.08);
+        }
+
+        /* Dark gradient overlay at bottom of image */
         .vehicle-image::after {
             content: '';
             position: absolute;
@@ -453,10 +620,11 @@
             left: 0;
             right: 0;
             height: 70%;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
             z-index: 1;
         }
 
+        /* Name and plate overlaid on image */
         .vehicle-overlay {
             position: absolute;
             bottom: 0;
@@ -465,6 +633,7 @@
             padding: 1.5rem;
             z-index: 2;
         }
+
         .vehicle-type-badge {
             display: inline-block;
             background: var(--secondary);
@@ -477,22 +646,25 @@
             letter-spacing: 1px;
             margin-bottom: 0.5rem;
         }
+
         .vehicle-name-overlay {
             font-family: 'Sora', sans-serif;
             font-size: 1.6rem;
             font-weight: 800;
             color: white;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             line-height: 1.2;
             margin-bottom: 0.3rem;
         }
+
         .vehicle-plate-overlay {
             font-size: 0.8rem;
-            color: rgba(255,255,255,0.75);
+            color: rgba(255, 255, 255, 0.75);
             font-weight: 500;
             letter-spacing: 0.5px;
         }
 
+        /* Available badge top right */
         .vehicle-badge {
             position: absolute;
             top: 1rem;
@@ -505,14 +677,26 @@
             letter-spacing: 0.5px;
             color: white;
             backdrop-filter: blur(8px);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
             z-index: 3;
         }
-        .badge-available  { background: rgba(16, 185, 129, 0.92); }
-        .badge-booked     { background: rgba(100, 116, 139, 0.92); }
-        .badge-maintenance{ background: rgba(245, 158, 11, 0.92); }
 
-        .vehicle-content { padding: 1.5rem; }
+        .badge-available {
+            background: rgba(16, 185, 129, 0.92);
+        }
+
+        .badge-booked {
+            background: rgba(100, 116, 139, 0.92);
+        }
+
+        .badge-maintenance {
+            background: rgba(245, 158, 11, 0.92);
+        }
+
+        /* ── Card bottom content ── */
+        .vehicle-content {
+            padding: 1.5rem;
+        }
 
         .vehicle-specs {
             display: flex;
@@ -520,6 +704,7 @@
             gap: 0.6rem;
             margin-bottom: 1.2rem;
         }
+
         .spec-item {
             display: flex;
             align-items: center;
@@ -531,7 +716,10 @@
             font-size: 0.82rem;
             font-weight: 600;
         }
-        .spec-icon { font-size: 0.95rem; }
+
+        .spec-icon {
+            font-size: 0.95rem;
+        }
 
         .status-row {
             display: flex;
@@ -540,6 +728,7 @@
             padding-top: 1rem;
             border-top: 2px solid var(--bg-light);
         }
+
         .status-pill {
             display: flex;
             align-items: center;
@@ -551,6 +740,7 @@
             background: var(--bg-light);
             color: var(--text-dark);
         }
+
         .status-dot {
             width: 8px;
             height: 8px;
@@ -558,16 +748,26 @@
             display: inline-block;
             flex-shrink: 0;
         }
-        .status-dot.green  { background: #10B981; }
-        .status-dot.yellow { background: #F59E0B; }
-        .status-dot.red    { background: #EF4444; }
 
-        /* ── Footer (matching index.php) ── */
+        .status-dot.green {
+            background: #10B981;
+        }
+
+        .status-dot.yellow {
+            background: #F59E0B;
+        }
+
+        .status-dot.red {
+            background: #EF4444;
+        }
+
+        /* ── Footer ── */
         .footer {
             background: var(--text-dark);
             color: white;
             padding: 4rem 2rem 2rem;
         }
+
         .footer-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -576,29 +776,36 @@
             gap: 3rem;
             margin-bottom: 3rem;
         }
+
         .footer-section h3 {
             font-family: 'Sora', sans-serif;
             font-size: 1.3rem;
             margin-bottom: 1.5rem;
         }
+
         .footer-section p,
         .footer-section a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             display: block;
             margin-bottom: 0.8rem;
             transition: color 0.3s ease;
         }
-        .footer-section a:hover { color: var(--secondary); }
+
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+
         .social-links {
             display: flex;
             gap: 1rem;
             margin-top: 1rem;
         }
+
         .social-link {
             width: 40px;
             height: 40px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -606,215 +813,565 @@
             transition: all 0.3s ease;
             object-fit: cover;
         }
+
         .social-link:hover {
             background: var(--primary);
             transform: translateY(-3px);
         }
+
         .footer-bottom {
             max-width: 1400px;
             margin: 0 auto;
             padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
 
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            .page-title { font-size: 2.5rem; }
-            .page-description { font-size: 1.05rem; }
-            .vehicles-grid { grid-template-columns: 1fr; }
-            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
-            .stat-item { padding: 0.8rem 1rem; }
-            .stat-number { font-size: 1.2rem; }
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .page-description {
+                font-size: 1.05rem;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .enquiry-container {
+                grid-template-columns: 1fr;
+            }
+
+            .eq-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Enquiry Section ── */
+        .enquiry-section {
+            background: linear-gradient(135deg, #0F172A 0%, #0A2A3A 100%);
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enquiry-section::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(10, 126, 164, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .enquiry-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .enquiry-tag {
+            display: inline-block;
+            background: rgba(10, 126, 164, 0.2);
+            border: 1px solid rgba(10, 126, 164, 0.4);
+            color: #7DD3FC;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .enquiry-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .enquiry-desc {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .enquiry-features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .eq-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .eq-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .enquiry-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .eq-card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .eq-alert {
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+
+        .eq-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .eq-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        .eq-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .eq-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .eq-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .eq-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .eq-group input,
+        .eq-group select,
+        .eq-group textarea {
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.25s;
+            background: white;
+        }
+
+        .eq-group input:focus,
+        .eq-group select:focus,
+        .eq-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 126, 164, 0.1);
+        }
+
+        .eq-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .eq-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(10, 126, 164, 0.35);
+            margin-top: 0.5rem;
+        }
+
+        .eq-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(10, 126, 164, 0.45);
+        }
+
+        .eq-btn:disabled {
+            opacity: 0.7;
+            pointer-events: none;
         }
     </style>
 </head>
+
 <body>
 
-<!-- Header - Search bar removed, navbar size matches index.php exactly -->
-<header class="header" id="header">
-    <nav class="nav-container">
-        <a href="index.php" class="logo">
-            <img src="logo.jpeg" alt="Jettransfer Logo" class="logo-img">
-            Jettransfer
-        </a>
-        <ul class="nav-menu" id="navMenu">
-            <li><a href="index.php">Home</a></li>
-            <li><a href="destination.php">Destinations</a></li>
-            <li><a href="packages.php">Packages</a></li>
-            <li><a href="vehicles.html" class="active">Vehicles</a></li>
-            <li><a href="service.php">Services &amp; Gallery</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="aboutus.php">About Us</a></li>
-            <li class="mobile-auth">
-                <div style="display:flex; gap:0.8rem; width:100%;">
-                    <a href="login.php" style="flex:1; display:block; padding:0.6rem 1rem; border-radius:50px; border:2px solid var(--primary); color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Login</a>
-                    <a href="register.php" style="flex:1; display:block; padding:0.6rem 1rem; border-radius:50px; background:var(--primary); color:white; font-weight:600; font-size:0.9rem; text-decoration:none; text-align:center;">Register</a>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="index.php" class="logo">
+                <img src="logo.jpeg" alt="Jettransfer Logo" class="logo-img">
+                Jettransfer
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.php">Home</a></li>
+                <li><a href="destination.php">Destinations</a></li>
+                <li><a href="packages.php">Packages</a></li>
+                <li><a href="vehicles.html" class="active">Vehicles</a></li>
+                <li><a href="profile.php">Profile</a></li>
+                <li><a href="service.php">Services & Gallery</a></li>
+                <li><a href="aboutus.html">About Us</a></li>
+                <li><a href="contact.php">Contact Us</a></li>
+                <li class="mobile-auth">
+                    <div class="mobile-search">
+                        <input type="text" placeholder="Search vehicles…">
+                        <button>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mobile-auth-btns">
+                        <a href="login.php"
+                            style="display:block;padding:0.6rem 1rem;border-radius:50px;border:2px solid var(--primary);color:var(--primary);font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Login</a>
+                        <a href="register.php"
+                            style="display:block;padding:0.6rem 1rem;border-radius:50px;background:var(--primary);color:white;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;">Register</a>
+                    </div>
+                </li>
+            </ul>
+            <div class="nav-actions">
+                <div class="nav-search" id="navSearch">
+                    <button class="search-toggle" id="searchToggle">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </button>
+                    <div class="search-box" id="searchBox">
+                        <input type="text" placeholder="Search vehicles…" id="searchInput">
+                        <button class="search-submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            </li>
-        </ul>
-        <div class="nav-actions">
-            <!-- Search bar completely removed - only login/register buttons -->
-            <div class="nav-auth">
-                <a href="login.php" class="btn-login">Login</a>
-                <a href="register.php" class="btn-register">Register</a>
+                <div class="nav-auth">
+                    <a href="login.php" class="btn-login">Login</a>
+                    <a href="register.php" class="btn-register">Register</a>
+                </div>
+            </div>
+            <div class="mobile-toggle" id="mobileToggle">
+                <span></span><span></span><span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <img src="southern.jpg" alt=""
+            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(1px);transform:scale(1.05);">
+        <div
+            style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.60),rgba(10,126,164,0.50));z-index:1;">
+        </div>
+        <div style="position:relative;z-index:2;">
+            <div class="page-tag">✈️ Our Fleet</div>
+            <h1 class="page-title">Our Vehicles</h1>
+            <p class="page-description">Choose the best vehicle for your tour based on your group size and comfort
+                needs. All vehicles are well-maintained and driven by professional drivers.</p>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar-section">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="statTotal">—</span>
+                <span class="stat-label">Total Vehicles</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-dot green"></span>
+                <span class="stat-number" id="statAvailable">—</span>
+                <span class="stat-label">Available</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-dot amber"></span>
+                <span class="stat-number" id="statBooked">—</span>
+                <span class="stat-label">Booked</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-dot red"></span>
+                <span class="stat-number" id="statMaintenance">—</span>
+                <span class="stat-label">Under Maintenance</span>
             </div>
         </div>
-        <div class="mobile-toggle" id="mobileToggle">
-            <span></span><span></span><span></span>
-        </div>
-    </nav>
-</header>
+    </section>
 
-<!-- Page Header -->
-<section class="page-header">
-    <img src="southern.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:blur(1px);transform:scale(1.05);">
-    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,90,122,0.60),rgba(10,126,164,0.50));z-index:1;"></div>
-    <div style="position:relative;z-index:2;">
-        <div class="page-tag"> 🚗 Our Fleet</div>
-        <h1 class="page-title">Our Vehicles</h1>
-        <p class="page-description">Choose the best vehicle for your tour based on your group size and comfort needs. All vehicles are well-maintained and driven by professional drivers.</p>
-    </div>
-</section>
+    <!-- Filter Bar -->
+    <section class="filter-section">
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Luxury Car">Luxury Car</button>
+            <button class="filter-btn" data-filter="SUV">SUV</button>
+            <button class="filter-btn" data-filter="Van">Van</button>
+            <button class="filter-btn" data-filter="Luxury Van">Luxury Van</button>
+            <button class="filter-btn" data-filter="Minibus">Minibus</button>
+            <button class="filter-btn" data-filter="Premium Car">Premium Car</button>
+        </div>
+    </section>
 
-<!-- Stats Bar -->
-<section class="stats-bar-section">
-    <div class="stats-bar">
-        <div class="stat-item">
-            <span class="stat-number" id="statTotal">—</span>
-            <span class="stat-label">Total Vehicles</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <span class="stat-dot green"></span>
-            <span class="stat-number" id="statAvailable">—</span>
-            <span class="stat-label">Available</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <span class="stat-dot amber"></span>
-            <span class="stat-number" id="statBooked">—</span>
-            <span class="stat-label">Booked</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <span class="stat-dot red"></span>
-            <span class="stat-number" id="statMaintenance">—</span>
-            <span class="stat-label">Under Maintenance</span>
-        </div>
-    </div>
-</section>
-
-<!-- Filter Bar -->
-<section class="filter-section">
-    <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="Luxury Car">Luxury Car</button>
-        <button class="filter-btn" data-filter="SUV">SUV</button>
-        <button class="filter-btn" data-filter="Van">Van</button>
-        <button class="filter-btn" data-filter="Luxury Van">Luxury Van</button>
-        <button class="filter-btn" data-filter="Minibus">Minibus</button>
-        <button class="filter-btn" data-filter="Premium Car">Premium Car</button>
-    </div>
-</section>
-
-<!-- Vehicles Section -->
-<section class="vehicles-section">
-    <div class="vehicles-grid" id="vehiclesGrid">
-        <div class="loading-state" id="loadingState">
-            <div class="loading-spinner"></div>
-            <p>Loading vehicles...</p>
-        </div>
-    </div>
-    <div id="noResultsState" style="display:none;" class="no-results">
-        <div style="font-size:3rem;">🚗</div>
-        <h3>No vehicles found</h3>
-        <p>Try selecting a different category</p>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer" id="contact">
-    <div class="footer-content">
-        <div class="footer-section">
-            <h3>Jettransfer Travels</h3>
-            <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.</p>
-            <div class="social-links">
-                <img src="images/insta1.webp" alt="Instagram" class="social-link">
-                <img src="images/fb.avif" alt="Facebook" class="social-link">
-                <img src="images/tiktok.webp" alt="TikTok" class="social-link">
+    <!-- Vehicles Section -->
+    <section class="vehicles-section">
+        <div class="vehicles-grid" id="vehiclesGrid">
+            <div class="loading-state" id="loadingState">
+                <div class="loading-spinner"></div>
+                <p>Loading vehicles...</p>
             </div>
         </div>
-        <div class="footer-section">
-            <h3>Quick Links</h3>
-            <a href="index.php#destinations">Destinations</a>
-            <a href="index.php#packages">Tour Packages</a>
-            <a href="vehicles.html">Our Vehicles</a>
-            <a href="aboutus.php">About Us</a>
-            <a href="terms.html">Terms & Conditions</a>
-            <a href="service.php">Gallery</a>
+        <div id="noResultsState" style="display:none;" class="no-results">
+            <div style="font-size:3rem;">🚗</div>
+            <h3>No vehicles found</h3>
+            <p>Try selecting a different category</p>
         </div>
-        <div class="footer-section">
-            <h3>Business Hours</h3>
-            <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
-            <p>Saturday: 10:00 AM - 6:00 PM</p>
-            <p>Sunday: 10:00 AM - 6:00 PM</p>
-            <p style="margin-top:1rem;color:var(--secondary)">24/7 Emergency Support Available</p>
-        </div>
-        <div class="footer-section">
-            <h3>Contact Info</h3>
-            <p>📞 +94 72 403 0499</p>
-            <p>📧 jettransfer@outlook.com</p>
-            <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
-    </div>
-</footer>
+    </section>
 
-<script>
-    // Mobile menu toggle
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navMenu = document.getElementById('navMenu');
-    if (mobileToggle) {
+    <!-- Enquiry Section -->
+    <section class="enquiry-section">
+        <div class="enquiry-container">
+            <div class="enquiry-left">
+                <div class="enquiry-tag">📋 Vehicle Enquiry</div>
+                <h2 class="enquiry-title">Interested in a Vehicle?</h2>
+                <p class="enquiry-desc">Fill in the form and our team will get back to you with the best vehicle option
+                    for your trip.</p>
+                <div class="enquiry-features">
+                    <div class="eq-feature">
+                        <span class="eq-icon">✅</span>
+                        <span>Free consultation</span>
+                    </div>
+                    <div class="eq-feature">
+                        <span class="eq-icon">⚡</span>
+                        <span>Quick response within 24 hours</span>
+                    </div>
+                    <div class="eq-feature">
+                        <span class="eq-icon">🚗</span>
+                        <span>Best vehicle matched to your needs</span>
+                    </div>
+                    <div class="eq-feature">
+                        <span class="eq-icon">🛡️</span>
+                        <span>Professional & insured drivers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="enquiry-right">
+                <div class="enquiry-card">
+                    <h3 class="eq-card-title">Send an Enquiry</h3>
+
+                    <!-- Success/Error message -->
+                    <div class="eq-alert eq-success" id="eqSuccess" style="display:none">
+                        ✅ Enquiry submitted! We'll contact you soon.
+                    </div>
+                    <div class="eq-alert eq-error" id="eqError" style="display:none"></div>
+
+                    <div class="eq-form">
+                        <div class="eq-row">
+                            <div class="eq-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="eqName" placeholder="Your full name">
+                            </div>
+                            <div class="eq-group">
+                                <label>Email *</label>
+                                <input type="email" id="eqEmail" placeholder="your@email.com">
+                            </div>
+                        </div>
+                        <div class="eq-row">
+                            <div class="eq-group">
+                                <label>Phone Number</label>
+                                <input type="text" id="eqPhone" placeholder="+94 77 000 0000">
+                            </div>
+                            <div class="eq-group">
+                                <label>Preferred Vehicle Type *</label>
+                                <select id="eqType">
+                                    <option value="">Select type…</option>
+                                    <option value="Luxury Car">Luxury Car</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Van">Van</option>
+                                    <option value="Luxury Van">Luxury Van</option>
+                                    <option value="Minibus">Minibus</option>
+                                    <option value="Premium Car">Premium Car</option>
+                                    <option value="Any">Any (Flexible)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="eq-row">
+                            <div class="eq-group">
+                                <label>Travel Date *</label>
+                                <input type="date" id="eqDate">
+                            </div>
+                            <div class="eq-group">
+                                <label>Number of Passengers</label>
+                                <input type="number" id="eqPassengers" placeholder="e.g. 4" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="eq-group">
+                            <label>Message / Additional Details</label>
+                            <textarea id="eqMessage" rows="3"
+                                placeholder="Tell us about your trip, destinations, special requirements…"></textarea>
+                        </div>
+                        <button class="eq-btn" id="eqSubmitBtn" onclick="submitEnquiry()">
+                            <span id="eqBtnText">Send Enquiry</span>
+                            <span id="eqBtnLoader" style="display:none">Sending…</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Jettransfer Travels</h3>
+                <p>Your trusted partner for exploring the beauty of Sri Lanka with comfort, safety, and professionalism.
+                </p>
+                <div class="social-links">
+                    <img src="insta.jpg" alt="Instagram" class="social-link">
+                    <img src="fb.png" alt="Facebook" class="social-link">
+                    <img src="tiktok.jpg" alt="TikTok" class="social-link">
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="destination.php">Destinations</a>
+                <a href="packages.php">Tour Packages</a>
+                <a href="vehicles.html">Our Vehicles</a>
+                <a href="aboutus.html">About Us</a>
+                <a href="terms.html">Terms & Conditions</a>
+                <a href="service.php">Gallery</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>📞 +94 72 403 0499</p>
+                <p>📧 jettransfer@outlook.com</p>
+                <p>📍 Ruwani Uyana, Matara, Sri Lanka</p>
+            </div>
+            <div class="footer-section">
+                <h3>Business Hours</h3>
+                <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+                <p>Saturday: 10:00 AM - 6:00 PM</p>
+                <p>Sunday: 10:00 AM - 6:00 PM</p>
+                <p style="margin-top:1rem;color:var(--secondary);">24/7 Emergency Support Available</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Jettransfer Travels. All rights reserved. | Designed with care for your journey</p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        // ── Nav & Header scripts ──
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navMenu = document.getElementById('navMenu');
         mobileToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
-    }
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => navMenu.classList.remove('active'));
-    });
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => navMenu.classList.remove('active'));
+        });
+        window.addEventListener('scroll', () => {
+            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 100);
+        });
+        const searchToggle = document.getElementById('searchToggle');
+        const searchBox = document.getElementById('searchBox');
+        const searchInput = document.getElementById('searchInput');
+        searchToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchBox.classList.toggle('open');
+            if (searchBox.classList.contains('open')) setTimeout(() => searchInput.focus(), 300);
+        });
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('navSearch').contains(e.target)) searchBox.classList.remove('open');
+        });
 
-    // Scroll effect for header
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('header');
-        if (header) header.classList.toggle('scrolled', window.scrollY > 100);
-    });
+        // ── Badge class based on availability ──
+        function badgeClass(availability) {
+            if (availability === 'Available') return 'badge-available';
+            if (availability === 'Booked') return 'badge-booked';
+            return 'badge-maintenance';
+        }
 
-    // Badge class based on availability
-    function badgeClass(availability) {
-        if (availability === 'Available') return 'badge-available';
-        if (availability === 'Booked') return 'badge-booked';
-        return 'badge-maintenance';
-    }
+        // ── Availability dot colour ──
+        function availDot(availability) {
+            if (availability === 'Available') return 'green';
+            if (availability === 'Booked') return 'red';
+            return 'yellow';
+        }
 
-    // Availability dot colour
-    function availDot(availability) {
-        if (availability === 'Available') return 'green';
-        if (availability === 'Booked') return 'red';
-        return 'yellow';
-    }
+        // ── Condition dot colour ──
+        function condDot(condition) {
+            if (condition === 'Good Condition') return 'green';
+            if (condition === 'Under Maintenance') return 'yellow';
+            return 'red';
+        }
 
-    // Condition dot colour
-    function condDot(condition) {
-        if (condition === 'Good Condition') return 'green';
-        if (condition === 'Under Maintenance') return 'yellow';
-        return 'red';
-    }
+        // ── Build one card HTML ──
+        function buildCard(v, index) {
+            const delay = (index * 0.1 + 0.1).toFixed(1);
 
-    // Build card HTML
-    function buildCard(v, index) {
-        const delay = (index * 0.1 + 0.1).toFixed(1);
-        return `
+            return `
         <div class="vehicle-card" style="animation-delay:${delay}s;">
             <div class="vehicle-image">
                 <img src="${v.image}" alt="${v.name}" class="vehicle-img">
@@ -843,78 +1400,158 @@
                 </div>
             </div>
         </div>`;
-    }
+        }
 
-    let allVehicles = [];
+        // ── Store all vehicles globally for filtering ──
+        let allVehicles = [];
 
-    // Fetch vehicles from database
-    async function loadVehicles() {
-        const grid = document.getElementById('vehiclesGrid');
-        if (!grid) return;
-        try {
-            const response = await fetch('vehicles.php?action=get');
-            const data = await response.json();
-            if (!data.success) throw new Error(data.message);
-            allVehicles = data.vehicles;
-            updateStats(allVehicles);
-            grid.innerHTML = '';
-            allVehicles.forEach((vehicle, index) => {
-                grid.innerHTML += buildCard(vehicle, index);
-            });
-        } catch (error) {
-            grid.innerHTML = `
+        // ── Fetch vehicles from database and render ──
+        async function loadVehicles() {
+            const grid = document.getElementById('vehiclesGrid');
+
+            try {
+                const response = await fetch('vehicles.php?action=get');
+                const data = await response.json();
+
+                if (!data.success) throw new Error(data.message);
+
+                allVehicles = data.vehicles;
+
+                // Update stats bar
+                updateStats(allVehicles);
+
+                // Clear loading spinner
+                grid.innerHTML = '';
+
+                // Build and insert each card
+                allVehicles.forEach((vehicle, index) => {
+                    grid.innerHTML += buildCard(vehicle, index);
+                });
+
+            } catch (error) {
+                grid.innerHTML = `
                 <div class="error-state">
                     <p>⚠️ Could not load vehicles. Please try again.</p>
                     <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-light);">${error.message}</p>
                 </div>`;
+            }
         }
-    }
 
-    // Update stats bar
-    function updateStats(vehicles) {
-        const available = vehicles.filter(v => v.availability === 'Available').length;
-        const booked = vehicles.filter(v => v.availability === 'Booked').length;
-        const maintenance = vehicles.filter(v => v.condition_status === 'Under Maintenance').length;
-        const statTotal = document.getElementById('statTotal');
-        const statAvailable = document.getElementById('statAvailable');
-        const statBooked = document.getElementById('statBooked');
-        const statMaintenance = document.getElementById('statMaintenance');
-        if (statTotal) statTotal.textContent = vehicles.length;
-        if (statAvailable) statAvailable.textContent = available;
-        if (statBooked) statBooked.textContent = booked;
-        if (statMaintenance) statMaintenance.textContent = maintenance;
-    }
+        // ── Update stats bar ──
+        function updateStats(vehicles) {
+            const available = vehicles.filter(v => v.availability === 'Available').length;
+            const booked = vehicles.filter(v => v.availability === 'Booked').length;
+            const maintenance = vehicles.filter(v => v.condition_status === 'Under Maintenance').length;
 
-    // Filter functionality
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    if (filterBtns.length) {
-        filterBtns.forEach(btn => {
+            document.getElementById('statTotal').textContent = vehicles.length;
+            document.getElementById('statAvailable').textContent = available;
+            document.getElementById('statBooked').textContent = booked;
+            document.getElementById('statMaintenance').textContent = maintenance;
+        }
+
+        // ── Filter functionality ──
+        document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+
                 const filter = btn.dataset.filter;
                 const grid = document.getElementById('vehiclesGrid');
                 const noResult = document.getElementById('noResultsState');
-                if (!grid) return;
+
                 const filtered = filter === 'all'
                     ? allVehicles
                     : allVehicles.filter(v => v.type === filter);
+
                 if (filtered.length === 0) {
                     grid.innerHTML = '';
-                    if (noResult) noResult.style.display = 'block';
+                    noResult.style.display = 'block';
                     return;
                 }
-                if (noResult) noResult.style.display = 'none';
+
+                noResult.style.display = 'none';
                 grid.innerHTML = '';
                 filtered.forEach((vehicle, index) => {
                     grid.innerHTML += buildCard(vehicle, index);
                 });
             });
         });
-    }
 
-    // Load vehicles on page load
-    loadVehicles();
-</script>
+        // ── Run when page loads ──
+        loadVehicles();
+
+        // ── Submit Enquiry ──
+        function submitEnquiry() {
+            const name = document.getElementById('eqName').value.trim();
+            const email = document.getElementById('eqEmail').value.trim();
+            const phone = document.getElementById('eqPhone').value.trim();
+            const vehicle_type = document.getElementById('eqType').value;
+            const travel_date = document.getElementById('eqDate').value;
+            const passengers = document.getElementById('eqPassengers').value;
+            const message = document.getElementById('eqMessage').value.trim();
+
+            const successBox = document.getElementById('eqSuccess');
+            const errorBox = document.getElementById('eqError');
+            const btnText = document.getElementById('eqBtnText');
+            const btnLoader = document.getElementById('eqBtnLoader');
+            const submitBtn = document.getElementById('eqSubmitBtn');
+
+            // Hide previous messages
+            successBox.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            // Validate
+            if (!name || !email || !vehicle_type || !travel_date) {
+                errorBox.textContent = '❌ Please fill in all required fields.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            // Loading state
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline';
+
+            const formData = new FormData();
+            formData.append('action', 'enquire');
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('vehicle_type', vehicle_type);
+            formData.append('travel_date', travel_date);
+            formData.append('passengers', passengers);
+            formData.append('message', message);
+
+            fetch('vehicles.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        successBox.style.display = 'block';
+                        // Clear form
+                        document.getElementById('eqName').value = '';
+                        document.getElementById('eqEmail').value = '';
+                        document.getElementById('eqPhone').value = '';
+                        document.getElementById('eqType').value = '';
+                        document.getElementById('eqDate').value = '';
+                        document.getElementById('eqPassengers').value = '';
+                        document.getElementById('eqMessage').value = '';
+                    } else {
+                        errorBox.textContent = '❌ ' + data.message;
+                        errorBox.style.display = 'block';
+                    }
+                })
+                .catch(() => {
+                    errorBox.textContent = '❌ Network error. Please try again.';
+                    errorBox.style.display = 'block';
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnLoader.style.display = 'none';
+                });
+        }
+    </script>
+
 </body>
+
 </html>
