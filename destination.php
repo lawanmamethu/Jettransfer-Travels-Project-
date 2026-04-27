@@ -3,6 +3,9 @@
 // DATABASE CONNECTION
 // ==============================================
 
+//Request data - POST 
+//Send data - GET 
+
 // Create connection to MySQL database
 $conn = new mysqli('localhost', 'root', '', 'jettransfer');
 
@@ -24,7 +27,7 @@ $conn->set_charset('utf8mb4');
 // ==============================================
 
 // Check if this is a POST request with an action parameter
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {  
     $action = $_POST['action'];
 
     // Handle ADD operation

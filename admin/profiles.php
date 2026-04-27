@@ -12,24 +12,24 @@ if ($action === 'toggle' && $tid) {
     $r   = $conn->query("SELECT is_active FROM users WHERE id=$tid LIMIT 1");
     $row = $r ? $r->fetch_assoc() : null;
     if ($row) {
-        $new = $row['is_active'] ? 0 : 1;  
+        $new = $row['is_active'] ? 0 : 1;
         $conn->query("UPDATE users SET is_active=$new WHERE id=$tid");
         $msg = $new ? '✅ User activated.' : '⚠️ User deactivated.';
     }
 }
-if ($action === 'delete' && $tid) {  
+if ($action === 'delete' && $tid) {
     $conn->query("DELETE FROM users WHERE id=$tid");
     $msg = '🗑️ User deleted.';
 }
 
-// ── Fetch admin info (same as index.php)
-$ar   = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
-$adm  = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
+// ── Fetch admin info
+$ar   = $conn->query("SELECT * FROM admins WHERE id=1 LIMIT 1");
+$adm  = $ar ? $ar->fetch_assoc() : ['id'=>1,'name'=>'Admin','email'=>'admin@jettransfer.com','last_login'=>null,'created_at'=>null];
 $admName  = htmlspecialchars($adm['name']);
 $admEmail = htmlspecialchars($adm['email']);
 $admInit  = strtoupper(substr($adm['name'],0,1));
 
-// ── Stats 
+// ── Stats (users only, admin shown separately)
 $total    = $conn->query("SELECT COUNT(*) FROM users")->fetch_row()[0] ?? 0;
 $active   = $conn->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fetch_row()[0] ?? 0;
 $inactive = $total - $active;
@@ -49,6 +49,18 @@ if ($status === 'inactive') $where .= ' AND is_active=0';
 $users = $conn->query("SELECT * FROM users WHERE $where ORDER BY id DESC");
 $allUsers = [];
 if ($users) while ($row = $users->fetch_assoc()) $allUsers[] = $row;
+
+// ── Check if admin matches search (show admin row only when no status filter or searching)
+$showAdmin = true;
+if ($status === 'active' || $status === 'inactive') $showAdmin = false;
+if ($search !== '') {
+    // Only show admin if search matches name or email
+    $sl = strtolower($search);
+    if (stripos($adm['name'], $sl) === false && stripos($adm['email'], $sl) === false) {
+        $showAdmin = false;
+    }
+}
+
 $conn->close();
 ?>
 
@@ -61,7 +73,6 @@ $conn->close();
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* ── CSS variables — matches index.php exactly ── */
     :root {
         --primary: #0A7EA4;
         --primary-dark: #065A7A;
@@ -80,7 +91,7 @@ $conn->close();
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Manrope',sans-serif; background:var(--bg); color:var(--text-dark); min-height:100vh; display:flex; }
 
-    /* ── SIDEBAR — matches index.php exactly ── */
+    /* ── SIDEBAR ── */
     .sidebar { width:var(--sidebar-w); background:var(--sidebar-bg); min-height:100vh; position:fixed; left:0; top:0; bottom:0; display:flex; flex-direction:column; z-index:100; transition:transform .3s ease; }
     .sidebar-brand { padding:1.8rem 1.5rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; gap:.8rem; }
     .sidebar-logo { width:42px; height:42px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
@@ -157,14 +168,24 @@ $conn->close();
     tbody tr:last-child { border-bottom:none; }
     td { padding:.9rem 1.2rem; font-size:.88rem; vertical-align:middle; }
 
+    /* Admin row highlight */
+    .admin-row { background:linear-gradient(90deg, rgba(10,126,164,0.04), transparent); }
+    .admin-row:hover { background:linear-gradient(90deg, rgba(10,126,164,0.08), rgba(10,126,164,0.03)) !important; }
+
     .user-cell { display:flex; align-items:center; gap:.85rem; }
     .user-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:.88rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .user-avatar.admin-av { background:linear-gradient(135deg,#0F172A,#0A7EA4); border-radius:10px; }
     .user-name  { font-weight:600; font-size:.88rem; }
     .user-email { font-size:.75rem; color:var(--text-light); }
 
     .badge { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .8rem; border-radius:50px; font-size:.73rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
     .badge-active   { background:#ECFDF5; color:#065F46; }
     .badge-inactive { background:#FEF2F2; color:#991B1B; }
+    .badge-admin    { background:linear-gradient(135deg,rgba(10,126,164,0.12),rgba(16,185,129,0.1)); color:var(--primary-dark); border:1px solid rgba(10,126,164,0.2); }
+
+    .role-tag { display:inline-block; padding:.18rem .6rem; border-radius:6px; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-left:.4rem; }
+    .role-tag.admin { background:rgba(10,126,164,0.1); color:var(--primary); }
+    .role-tag.user  { background:#F1F5F9; color:var(--text-light); }
 
     .actions { display:flex; align-items:center; gap:.5rem; flex-wrap:nowrap; }
     .btn-sm { padding:.35rem .85rem; border-radius:8px; font-size:.78rem; font-weight:600; cursor:pointer; border:none; font-family:'Manrope',sans-serif; transition:all .2s; text-decoration:none; display:inline-block; white-space:nowrap; }
@@ -176,6 +197,7 @@ $conn->close();
     .btn-delete:hover { background:#FECACA; }
     .btn-view   { background:#EFF6FF; color:#1D4ED8; }
     .btn-view:hover { background:#BFDBFE; }
+    .btn-disabled { background:#F1F5F9; color:#CBD5E1; cursor:not-allowed; font-size:.75rem; }
 
     .alert-bar { padding:.8rem 1.2rem; border-radius:12px; margin-bottom:1.2rem; font-size:.88rem; font-weight:600; }
     .alert-bar.ok   { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
@@ -183,6 +205,27 @@ $conn->close();
 
     .empty-state { text-align:center; padding:3rem 1rem; color:var(--text-light); }
     .empty-state .icon { font-size:3rem; margin-bottom:.8rem; }
+
+    .admin-section-label {
+        padding:.5rem 1.2rem;
+        background: linear-gradient(90deg, rgba(10,126,164,0.07), transparent);
+        font-size:.7rem;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        color:var(--primary);
+        border-bottom:1px solid rgba(10,126,164,0.1);
+    }
+    .users-section-label {
+        padding:.5rem 1.2rem;
+        background:#F8FAFC;
+        font-size:.7rem;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        color:var(--text-light);
+        border-bottom:1px solid var(--border);
+    }
 
     /* ── RESPONSIVE ── */
     @media(max-width:768px) {
@@ -199,9 +242,7 @@ $conn->close();
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- ══════════════════════════════════
-     SIDEBAR — matches index.php exactly
-══════════════════════════════════ -->
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="sidebar-logo">✈️</div>
@@ -270,9 +311,7 @@ $conn->close();
     </div>
 </aside>
 
-<!-- ══════════════════════════════════
-     MAIN
-══════════════════════════════════ -->
+<!-- MAIN -->
 <div class="main">
 
     <!-- TOPBAR -->
@@ -302,7 +341,7 @@ $conn->close();
 
         <!-- Stats -->
         <div class="stats-row">
-            <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-val"><?= $total ?></div><div class="stat-lbl">Total Users</div></div></div>
+            <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-val"><?= $total + 1 ?></div><div class="stat-lbl">Total Users</div></div></div>
             <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-val"><?= $active ?></div><div class="stat-lbl">Active Users</div></div></div>
             <div class="stat-card"><div class="stat-icon red">🚫</div><div><div class="stat-val"><?= $inactive ?></div><div class="stat-lbl">Inactive Users</div></div></div>
             <div class="stat-card"><div class="stat-icon amber">🆕</div><div><div class="stat-val"><?= $today ?></div><div class="stat-lbl">Joined Today</div></div></div>
@@ -316,7 +355,7 @@ $conn->close();
                     <input type="text" name="search" placeholder="Search by name, email, phone…" value="<?= htmlspecialchars($search) ?>">
                 </div>
                 <div class="filter-tabs">
-                    <a href="profiles.php?status=all<?= $search ? '&search='.urlencode($search) : '' ?>"      class="filter-btn <?= $status==='all'      ? 'active':'' ?>">All (<?= $total ?>)</a>
+                    <a href="profiles.php?status=all<?= $search ? '&search='.urlencode($search) : '' ?>"      class="filter-btn <?= $status==='all'      ? 'active':'' ?>">All (<?= $total + 1 ?>)</a>
                     <a href="profiles.php?status=active<?= $search ? '&search='.urlencode($search) : '' ?>"   class="filter-btn <?= $status==='active'   ? 'active':'' ?>">Active (<?= $active ?>)</a>
                     <a href="profiles.php?status=inactive<?= $search ? '&search='.urlencode($search) : '' ?>" class="filter-btn <?= $status==='inactive' ? 'active':'' ?>">Inactive (<?= $inactive ?>)</a>
                 </div>
@@ -337,12 +376,12 @@ $conn->close();
                 </div>
             </div>
             <div class="table-wrap">
-                <?php if (!empty($allUsers)): ?>
                 <table id="usersTable">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>User</th>
+                            <th>Role</th>
                             <th>Phone</th>
                             <th>Nationality</th>
                             <th>Registered</th>
@@ -352,6 +391,39 @@ $conn->close();
                         </tr>
                     </thead>
                     <tbody>
+
+                        <?php if ($showAdmin): ?>
+                        <!-- ── Admin Row ── -->
+                        <tr class="admin-row">
+                            <td style="color:var(--text-light);font-size:.8rem">#<?= $adm['id'] ?></td>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar admin-av"><?= $admInit ?></div>
+                                    <div>
+                                        <div class="user-name"><?= $admName ?></div>
+                                        <div class="user-email"><?= $admEmail ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="role-tag admin">Admin</span></td>
+                            <td style="color:var(--text-light)">—</td>
+                            <td style="color:var(--text-light)">—</td>
+                            <td style="font-size:.82rem;color:var(--text-light)">
+                                <?= $adm['created_at'] ? date('d M Y', strtotime($adm['created_at'])) : '—' ?>
+                            </td>
+                            <td style="font-size:.82rem;color:var(--text-light)">
+                                <?= $adm['last_login'] ? date('d M Y', strtotime($adm['last_login'])) : '—' ?>
+                            </td>
+                            <td><span class="badge badge-admin">⚙️ Admin</span></td>
+                            <td>
+                                <div class="actions">
+                                    <span class="btn-sm btn-disabled" title="Admin account is protected">Protected</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+
+                        <?php if (!empty($allUsers)): ?>
                         <?php foreach ($allUsers as $u):
                             $ini = strtoupper(substr($u['first_name'],0,1) . substr($u['last_name'],0,1));
                         ?>
@@ -366,6 +438,7 @@ $conn->close();
                                     </div>
                                 </div>
                             </td>
+                            <td><span class="role-tag user">User</span></td>
                             <td><?= htmlspecialchars($u['phone'] ?: '—') ?></td>
                             <td><?= htmlspecialchars($u['nationality'] ?: '—') ?></td>
                             <td style="font-size:.82rem;color:var(--text-light)"><?= date('d M Y', strtotime($u['created_at'])) ?></td>
@@ -374,7 +447,7 @@ $conn->close();
                                 <span class="badge <?= $u['is_active'] ? 'badge-active' : 'badge-inactive' ?>">
                                     <?= $u['is_active'] ? '✅ Active' : '🚫 Inactive' ?>
                                 </span>
-                             </td>
+                            </td>
                             <td>
                                 <div class="actions">
                                     <a href="view_user.php?id=<?= $u['id'] ?>" class="btn-sm btn-view">View</a>
@@ -391,20 +464,25 @@ $conn->close();
                                         <button type="submit" class="btn-sm btn-delete">Delete</button>
                                     </form>
                                 </div>
-                             </td>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
+                        <?php elseif (!$showAdmin): ?>
+                        <tr>
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <div class="icon">👥</div>
+                                    <p style="font-weight:600;font-size:1rem;margin-bottom:.4rem">
+                                        <?= $search ? 'No users match your search' : 'No users registered yet' ?>
+                                    </p>
+                                    <p style="font-size:.85rem">Users will appear here after they register on the website.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+
                     </tbody>
                 </table>
-                <?php else: ?>
-                <div class="empty-state">
-                    <div class="icon">👥</div>
-                    <p style="font-weight:600;font-size:1rem;margin-bottom:.4rem">
-                        <?= $search ? 'No users match your search' : 'No users registered yet' ?>
-                    </p>
-                    <p style="font-size:.85rem">Users will appear here after they register on the website.</p>
-                </div>
-                <?php endif; ?>
             </div>
         </div>
 
@@ -412,8 +490,15 @@ $conn->close();
 </div><!-- /.main -->
 
 <script>
-    // Store all users data for export/print
     const allUsers = <?php echo json_encode($allUsers); ?>;
+    const adminData = <?php echo json_encode([
+        'id'         => $adm['id'],
+        'name'       => $adm['name'],
+        'email'      => $adm['email'],
+        'last_login' => $adm['last_login'] ?? '',
+        'created_at' => $adm['created_at'] ?? '',
+        'showAdmin'  => $showAdmin
+    ]); ?>;
 
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
@@ -424,19 +509,27 @@ $conn->close();
         document.getElementById('sidebarOverlay').classList.remove('show');
     });
 
-    // Export to CSV
+    // Export to CSV — includes admin row if visible
     function exportUsersCSV() {
-        if (!allUsers.length) {
-            alert('No users to export.');
-            return;
+        let rows = [['ID', 'Name', 'Email', 'Role', 'Phone', 'Nationality', 'Status', 'Registered', 'Last Login']];
+
+        if (adminData.showAdmin) {
+            rows.push([
+                adminData.id,
+                adminData.name,
+                adminData.email,
+                'Admin', '', '', 'Active',
+                adminData.created_at || '',
+                adminData.last_login || ''
+            ]);
         }
-        let rows = [['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Nationality', 'Status', 'Registered Date', 'Last Login']];
+
         allUsers.forEach(user => {
             rows.push([
                 user.id,
-                user.first_name,
-                user.last_name,
+                user.first_name + ' ' + user.last_name,
                 user.email,
+                'User',
                 user.phone || '',
                 user.nationality || '',
                 user.is_active ? 'Active' : 'Inactive',
@@ -444,73 +537,84 @@ $conn->close();
                 user.last_login || ''
             ]);
         });
+
+        if (rows.length === 1) { alert('No users to export.'); return; }
+
         let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
         const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.href = url;
+        link.href = URL.createObjectURL(blob);
         link.setAttribute('download', 'jettransfer_users.csv');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
     }
 
-    // Print/PDF
+    // Print/PDF — includes admin row if visible
     function printUsers() {
-        if (!allUsers.length) {
-            alert('No users to print.');
-            return;
+        let bodyRows = '';
+
+        if (adminData.showAdmin) {
+            bodyRows += `<tr style="background:#f0f9ff">
+                <td>${adminData.id}</td>
+                <td><strong>${escapeHtml(adminData.name)}</strong></td>
+                <td>${escapeHtml(adminData.email)}</td>
+                <td><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:50px;font-size:11px;font-weight:700">ADMIN</span></td>
+                <td>—</td><td>—</td>
+                <td style="color:green;font-weight:700">Active</td>
+                <td>${escapeHtml(adminData.created_at || '—')}</td>
+                <td>${escapeHtml(adminData.last_login || '—')}</td>
+            </tr>`;
         }
-        const printWindow = window.open('', '_blank');
-        let html = `
-            <html>
-            <head><title>Jettransfer - Users Report</title>
-            <style>
-                body { font-family: 'Manrope', sans-serif; margin: 2rem; }
-                h1 { color: #0A7EA4; }
-                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-                th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
-                th { background: #f2f2f2; }
-                .status-active { color: green; font-weight: bold; }
-                .status-inactive { color: red; }
-            </style>
-            </head>
-            <body>
-            <h1>Jettransfer - Registered Users Report</h1>
-            <p>Generated on: ${new Date().toLocaleString()}</p>
-            <table><thead><tr>
-                <th>ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th><th>Nationality</th><th>Status</th><th>Registered</th><th>Last Login</th>
-            </tr></thead><tbody>
-        `;
+
         allUsers.forEach(user => {
-            html += `<tr>
-                <td>${escapeHtml(user.id)}</td>
-                <td>${escapeHtml(user.first_name)}</td>
-                <td>${escapeHtml(user.last_name)}</td>
+            bodyRows += `<tr>
+                <td>${user.id}</td>
+                <td><strong>${escapeHtml(user.first_name + ' ' + user.last_name)}</strong></td>
                 <td>${escapeHtml(user.email)}</td>
+                <td><span style="background:#F1F5F9;color:#64748B;padding:2px 8px;border-radius:50px;font-size:11px;font-weight:700">USER</span></td>
                 <td>${escapeHtml(user.phone || '—')}</td>
                 <td>${escapeHtml(user.nationality || '—')}</td>
-                <td class="${user.is_active ? 'status-active' : 'status-inactive'}">${user.is_active ? 'Active' : 'Inactive'}</td>
+                <td style="color:${user.is_active ? 'green' : 'red'};font-weight:700">${user.is_active ? 'Active' : 'Inactive'}</td>
                 <td>${escapeHtml(user.created_at)}</td>
                 <td>${escapeHtml(user.last_login || '—')}</td>
             </tr>`;
         });
-        html += `</tbody></table></body></html>`;
-        printWindow.document.write(html);
-        printWindow.document.close();
-        printWindow.print();
-        printWindow.onafterprint = () => printWindow.close();
+
+        if (!bodyRows) { alert('No users to print.'); return; }
+
+        const w = window.open('', '_blank');
+        w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <title>Jettransfer – Users Report</title>
+        <style>
+            body{font-family:Arial,sans-serif;padding:2rem;color:#0F172A;font-size:13px}
+            .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #0A7EA4}
+            .header h1{font-size:1.3rem;color:#0A7EA4;margin-bottom:.2rem}
+            .header p{font-size:.78rem;color:#64748B}
+            table{width:100%;border-collapse:collapse;font-size:.82rem}
+            th{text-align:left;padding:.55rem .7rem;background:#0A7EA4;color:#fff;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px}
+            td{padding:.55rem .7rem;border-bottom:1px solid #E2E8F0;vertical-align:middle}
+            tr:nth-child(even) td{background:#F8FAFC}
+            .footer{margin-top:1.5rem;font-size:.72rem;color:#94A3B8;text-align:center;border-top:1px solid #E2E8F0;padding-top:.75rem}
+            @media print{body{padding:.5rem}}
+        </style></head><body>
+        <div class="header">
+            <div><h1>✈️ Jettransfer – Users Report</h1><p>All registered accounts including admin</p></div>
+            <div style="text-align:right;font-size:.75rem;color:#64748B">Generated: ${new Date().toLocaleString()}</div>
+        </div>
+        <table>
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Phone</th><th>Nationality</th><th>Status</th><th>Registered</th><th>Last Login</th></tr></thead>
+            <tbody>${bodyRows}</tbody>
+        </table>
+        <div class="footer">Jettransfer Admin Panel &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; ${new Date().toLocaleDateString()}</div>
+        <script>window.onload=()=>{window.print();window.onafterprint=()=>window.close()}<\/script>
+        </body></html>`);
+        w.document.close();
     }
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 </script>
 </body>

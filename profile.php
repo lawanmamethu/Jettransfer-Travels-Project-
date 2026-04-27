@@ -8,6 +8,56 @@ $uid     = (int)$_SESSION['user_id'];
 $msg     = '';
 $msgType = 'success';
 
+// ── Handle profile picture upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload_pic') {
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+        $file     = $_FILES['profile_pic'];
+        $allowed  = ['image/jpeg','image/jpg','image/png','image/webp','image/gif'];
+        $maxSize  = 2 * 1024 * 1024; // 2MB
+
+        if (!in_array($file['type'], $allowed)) {
+            $msg = '❌ Only JPG, PNG, WEBP or GIF images are allowed.'; $msgType = 'error';
+        } elseif ($file['size'] > $maxSize) {
+            $msg = '❌ Image must be under 2MB.'; $msgType = 'error';
+        } else {
+            $uploadDir = 'uploads/profiles/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+            // Delete old pic if exists
+            $oldR = $conn->query("SELECT profile_pic FROM users WHERE id=$uid LIMIT 1");
+            $oldRow = $oldR ? $oldR->fetch_assoc() : [];
+            if (!empty($oldRow['profile_pic']) && file_exists($oldRow['profile_pic'])) {
+                unlink($oldRow['profile_pic']);
+            }
+
+            $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $filename = 'user_' . $uid . '_' . time() . '.' . $ext;
+            $dest     = $uploadDir . $filename;
+
+            if (move_uploaded_file($file['tmp_name'], $dest)) {
+                $escaped = $conn->real_escape_string($dest);
+                $conn->query("UPDATE users SET profile_pic='$escaped' WHERE id=$uid");
+                $msg = '✅ Profile picture updated!';
+            } else {
+                $msg = '❌ Upload failed. Please try again.'; $msgType = 'error';
+            }
+        }
+    } else {
+        $msg = '❌ No file selected.'; $msgType = 'error';
+    }
+}
+
+// ── Handle remove profile picture
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'remove_pic') {
+    $oldR = $conn->query("SELECT profile_pic FROM users WHERE id=$uid LIMIT 1");
+    $oldRow = $oldR ? $oldR->fetch_assoc() : [];
+    if (!empty($oldRow['profile_pic']) && file_exists($oldRow['profile_pic'])) {
+        unlink($oldRow['profile_pic']);
+    }
+    $conn->query("UPDATE users SET profile_pic=NULL WHERE id=$uid");
+    $msg = '✅ Profile picture removed.';
+}
+
 // Handle password change POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chgpass') {
     $cur  = $_POST['current_password']  ?? '';
@@ -30,13 +80,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chgpa
 
 $r    = $conn->query("SELECT * FROM users WHERE id=$uid LIMIT 1");
 $user = $r ? $r->fetch_assoc() : [];
-//conn->close();
 
 // Derive display values
 $fullName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
 $parts    = explode(' ', $fullName);
 $initials = strtoupper(substr($parts[0] ?? 'U', 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
 $_SESSION['user_name'] = $fullName;
+
+$profilePic = !empty($user['profile_pic']) && file_exists($user['profile_pic'])
+    ? htmlspecialchars($user['profile_pic'])
+    : null;
 
 // Active tab
 $tab = $_GET['tab'] ?? 'personal';
@@ -76,16 +129,18 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
 .search-box.open{width:280px;opacity:1;pointer-events:all}
 .search-box input{border:none;outline:none;padding:.55rem 1rem;font-family:'Manrope',sans-serif;font-size:.88rem;width:100%;background:transparent}
 .search-submit{background:var(--primary);border:none;padding:.55rem 1rem;color:white;cursor:pointer;display:flex;align-items:center;flex-shrink:0}
-/* ─── Profile dropdown (shown when logged in) ─── */
+/* ─── Profile dropdown ─── */
 .profile-dropdown{position:relative}
 .profile-pill{display:flex;align-items:center;gap:.5rem;padding:.4rem .9rem .4rem .45rem;border-radius:50px;border:2px solid #E2E8F0;background:white;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;font-size:.88rem;color:var(--text-dark);transition:all .25s;white-space:nowrap}
 .profile-pill:hover{border-color:var(--primary);box-shadow:0 2px 12px rgba(10,126,164,.15)}
-.pill-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
+.pill-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+.pill-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .pill-name{max-width:110px;overflow:hidden;text-overflow:ellipsis}
 .dropdown-menu{position:absolute;right:0;top:calc(100% + .6rem);background:white;border:1px solid #E2E8F0;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.12);min-width:230px;z-index:1001;opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;transition:all .22s ease}
 .dropdown-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
 .dd-header{display:flex;align-items:center;gap:.75rem;padding:1rem 1.1rem .8rem}
-.dd-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0}
+.dd-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+.dd-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .dd-name{font-weight:700;font-size:.92rem;color:var(--text-dark);margin-bottom:.15rem}
 .dd-email{font-size:.73rem;color:#94A3B8;overflow:hidden;text-overflow:ellipsis;max-width:155px}
 .dd-divider{height:1px;background:#F1F5F9;margin:.3rem 0}
@@ -108,7 +163,24 @@ body{font-family:'Manrope',sans-serif;color:var(--text-dark);background:var(--bg
 /* Sidebar */
 .sidebar{background:white;border-radius:28px;box-shadow:var(--shadow-md);padding:2rem;height:fit-content;animation:fadeInUp .8s ease .2s both}
 .sb-avatar{text-align:center;margin-bottom:1.5rem}
-.sb-circle{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:white;font-weight:700;box-shadow:0 8px 25px rgba(10,126,164,.3)}
+
+/* ── Profile picture area ── */
+.sb-pic-wrap{position:relative;width:110px;height:110px;margin:0 auto 1rem}
+.sb-circle{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:white;font-weight:700;box-shadow:0 8px 25px rgba(10,126,164,.3);overflow:hidden}
+.sb-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sb-pic-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s}
+.sb-pic-wrap:hover .sb-pic-overlay{background:rgba(0,0,0,.45)}
+.sb-pic-overlay span{color:white;font-size:.72rem;font-weight:700;opacity:0;transition:opacity .25s;text-align:center;line-height:1.4;padding:.3rem}
+.sb-pic-wrap:hover .sb-pic-overlay span{opacity:1}
+.sb-pic-input{display:none}
+
+/* Upload buttons below avatar */
+.sb-pic-btns{display:flex;justify-content:center;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap}
+.btn-pic-upload{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .75rem;border-radius:50px;border:1.5px solid var(--primary);background:white;color:var(--primary);font-family:'Manrope',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-pic-upload:hover{background:var(--primary);color:white}
+.btn-pic-remove{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .75rem;border-radius:50px;border:1.5px solid #EF4444;background:white;color:#EF4444;font-family:'Manrope',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-pic-remove:hover{background:#EF4444;color:white}
+
 .sb-name{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:.25rem}
 .sb-email{color:var(--text-light);font-size:.88rem;margin-bottom:1rem}
 .sb-stats{display:flex;justify-content:center;gap:1.5rem;padding:1rem 0;border-top:2px solid var(--bg-light);border-bottom:2px solid var(--bg-light);margin-bottom:1.5rem}
@@ -199,24 +271,32 @@ input:checked+.slider:before{transform:translateX(24px)}
       <li><a href="contact.php">Contact Us</a></li>
       <li><a href="aboutus.php">About Us</a></li>
       <li><a href="profile.php" class="active">Profile</a></li>
-
-      <!-- Mobile: only logout when logged in -->
       <li class="mobile-auth">
         <a href="logout.php" style="display:block;padding:.6rem 1rem;border-radius:50px;border:2px solid #EF4444;color:#EF4444;font-weight:600;font-size:.9rem;text-decoration:none;text-align:center">🚪 Logout</a>
       </li>
     </ul>
     <div class="nav-actions">
-      
-      <!-- Profile pill dropdown -->
       <div class="profile-dropdown" id="profileDropdown">
         <button class="profile-pill" onclick="toggleDD()">
-          <div class="pill-avatar"><?= $initials ?></div>
+          <div class="pill-avatar">
+            <?php if ($profilePic): ?>
+              <img src="<?= $profilePic ?>" alt="Profile">
+            <?php else: ?>
+              <?= $initials ?>
+            <?php endif; ?>
+          </div>
           <span class="pill-name"><?= htmlspecialchars(explode(' ', $fullName)[0]) ?></span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="dropdown-menu" id="dropdownMenu">
           <div class="dd-header">
-            <div class="dd-avatar"><?= $initials ?></div>
+            <div class="dd-avatar">
+              <?php if ($profilePic): ?>
+                <img src="<?= $profilePic ?>" alt="Profile">
+              <?php else: ?>
+                <?= $initials ?>
+              <?php endif; ?>
+            </div>
             <div>
               <div class="dd-name"><?= htmlspecialchars($fullName) ?></div>
               <div class="dd-email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
@@ -247,11 +327,48 @@ input:checked+.slider:before{transform:translateX(24px)}
     <!-- ── SIDEBAR ── -->
     <aside class="sidebar">
       <div class="sb-avatar">
-        <div class="sb-circle"><?= $initials ?></div>
+
+        <!-- Profile picture circle with hover overlay -->
+        <div class="sb-pic-wrap" onclick="document.getElementById('picInput').click()" title="Click to change photo">
+          <div class="sb-circle">
+            <?php if ($profilePic): ?>
+              <img src="<?= $profilePic ?>" alt="Profile Photo">
+            <?php else: ?>
+              <?= $initials ?>
+            <?php endif; ?>
+          </div>
+          <div class="sb-pic-overlay">
+            <span>📷<br>Change<br>Photo</span>
+          </div>
+        </div>
+
+        <!-- Hidden file input — triggers on circle click -->
+        <form method="POST" enctype="multipart/form-data" id="picForm">
+          <input type="hidden" name="action" value="upload_pic">
+          <input type="file" name="profile_pic" id="picInput" class="sb-pic-input"
+                 accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                 onchange="document.getElementById('picForm').submit()">
+        </form>
+
+        <!-- Upload / Remove buttons -->
+        <div class="sb-pic-btns">
+          <label for="picInput" class="btn-pic-upload">
+            📷 Upload Photo
+          </label>
+          <?php if ($profilePic): ?>
+          <form method="POST" style="display:inline" onsubmit="return confirm('Remove profile picture?')">
+            <input type="hidden" name="action" value="remove_pic">
+            <button type="submit" class="btn-pic-remove">🗑 Remove</button>
+          </form>
+          <?php endif; ?>
+        </div>
+
+        <p style="font-size:.7rem;color:var(--text-light);margin-bottom:.8rem">JPG, PNG, WEBP · Max 2MB</p>
+
         <h2 class="sb-name"><?= htmlspecialchars($fullName) ?></h2>
         <p class="sb-email"><?= htmlspecialchars($user['email'] ?? '') ?></p>
       </div>
-    
+
       <ul class="sb-menu">
         <li><a href="profile.php?tab=personal"     class="<?= $tab==='personal'    ?'active':'' ?>">👤 Personal Info</a></li>
         <li><a href="editprofile.php"               class="<?= $tab==='edit'        ?'active':'' ?>">✏️ Edit Profile</a></li>
@@ -301,121 +418,65 @@ input:checked+.slider:before{transform:translateX(24px)}
         </form>
       </div>
 
-     <?php
-/*
- ┌─────────────────────────────────────────────────────────┐
- │  HOW TO FIX profile.php — Two steps                     │
- │                                                         │
- │  STEP 1 — In profile.php, find this line near the top:  │
- │      $conn->close();                                    │
- │  DELETE it (or comment it out). The connection must     │
- │  stay open so the bookings tab can use it.              │
- │                                                         │
- │  STEP 2 — Replace the entire bookings tab-panel block   │
- │  (the <div id="tab-bookings" ...> section) with the     │
- │  code below. Paste it directly into profile.php.        │
- └─────────────────────────────────────────────────────────┘
-*/
-?>
-
-<!-- ── BOOKINGS TAB ── paste this inside profile.php replacing the old bookings panel -->
-<div id="tab-bookings" class="tab-panel <?= $tab==='bookings'?'active':'' ?>">
-    <div class="panel-header">
-        <h2 class="panel-title">My Bookings</h2>
-        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
-
-            <!-- ✅ Export as CSV button -->
+      <!-- BOOKINGS -->
+      <div id="tab-bookings" class="tab-panel <?= $tab==='bookings'?'active':'' ?>">
+        <div class="panel-header">
+          <h2 class="panel-title">My Bookings</h2>
+          <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
             <a href="export_bookings.php"
                style="display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.3rem;
                       background:#065F46;color:white;border-radius:50px;
                       font-family:'Manrope',sans-serif;font-weight:600;font-size:.85rem;
-                      text-decoration:none;transition:all .25s;
-                      box-shadow:0 3px 10px rgba(6,95,70,.3)"
+                      text-decoration:none;transition:all .25s;box-shadow:0 3px 10px rgba(6,95,70,.3)"
                onmouseover="this.style.background='#047857';this.style.transform='translateY(-1px)'"
                onmouseout="this.style.background='#065F46';this.style.transform='translateY(0)'">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                    <polyline points="10 9 9 9 8 9"/>
-                </svg>
-                Export as CSV
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Export as CSV
             </a>
-
             <a href="packages.php" class="btn-act btn-outline">Browse Packages</a>
+          </div>
         </div>
-    </div>
-
-    <?php
-    // ── Use the SAME $conn that is already open in profile.php
-    // (Do NOT require db.php again — it's already included at the top of profile.php)
-    $bookEmail    = $conn->real_escape_string($user['email'] ?? '');
-    $bRes2        = $conn->query("SELECT * FROM bookings WHERE email='$bookEmail' ORDER BY created_at DESC");
-    $userBookings = [];
-    if ($bRes2) while ($row = $bRes2->fetch_assoc()) $userBookings[] = $row;
-    ?>
-
-    <?php if (empty($userBookings)): ?>
-        <div style="text-align:center;padding:3rem 1rem;color:var(--text-light)">
+        <?php
+        $bookEmail    = $conn->real_escape_string($user['email'] ?? '');
+        $bRes2        = $conn->query("SELECT * FROM bookings WHERE email='$bookEmail' ORDER BY created_at DESC");
+        $userBookings = [];
+        if ($bRes2) while ($row = $bRes2->fetch_assoc()) $userBookings[] = $row;
+        ?>
+        <?php if (empty($userBookings)): ?>
+          <div style="text-align:center;padding:3rem 1rem;color:var(--text-light)">
             <div style="font-size:3.5rem;margin-bottom:1rem">📅</div>
             <p style="font-weight:600;font-size:1rem;margin-bottom:.5rem">No bookings yet</p>
             <p style="font-size:.88rem">Browse our packages and book your first Sri Lanka adventure!</p>
-            <a href="packages.php"
-               style="display:inline-block;margin-top:1rem;padding:.6rem 1.5rem;
-                      background:var(--primary);color:white;border-radius:50px;
-                      text-decoration:none;font-weight:600;font-size:.88rem">
-                Browse Packages →
-            </a>
-        </div>
-    <?php else: ?>
-        <p style="font-size:.82rem;color:var(--text-light);margin-bottom:1rem">
-            You have <strong style="color:var(--primary)"><?= count($userBookings) ?></strong>
-            booking<?= count($userBookings) > 1 ? 's' : '' ?>.
-        </p>
-
-        <div style="display:flex;flex-direction:column;gap:1rem">
-        <?php foreach ($userBookings as $b):
-            $statusColors = [
-                'Pending'   => ['bg'=>'#FEF3C7','txt'=>'#92400E'],
-                'Confirmed' => ['bg'=>'#ECFDF5','txt'=>'#065F46'],
-                'Completed' => ['bg'=>'#DBEAFE','txt'=>'#1E40AF'],
-                'Cancelled' => ['bg'=>'#FEE2E2','txt'=>'#991B1B'],
-            ];
+            <a href="packages.php" style="display:inline-block;margin-top:1rem;padding:.6rem 1.5rem;background:var(--primary);color:white;border-radius:50px;text-decoration:none;font-weight:600;font-size:.88rem">Browse Packages →</a>
+          </div>
+        <?php else: ?>
+          <p style="font-size:.82rem;color:var(--text-light);margin-bottom:1rem">
+            You have <strong style="color:var(--primary)"><?= count($userBookings) ?></strong> booking<?= count($userBookings) > 1 ? 's' : '' ?>.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:1rem">
+          <?php foreach ($userBookings as $b):
+            $statusColors = ['Pending'=>['bg'=>'#FEF3C7','txt'=>'#92400E'],'Confirmed'=>['bg'=>'#ECFDF5','txt'=>'#065F46'],'Completed'=>['bg'=>'#DBEAFE','txt'=>'#1E40AF'],'Cancelled'=>['bg'=>'#FEE2E2','txt'=>'#991B1B']];
             $sc = $statusColors[$b['status']] ?? ['bg'=>'#F1F5F9','txt'=>'#475569'];
-        ?>
-        <div style="display:flex;justify-content:space-between;align-items:center;
-                    padding:1.1rem 1.2rem;background:var(--bg-light);border-radius:14px;
-                    transition:transform .2s"
-             onmouseover="this.style.transform='translateX(4px)'"
-             onmouseout="this.style.transform='translateX(0)'">
+          ?>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.2rem;background:var(--bg-light);border-radius:14px;transition:transform .2s"
+               onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform='translateX(0)'">
             <div>
-                <div style="font-weight:700;font-size:.95rem;margin-bottom:.3rem">
-                    <?= htmlspecialchars($b['package_name']) ?>
-                </div>
-                <div style="display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.82rem;color:var(--text-light)">
-                    <span>📅 <?= date('d M Y', strtotime($b['travel_date'])) ?></span>
-                    <span>👥 <?= $b['guests'] ?> guest<?= $b['guests'] > 1 ? 's' : '' ?></span>
-                    <span>🕐 Booked <?= date('d M Y', strtotime($b['created_at'])) ?></span>
-                </div>
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:.3rem"><?= htmlspecialchars($b['package_name']) ?></div>
+              <div style="display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.82rem;color:var(--text-light)">
+                <span>📅 <?= date('d M Y', strtotime($b['travel_date'])) ?></span>
+                <span>👥 <?= $b['guests'] ?> guest<?= $b['guests'] > 1 ? 's' : '' ?></span>
+                <span>🕐 Booked <?= date('d M Y', strtotime($b['created_at'])) ?></span>
+              </div>
             </div>
             <div style="display:flex;align-items:center;gap:1rem;flex-shrink:0;margin-left:1rem">
-                <span style="padding:.28rem .85rem;border-radius:50px;font-size:.73rem;
-                             font-weight:700;background:<?= $sc['bg'] ?>;color:<?= $sc['txt'] ?>">
-                    <?= htmlspecialchars($b['status']) ?>
-                </span>
-                <span style="font-family:'Sora',sans-serif;font-weight:800;
-                             color:var(--primary);font-size:1rem;white-space:nowrap">
-                    <?= htmlspecialchars($b['price']) ?>
-                </span>
+              <span style="padding:.28rem .85rem;border-radius:50px;font-size:.73rem;font-weight:700;background:<?= $sc['bg'] ?>;color:<?= $sc['txt'] ?>"><?= htmlspecialchars($b['status']) ?></span>
+              <span style="font-family:'Sora',sans-serif;font-weight:800;color:var(--primary);font-size:1rem;white-space:nowrap"><?= htmlspecialchars($b['price']) ?></span>
             </div>
-        </div>
-        <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-</div>
-<!-- ── END BOOKINGS TAB ── -->
+          </div>
+          <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
 
       <!-- PREFERENCES -->
       <div id="tab-preferences" class="tab-panel <?= $tab==='preferences'?'active':'' ?>">
@@ -444,16 +505,9 @@ input:checked+.slider:before{transform:translateX(24px)}
 </footer>
 
 <script>
-// Mobile menu
 document.getElementById('mobileToggle').addEventListener('click',()=>document.getElementById('navMenu').classList.toggle('active'));
 document.querySelectorAll('.nav-menu a').forEach(a=>a.addEventListener('click',()=>document.getElementById('navMenu').classList.remove('active')));
-// Scroll header
 window.addEventListener('scroll',()=>document.getElementById('header').classList.toggle('scrolled',window.scrollY>100));
-// Search
-const st=document.getElementById('searchToggle'),sb=document.getElementById('searchBox');
-st.addEventListener('click',e=>{e.stopPropagation();sb.classList.toggle('open');if(sb.classList.contains('open'))setTimeout(()=>document.getElementById('searchInput').focus(),300)});
-document.addEventListener('click',e=>{if(!document.getElementById('navSearch').contains(e.target))sb.classList.remove('open')});
-// Profile dropdown
 function toggleDD(){document.getElementById('dropdownMenu').classList.toggle('open')}
 document.addEventListener('click',e=>{
   const dd=document.getElementById('profileDropdown');

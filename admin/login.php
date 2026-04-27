@@ -7,7 +7,24 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['password']) && $_POST['password'] === ADMIN_PASS) {
+        session_regenerate_id(true);
         $_SESSION['jt_admin'] = true;
+
+require_once '../db.php';
+
+// ── Update last_login timestamp
+$conn->query("UPDATE admins SET last_login=NOW() WHERE id=1");
+
+// ── Fetch name and email
+$r = $conn->query("SELECT name, email FROM admins WHERE id=1 LIMIT 1");
+if ($r && $row = $r->fetch_assoc()) {
+    $_SESSION['jt_admin_name']  = $row['name'];
+    $_SESSION['jt_admin_email'] = $row['email'];
+} else {
+    $_SESSION['jt_admin_name']  = 'Admin';
+    $_SESSION['jt_admin_email'] = 'admin@jettransfer.com';
+}
+
         header('Location: index.php');
         exit;
     } else {

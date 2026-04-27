@@ -23,6 +23,7 @@
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
             --rating-gold: #FFB800;
+            --rating-silver: #C0C0C0;
         }
 
         * {
@@ -392,7 +393,6 @@
             transition: all 0.3s ease;
             border-radius: 2px;
         }
-
         /* ---HERO SECTION --- */
         .hero {
             height: 90vh;
@@ -591,202 +591,7 @@
             font-weight: 600;
         }
 
-        /* ===== User Rating Section ===== */
-        .rating-section {
-            background: white;
-            border-radius: 24px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(10,126,164,0.1);
-        }
-        .rating-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .rating-stars {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .stars-display {
-            display: flex;
-            gap: 0.2rem;
-        }
-        .star {
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #ddd;
-        }
-        .star:hover,
-        .star.hovered {
-            transform: scale(1.1);
-        }
-        .star.selected {
-            color: var(--rating-gold);
-        }
-        .rating-average {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .rating-count {
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-        .rating-badge {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .rating-input-area {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #E2E8F0;
-        }
-        .rating-name-input {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .rating-name-input input {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            border: 2px solid #E2E8F0;
-            border-radius: 50px;
-            font-family: 'Manrope', sans-serif;
-            font-size: 0.85rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .rating-name-input input:focus {
-            border-color: var(--primary);
-        }
-        .rating-comment {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #E2E8F0;
-            border-radius: 16px;
-            font-family: 'Manrope', sans-serif;
-            font-size: 0.85rem;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .rating-comment:focus {
-            border-color: var(--primary);
-        }
-        .submit-rating-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            align-self: flex-start;
-        }
-        .submit-rating-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        .reviews-list {
-            margin-top: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .review-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid #E2E8F0;
-        }
-        .review-header {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .review-name {
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .review-stars {
-            display: flex;
-            gap: 0.2rem;
-        }
-        .review-stars .star-static {
-            color: #ddd;
-            font-size: 0.85rem;
-        }
-        .review-stars .star-static.filled {
-            color: var(--rating-gold);
-        }
-        .review-date {
-            font-size: 0.7rem;
-            color: var(--text-light);
-        }
-        .review-comment {
-            color: var(--text-light);
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin-top: 0.3rem;
-        }
-        .delete-review-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            margin-left: auto;
-            opacity: 0.6;
-        }
-        .delete-review-btn:hover {
-            background: #FEE2E2;
-            opacity: 1;
-            transform: scale(1.05);
-        }
-        .no-reviews {
-            text-align: center;
-            color: var(--text-light);
-            padding: 1rem;
-            font-style: italic;
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--accent);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s;
-            pointer-events: none;
-        }
-        .toast-msg.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ===== Currency Converter Widget ===== */
+        /* ===== CURRENCY CONVERTER WIDGET (REAL-TIME RATES) ===== */
         .currency-widget {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 24px;
@@ -849,8 +654,8 @@
             backdrop-filter: blur(10px);
         }
         .exchange-note {
-            font-size: 0.7rem;
-            opacity: 0.7;
+            font-size: 0.65rem;
+            opacity: 0.6;
             margin-top: 0.8rem;
             text-align: right;
         }
@@ -1136,6 +941,27 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 
@@ -1156,7 +982,7 @@
             <li><a href="destination.php">Destinations</a></li>
             <li><a href="packages.php">Packages</a></li>
             <li><a href="vehicles.html">Vehicles</a></li>
-            <li><a href="service.php">Services &amp; Gallery</a></li>
+            <li><a href="service.php">Services & Gallery</a></li>
             <li><a href="contact.php">Contact Us</a></li>
             <li><a href="aboutus.php">About Us</a></li>
 
@@ -1177,6 +1003,7 @@
 
         <!-- Right Side Actions -->
         <div class="nav-actions">
+            
 
             <!-- Login / Register -->
             <div class="nav-auth">
@@ -1209,20 +1036,20 @@
 
 <section class="section">
 
-    <!-- Dambulla Intro -->
+   <!-- Dambulla Intro -->
 <div class="ella-intro fade-in">
     <span class="section-eyebrow">✦ Cultural & Heritage Site ✦</span>
     <h1 class="ella-title">DAMBULLA</h1>
 
     <div class="desc-card">
-    <p>
-        A sacred city filled with history and spiritual beauty — <strong>Dambulla</strong> is home to the magnificent <strong>Dambulla Cave Temple</strong>, one of Sri Lanka's most treasured heritage sites. Inside the caves, you'll find ancient Buddha statues and colorful murals carved into rock.<br><br>
-        Surrounded by peaceful countryside and close to <strong>Sigiriya</strong>, Dambulla offers a perfect blend of culture, history, and timeless tradition.
-    </p>
+        <p>
+            A sacred city filled with history and spiritual beauty — <strong>Dambulla</strong> is home to the magnificent <strong>Dambulla Cave Temple</strong>, one of Sri Lanka's most treasured heritage sites. Inside the caves, you'll find ancient Buddha statues and colorful murals carved into rock.<br><br>
+            Surrounded by peaceful countryside and close to <strong>Sigiriya</strong>, Dambulla offers a perfect blend of culture, history, and timeless tradition.
+        </p>
     </div>
 </div>
 
-    <!-- Currency Converter Widget -->
+    <!-- ===== CURRENCY CONVERTER WIDGET (REAL-TIME RATES) ===== -->
     <div class="currency-widget fade-in">
         <div class="currency-title">
             💱 Currency Converter
@@ -1242,6 +1069,7 @@
                     <option value="CAD">CAD - Canadian Dollar</option>
                     <option value="SGD">SGD - Singapore Dollar</option>
                     <option value="INR">INR - Indian Rupee</option>
+                    <option value="LKR">LKR - Sri Lankan Rupee</option>
                 </select>
             </div>
             <div class="currency-input-group">
@@ -1251,6 +1079,10 @@
                     <option value="USD">USD - US Dollar</option>
                     <option value="EUR">EUR - Euro</option>
                     <option value="GBP">GBP - British Pound</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="SGD">SGD - Singapore Dollar</option>
+                    <option value="INR">INR - Indian Rupee</option>
                 </select>
             </div>
             <div class="currency-result" id="currencyResult">
@@ -1258,43 +1090,6 @@
             </div>
         </div>
         <div class="exchange-note">💰 Real-time exchange rates • Updated daily</div>
-    </div>
-
-    <!-- User Rating Section -->
-    <div class="rating-section fade-in">
-        <div class="rating-header">
-            <div class="rating-stars">
-                <div class="stars-display" id="starRatingDisplay">
-                    <span class="star" data-value="1">★</span>
-                    <span class="star" data-value="2">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="5">★</span>
-                </div>
-                <div class="rating-average" id="avgRating">0.0</div>
-                <div class="rating-count" id="ratingCount">(0 reviews)</div>
-            </div>
-            <div class="rating-badge">⭐ Top Rated Destination</div>
-        </div>
-        
-        <div class="rating-input-area">
-            <div class="rating-name-input">
-                <input type="text" id="reviewerName" placeholder="Your name">
-                <div class="stars-display" id="ratingInputStars">
-                    <span class="star" data-value="1">★</span>
-                    <span class="star" data-value="2">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="5">★</span>
-                </div>
-            </div>
-            <textarea id="reviewComment" class="rating-comment" rows="2" placeholder="Share your experience at Dambulla..."></textarea>
-            <button class="submit-rating-btn" onclick="submitRating()">Submit Review</button>
-        </div>
-        
-        <div class="reviews-list" id="reviewsList">
-            <div class="no-reviews">Be the first to review Dambulla!</div>
-        </div>
     </div>
 
     <!-- Experiences -->
@@ -1384,7 +1179,7 @@
     </footer>
 
     <!-- Toast Message -->
-    <div class="toast-msg" id="toastMsg">✨ Review submitted!</div>
+    <div class="toast-msg" id="toastMsg">✨ Rates updated!</div>
 
     <script>
         const mobileToggle = document.getElementById('mobileToggle');
@@ -1416,7 +1211,7 @@
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
+                if (entry.isIntersecting) {   
                     setTimeout(() => {
                         entry.target.classList.add('visible');
                     }, index * 150);
@@ -1476,214 +1271,55 @@
             });
         });
 
-        // ===== USER RATING SYSTEM (LocalStorage) =====
-        let currentRating = 0;
+        // ===== REAL-TIME CURRENCY CONVERTER =====
+        let exchangeRates = {};
 
-        // Load reviews from localStorage
-        function loadReviews() {
-            const saved = localStorage.getItem('dambulla_reviews');
-            if (saved) {
-                return JSON.parse(saved);
-            }
-            return [];
-        }
-
-        // Save reviews to localStorage
-        function saveReviews(reviews) {
-            localStorage.setItem('dambulla_reviews', JSON.stringify(reviews));
-        }
-
-        // Calculate and update average rating
-        function updateAverageRating() {
-            const reviews = loadReviews();
-            if (reviews.length === 0) {
-                document.getElementById('avgRating').textContent = '0.0';
-                document.getElementById('ratingCount').textContent = '(0 reviews)';
-                return;
-            }
-            const total = reviews.reduce((sum, r) => sum + r.rating, 0);
-            const avg = total / reviews.length;
-            document.getElementById('avgRating').textContent = avg.toFixed(1);
-            document.getElementById('ratingCount').textContent = `(${reviews.length} review${reviews.length !== 1 ? 's' : ''})`;
-        }
-
-        // Delete a review
-        function deleteReview(index) {
-            if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-                const reviews = loadReviews();
-                reviews.splice(index, 1);
-                saveReviews(reviews);
-                renderReviews();
-                showToast('Review deleted successfully 🗑️');
-            }
-        }
-
-        // Render reviews list with delete buttons
-        function renderReviews() {
-            const reviews = loadReviews();
-            const container = document.getElementById('reviewsList');
-            
-            if (reviews.length === 0) {
-                container.innerHTML = '<div class="no-reviews">Be the first to review Dambulla!</div>';
-                updateAverageRating();
-                return;
-            }
-            
-            // Sort by date (newest first)
-            reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            container.innerHTML = reviews.map((review, idx) => `
-                <div class="review-item">
-                    <div class="review-header">
-                        <span class="review-name">${escapeHtml(review.name)}</span>
-                        <div class="review-stars">
-                            ${Array(5).fill().map((_, i) => `<span class="star-static ${i < review.rating ? 'filled' : ''}">★</span>`).join('')}
-                        </div>
-                        <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
-                        <button class="delete-review-btn" onclick="deleteReview(${idx})" title="Delete review">
-                            🗑️
-                        </button>
-                    </div>
-                    ${review.comment ? `<div class="review-comment">${escapeHtml(review.comment)}</div>` : ''}
-                </div>
-            `).join('');
-            
-            updateAverageRating();
-        }
-
-        // Submit a new rating
-        function submitRating() {
-            const name = document.getElementById('reviewerName').value.trim();
-            const rating = currentRating;
-            const comment = document.getElementById('reviewComment').value.trim();
-            
-            if (!name) {
-                showToast('Please enter your name');
-                return;
-            }
-            if (rating === 0) {
-                showToast('Please select a rating');
-                return;
-            }
-            
-            const reviews = loadReviews();
-            reviews.push({
-                name: name,
-                rating: rating,
-                comment: comment,
-                date: new Date().toISOString()
-            });
-            
-            saveReviews(reviews);
-            renderReviews();
-            
-            // Reset form
-            document.getElementById('reviewerName').value = '';
-            document.getElementById('reviewComment').value = '';
-            currentRating = 0;
-            updateStarSelection('ratingInputStars', 0);
-            document.querySelectorAll('#ratingInputStars .star').forEach(s => s.classList.remove('selected'));
-            
-            showToast('Thank you for your review! ⭐');
-        }
-
-        // Helper function to escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Show toast message
-        function showToast(message) {
-            const toast = document.getElementById('toastMsg');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Star rating hover/click handlers
-        function initStarRating(containerId, onRatingChange) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            const stars = container.querySelectorAll('.star');
-            let currentVal = 0;
-            
-            stars.forEach(star => {
-                star.addEventListener('mouseenter', () => {
-                    const val = parseInt(star.dataset.value);
-                    stars.forEach((s, i) => {
-                        if (i < val) {
-                            s.classList.add('hovered');
-                        } else {
-                            s.classList.remove('hovered');
-                        }
-                    });
-                });
-                
-                star.addEventListener('mouseleave', () => {
-                    stars.forEach(s => s.classList.remove('hovered'));
-                    stars.forEach((s, i) => {
-                        if (i < currentVal) {
-                            s.classList.add('selected');
-                        } else {
-                            s.classList.remove('selected');
-                        }
-                    });
-                });
-                
-                star.addEventListener('click', () => {
-                    currentVal = parseInt(star.dataset.value);
-                    stars.forEach((s, i) => {
-                        if (i < currentVal) {
-                            s.classList.add('selected');
-                        } else {
-                            s.classList.remove('selected');
-                        }
-                    });
-                    if (onRatingChange) onRatingChange(currentVal);
-                });
-            });
-        }
-
-        // Update star selection programmatically
-        function updateStarSelection(containerId, rating) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            const stars = container.querySelectorAll('.star');
-            stars.forEach((star, i) => {
-                if (i < rating) {
-                    star.classList.add('selected');
-                } else {
-                    star.classList.remove('selected');
-                }
-            });
-        }
-
-        // Initialize rating system
-        initStarRating('ratingInputStars', (rating) => {
-            currentRating = rating;
-        });
-
-        // Load existing reviews on page load
-        renderReviews();
-
-        // ===== CURRENCY CONVERTER =====
-        // Exchange rates (approximate)
-        const toUSDRate = {
-            USD: 1,
-            EUR: 1 / 0.92,
-            GBP: 1 / 0.79,
-            AUD: 1 / 1.52,
-            CAD: 1 / 1.37,
-            SGD: 1 / 1.35,
-            INR: 1 / 83.5,
-            LKR: 1 / 300
+        // Currency symbols for display
+        const currencySymbols = {
+            USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$', SGD: 'S$', INR: '₹', LKR: 'Rs'
         };
 
+        // Fallback rates
+        function setFallbackRates() {
+            exchangeRates = {
+                USD: 1,
+                EUR: 0.92,
+                GBP: 0.79,
+                AUD: 1.52,
+                CAD: 1.37,
+                SGD: 1.35,
+                INR: 83.5,
+                LKR: 305.50
+            };
+        }
+
+        // Fetch real-time exchange rates
+        async function fetchRealTimeRates() {
+            try {
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                
+                if (data.rates) {
+                    exchangeRates = data.rates;
+                    convertCurrency();
+                    return true;
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                console.error('Error fetching rates:', error);
+                setFallbackRates();
+                convertCurrency();
+                return false;
+            }
+        }
+
+        // Convert currency
         function convertCurrency() {
             const amount = parseFloat(document.getElementById('amountInput').value);
             const from = document.getElementById('fromCurrency').value;
@@ -1694,35 +1330,46 @@
                 return;
             }
             
-            // Convert to USD first, then to target
-            const usdAmount = amount * toUSDRate[from];
-            let converted;
-            
-            if (to === 'LKR') {
-                converted = usdAmount * 300;
-            } else {
-                converted = usdAmount / toUSDRate[to];
+            if (Object.keys(exchangeRates).length === 0) {
+                setFallbackRates();
             }
             
-            const formatted = converted.toLocaleString(undefined, {
+            const amountInUSD = amount / exchangeRates[from];
+            const convertedAmount = amountInUSD * exchangeRates[to];
+            
+            const formatted = convertedAmount.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
             
-            const toSymbol = {
-                USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$', SGD: 'S$', INR: '₹', LKR: 'Rs'
-            };
+            const toSymbol = currencySymbols[to] || '';
             
-            document.getElementById('currencyResult').innerHTML = `${toSymbol[to] || ''} ${formatted} ${to}`;
+            document.getElementById('currencyResult').innerHTML = `${toSymbol} ${formatted} ${to}`;
         }
 
-        // Add event listeners for currency converter
+        function showToast(message) {
+            const toast = document.getElementById('toastMsg');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add event listeners
         document.getElementById('amountInput').addEventListener('input', convertCurrency);
         document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
         document.getElementById('toCurrency').addEventListener('change', convertCurrency);
 
-        // Initial conversion
-        convertCurrency();
+        // Initialize
+        async function init() {
+            await fetchRealTimeRates();
+            // Refresh rates every hour
+            setInterval(fetchRealTimeRates, 60 * 60 * 1000);
+        }
+
+        init();
+
     </script>
 
 </body>

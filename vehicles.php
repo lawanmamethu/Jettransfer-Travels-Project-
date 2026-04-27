@@ -7,7 +7,6 @@ $action = $_GET['action'] ?? $_POST['action'] ?? 'get';
 
 
 //  GET — fetch all vehicles (no auth needed, public)
-
 if ($action === 'get') {
     $result   = $conn->query("SELECT * FROM vehicles ORDER BY id ASC");
     $vehicles = [];
@@ -15,22 +14,13 @@ if ($action === 'get') {
         $vehicles[] = $row;
     }
     echo json_encode(['success' => true, 'count' => count($vehicles), 'vehicles' => $vehicles]);
+    $conn->close();
     exit;
 }
 
-
-//  All other actions require admin session
-
-session_start();
-if (!isset($_SESSION['jt_admin']) || $_SESSION['jt_admin'] !== true) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
 
 
 //  ADD — insert new vehicle
-
 if ($action === 'add') {
     $name             = trim($_POST['name']             ?? '');
     $plate            = trim($_POST['plate']            ?? '');
@@ -47,6 +37,14 @@ if ($action === 'add') {
         exit;
     }
 
+    // Sri Lanka plate: 2 letters + space + 2-3 letters + space + 4 digits (e.g. WP CAB 1234)
+    if (!preg_match('/^[A-Z]{2}\s[A-Z]{2,3}\s\d{4}$/i', $plate)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid plate number. Use format: WP CAB 1234']);
+        exit;
+    }
+
+    $plate = strtoupper($plate); // store consistently in uppercase
+
     $stmt = $conn->prepare("INSERT INTO vehicles (name, plate, type, seats, fuel, luggage, image, availability, condition_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param('sssisssss', $name, $plate, $type, $seats, $fuel, $luggage, $image, $availability, $condition_status);
 
@@ -56,12 +54,12 @@ if ($action === 'add') {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
     $stmt->close();
+    $conn->close();
     exit;
 }
 
 
 //  UPDATE — update availability and condition
-
 if ($action === 'update') {
     $id               = intval($_POST['id']               ?? 0);
     $availability     = trim($_POST['availability']       ?? '');
@@ -89,12 +87,12 @@ if ($action === 'update') {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
     $stmt->close();
+    $conn->close();
     exit;
 }
 
 
 //  DELETE — remove a vehicle
-
 if ($action === 'delete') {
     $id = intval($_POST['id'] ?? 0);
 
@@ -116,21 +114,20 @@ if ($action === 'delete') {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
     $stmt->close();
+    $conn->close();
     exit;
 }
 
 
 //  ENQUIRE — submit enquiry (public, no auth needed)
-
 if ($action === 'enquire') {
-    // This doesn't need admin session 
+    // This action doesn't need admin session — it's public
     $name         = trim($_POST['name']         ?? '');
     $email        = trim($_POST['email']        ?? '');
     $phone        = trim($_POST['phone']        ?? '');
     $vehicle_type = trim($_POST['vehicle_type'] ?? '');
     $travel_date  = trim($_POST['travel_date']  ?? '');
     $passengers   = intval($_POST['passengers'] ?? 0);
-    $message      = trim($_POST['message']      ?? '');
 
     if (!$name || !$email || !$vehicle_type || !$travel_date) {
         echo json_encode(['success' => false, 'message' => 'Please fill in all required fields']);
@@ -142,11 +139,30 @@ if ($action === 'enquire') {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO enquiries (name, email, phone, vehicle_type, travel_date, passengers, message) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssssds', $name, $email, $phone, $vehicle_type, $travel_date, $passengers, $message);
+    // Travel date must be today or in the future
+    $today = new DateTime('today');
+    $chosen = DateTime::createFromFormat('Y-m-d', $travel_date);
+    if (!$chosen || $chosen < $today) {
+        echo json_encode(['success' => false, 'message' => 'Travel date cannot be in the past. Please select today or a future date.']);
+        exit;
+    }
+
+    // Phone: optional, but if provided must be +94 followed by exactly 9 digits
+    if ($phone !== '') {
+        $phone_clean = preg_replace('/\s+/', '', $phone);
+        if (!preg_match('/^\+94\d{9}$/', $phone_clean)) {
+            echo json_encode(['success' => false, 'message' => 'Phone must be +94 followed by exactly 9 digits (e.g. +94771234567).']);
+            exit;
+        }
+        $phone = $phone_clean;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO enquiries (name, email, phone, vehicle_type, travel_date, passengers) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('sssssi', $name, $email, $phone, $vehicle_type, $travel_date, $passengers);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Enquiry submitted successfully! We will contact you soon.']);
+        $new_id = $conn->insert_id;
+        echo json_encode(['success' => true, 'message' => 'Availability check submitted successfully! We will contact you soon.', 'id' => $new_id]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
@@ -156,8 +172,7 @@ if ($action === 'enquire') {
 }
 
 
-//  GET ENQUIRIES — fetch all enquiries 
-
+//  GET ENQUIRIES — fetch all enquiries (admin only)
 if ($action === 'get_enquiries') {
     $result     = $conn->query("SELECT * FROM enquiries ORDER BY created_at DESC");
     $enquiries  = [];
@@ -170,13 +185,12 @@ if ($action === 'get_enquiries') {
 }
 
 
-//  UPDATE ENQUIRY STATUS — mark as Responded 
-
+//  UPDATE ENQUIRY STATUS — mark as Available or Not Available (admin only)
 if ($action === 'update_enquiry') {
-    $id     = intval($_POST['id']     ?? 0);
-    $status = trim($_POST['status']   ?? '');
+    $id           = intval($_POST['id']           ?? 0);
+    $status       = trim($_POST['status']         ?? '');
 
-    if (!$id || !in_array($status, ['Pending', 'Responded'])) {
+    if (!$id || !in_array($status, ['Pending', 'Available', 'Not Available'])) {
         echo json_encode(['success' => false, 'message' => 'Invalid request']);
         exit;
     }
@@ -185,7 +199,7 @@ if ($action === 'update_enquiry') {
     $stmt->bind_param('si', $status, $id);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Enquiry status updated']);
+        echo json_encode(['success' => true, 'message' => 'Enquiry updated successfully']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
@@ -195,8 +209,7 @@ if ($action === 'update_enquiry') {
 }
 
 
-//  DELETE ENQUIRY — remove an enquiry 
-
+//  DELETE ENQUIRY — remove an enquiry (admin only)
 if ($action === 'delete_enquiry') {
     $id = intval($_POST['id'] ?? 0);
 
@@ -214,6 +227,31 @@ if ($action === 'delete_enquiry') {
         echo json_encode(['success' => false, 'message' => 'Failed: ' . $conn->error]);
     }
     $stmt->close();
+    $conn->close();
+    exit;
+}
+
+
+//  CHECK STATUS — user looks up their own requests by email
+if ($action === 'check_status') {
+    $email = trim($_POST['email'] ?? '');
+
+    if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Please enter a valid email address']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("SELECT id, vehicle_type, travel_date, passengers, status, created_at FROM enquiries WHERE email = ? ORDER BY created_at DESC");
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $enquiries = [];
+    while ($row = $result->fetch_assoc()) {
+        $enquiries[] = $row;
+    }
+    $stmt->close();
+
+    echo json_encode(['success' => true, 'enquiries' => $enquiries]);
     $conn->close();
     exit;
 }

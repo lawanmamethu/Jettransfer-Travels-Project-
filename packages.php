@@ -1,40 +1,55 @@
 <?php
-
+// ============================================================
+//  packages.php — Tour Packages with Dynamic Price Customizer
+// ============================================================
 require_once __DIR__ . '/admin/db_packages.php';
 
 $bookingSuccess = false;
 $bookingError   = '';
 
+// ── Price Calculation Logic (mirrored from JS) ─────────────
+function calculatePrice(float $base, string $hotel, string $vehicle, int $days, int $groupSize): float {
+    $hotelAdd   = match($hotel)   { '★★★★★' => 10000, '★★★★' => 5000, default => 0 };
+    $vehicleAdd = match($vehicle) { 'Luxury Van' => 7000, 'Van' => 3000, default => 0 };
+    $total      = ($base + $hotelAdd + $vehicleAdd) * $days;
+    if ($groupSize > 5) $total *= 0.90;
+    return round($total);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
     $pdo = getDB();
 
-    // ── Common fields ─────────────────────────────────────
     $name        = htmlspecialchars(strip_tags(trim($_POST['customer_name'] ?? '')));
     $email       = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
     $phone       = htmlspecialchars(strip_tags(trim($_POST['phone'] ?? '')));
     $travelDate  = trim($_POST['travel_date'] ?? '');
     $guests      = (int)($_POST['guests'] ?? 0);
     $pkgName     = htmlspecialchars(strip_tags(trim($_POST['package_name'] ?? '')));
-    $price       = htmlspecialchars(strip_tags(trim($_POST['price'] ?? '')));
+    $basePrice   = (float)($_POST['base_price'] ?? 0);
     $bookingType = (($_POST['booking_type'] ?? '') === 'custom') ? 'custom' : 'standard';
 
-    // ── Custom fields (null for standard bookings) ─────────
-    $customDuration  = ($bookingType === 'custom' && !empty($_POST['custom_duration']))
-                       ? (int)$_POST['custom_duration'] : null;
-    $customHotel     = ($bookingType === 'custom' && !empty($_POST['custom_hotel']))
-                       ? htmlspecialchars(strip_tags(trim($_POST['custom_hotel']))) : null;
-    $customVehicle   = ($bookingType === 'custom' && !empty($_POST['custom_vehicle']))
-                       ? htmlspecialchars(strip_tags(trim($_POST['custom_vehicle']))) : null;
-    $customGroupSize = ($bookingType === 'custom' && !empty($_POST['custom_group_size']))
-                       ? htmlspecialchars(strip_tags(trim($_POST['custom_group_size']))) : null;
+    $customHotel    = htmlspecialchars(strip_tags(trim($_POST['custom_hotel']    ?? '')));
+    $customVehicle  = htmlspecialchars(strip_tags(trim($_POST['custom_vehicle']  ?? '')));
+    $customDuration = (int)($_POST['custom_duration'] ?? 0);
+    $customGroup    = (int)($_POST['custom_group_size'] ?? 0);
 
-    // ── Validate ───────────────────────────────────────────
+    if ($bookingType === 'standard') {
+        $price           = htmlspecialchars(strip_tags(trim($_POST['price'] ?? '')));
+        $customDuration  = null;
+        $customHotel     = null;
+        $customVehicle   = null;
+        $customGroupSize = null;
+    } else {
+        $customGroupSize = $customGroup;
+        $totalPrice      = calculatePrice($basePrice, $customHotel, $customVehicle, $customDuration, $customGroup);
+        $price           = 'LKR ' . number_format($totalPrice);
+    }
+
     if (!$name || !$email || !$phone || !$travelDate || !$guests || !$pkgName) {
         $bookingError = 'Please fill in all required fields correctly.';
     } elseif ($bookingType === 'custom' && (!$customDuration || !$customHotel || !$customVehicle || !$customGroupSize)) {
         $bookingError = 'Please fill in all customization fields.';
     } else {
-        // ── Insert with PDO prepared statement ─────────────
         $stmt = $pdo->prepare(
             'INSERT INTO bookings
                 (package_name, price, customer_name, email, phone, travel_date, guests,
@@ -51,10 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
             ':phone'   => $phone,
             ':date'    => $travelDate,
             ':guests'  => $guests,
-            ':cdur'    => $customDuration,
-            ':chotel'  => $customHotel,
-            ':cvehicle'=> $customVehicle,
-            ':cgroup'  => $customGroupSize,
+            ':cdur'    => $customDuration ?? null,
+            ':chotel'  => $customHotel   ?? null,
+            ':cvehicle'=> $customVehicle ?? null,
+            ':cgroup'  => $customGroupSize ?? null,
             ':btype'   => $bookingType,
         ]);
         $bookingSuccess = true;
@@ -106,10 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
 
         /* ── HERO ── */
         .hero { margin-top:80px; height:50vh; min-height:340px; display:flex; align-items:center; position:relative; overflow:hidden; }
-        .hero-circle { position:absolute; border-radius:50%; opacity:.12; background:white; }
-        .hero-circle.c1 { width:280px; height:280px; top:-60px; right:80px; }
-        .hero-circle.c2 { width:160px; height:160px; bottom:-40px; right:280px; }
-        .hero-circle.c3 { width:100px; height:100px; top:50px; left:40%; }
         .hero-content { max-width:1400px; margin:0 auto; padding:0 2rem; color:white; z-index:3; animation:fadeInUp .9s ease-out both; }
         .hero h1 { font-family:'Sora',sans-serif; font-size:3.2rem; font-weight:800; line-height:1.1; margin-bottom:1rem; }
         .hero-subtitle { font-size:1.2rem; opacity:.92; max-width:560px; }
@@ -157,23 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
         .pkg-price-label { font-size:.75rem; color:var(--text-light); margin-bottom:.12rem; }
         .pkg-price { font-family:'Sora',sans-serif; font-size:1.35rem; font-weight:800; color:var(--primary); }
         .pkg-price span { font-size:.77rem; font-weight:500; color:var(--text-light); }
-
-        /* ── BUTTONS ── */
-        .btn-book {
-            background:var(--primary); color:white; padding:.6rem 1.2rem; border-radius:50px;
-            font-weight:700; font-size:.85rem; border:none; cursor:pointer;
-            transition:all .3s; box-shadow:0 4px 15px rgba(10,126,164,.3); white-space:nowrap;
-        }
+        .btn-book { background:var(--primary); color:white; padding:.6rem 1.2rem; border-radius:50px; font-weight:700; font-size:.85rem; border:none; cursor:pointer; transition:all .3s; box-shadow:0 4px 15px rgba(10,126,164,.3); white-space:nowrap; }
         .btn-book:hover { background:var(--primary-dark); transform:translateY(-2px); }
-
-        /* ── NEW: Customize button ── */
-        .btn-customize {
-            background:white; color:var(--accent); padding:.6rem 1.2rem; border-radius:50px;
-            font-weight:700; font-size:.85rem; border:2px solid var(--accent); cursor:pointer;
-            transition:all .3s; white-space:nowrap;
-        }
+        .btn-customize { background:white; color:var(--accent); padding:.6rem 1.2rem; border-radius:50px; font-weight:700; font-size:.85rem; border:2px solid var(--accent); cursor:pointer; transition:all .3s; white-space:nowrap; }
         .btn-customize:hover { background:var(--accent); color:white; transform:translateY(-2px); }
-
         .no-results { display:none; flex-direction:column; align-items:center; text-align:center; padding:5rem 2rem; color:var(--text-light); }
         .no-results .nr-icon { font-size:3rem; margin-bottom:1rem; }
         .no-results h3 { font-family:'Sora',sans-serif; font-size:1.4rem; margin-bottom:.5rem; }
@@ -200,25 +198,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
         .fade-in { opacity:0; transform:translateY(28px); transition:opacity .75s ease,transform .75s ease; }
         .fade-in.visible { opacity:1; transform:translateY(0); }
 
-        /* ── MODAL SHARED STYLES ── */
-        .modal-overlay {
-            display:none; position:fixed; inset:0;
-            background:rgba(15,23,42,.6); z-index:9999;
-            align-items:center; justify-content:center; padding:1rem;
-        }
+        /* ── MODAL SHARED ── */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.65); z-index:9999; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(4px); }
         .modal-overlay.open { display:flex; }
-        .modal-box {
-            background:white; border-radius:20px; padding:2.5rem;
-            max-width:480px; width:100%; max-height:90vh; overflow-y:auto;
-            box-shadow:0 20px 60px rgba(0,0,0,.3); position:relative;
-            animation:slideUp .35s ease both;
-        }
+        .modal-box { background:white; border-radius:20px; padding:2.5rem; max-width:540px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3); position:relative; animation:slideUp .35s ease both; }
         @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-        .modal-close-btn {
-            position:absolute; top:1rem; right:1.2rem;
-            background:none; border:none; font-size:1.4rem;
-            cursor:pointer; color:#64748B; line-height:1;
-        }
+        .modal-close-btn { position:absolute; top:1rem; right:1.2rem; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748B; line-height:1; }
         .modal-title { font-family:'Sora',sans-serif; color:var(--primary); margin-bottom:.3rem; font-size:1.3rem; font-weight:700; }
         .modal-subtitle { color:#64748B; margin-bottom:1.5rem; font-size:.9rem; }
 
@@ -226,33 +211,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
         .field-group { display:flex; flex-direction:column; gap:.4rem; margin-bottom:.9rem; }
         .field-group label { font-size:.78rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:.5px; }
         .field-group input,
-        .field-group select {
-            padding:.75rem 1rem; border:2px solid #E2E8F0; border-radius:10px;
-            font-family:'Manrope',sans-serif; font-size:.95rem; color:var(--text-dark);
-            outline:none; transition:border-color .3s; background:white; width:100%;
-        }
-        .field-group input:focus,
-        .field-group select:focus { border-color:var(--primary); }
+        .field-group select { padding:.75rem 1rem; border:2px solid #E2E8F0; border-radius:10px; font-family:'Manrope',sans-serif; font-size:.95rem; color:var(--text-dark); outline:none; transition:border-color .3s; background:white; width:100%; }
+        .field-group input:focus, .field-group select:focus { border-color:var(--primary); }
         .field-row { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
 
-        /* ── NEW: Customize section inside modal ── */
-        .customize-section {
-            background:linear-gradient(135deg,#F0FDF4,#ECFDF5);
-            border:2px solid #86EFAC;
-            border-radius:12px; padding:1.2rem; margin-bottom:1rem;
-        }
-        .customize-section-title {
-            font-size:.8rem; font-weight:700; color:#065f46;
-            text-transform:uppercase; letter-spacing:.5px;
-            margin-bottom:1rem; display:flex; align-items:center; gap:.4rem;
-        }
+        /* ── CUSTOMIZE SECTION ── */
+        .customize-section { background:linear-gradient(135deg,#F0FDF4,#ECFDF5); border:2px solid #86EFAC; border-radius:14px; padding:1.4rem; margin-bottom:1rem; }
+        .customize-section-title { font-size:.8rem; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:.5px; margin-bottom:1rem; display:flex; align-items:center; gap:.4rem; }
 
-        .btn-submit {
-            width:100%; background:var(--primary); color:white; padding:.9rem;
-            border:none; border-radius:50px; font-family:inherit; font-size:1rem;
-            font-weight:700; cursor:pointer; transition:background .3s;
-            box-shadow:0 4px 15px rgba(10,126,164,.3); margin-top:.5rem;
+        /* ── DYNAMIC PRICE BOX ── */
+        .price-preview-box {
+            background: linear-gradient(135deg, #0A7EA4, #065A7A);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1.2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
         }
+        .price-preview-box::before {
+            content: '';
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 100px; height: 100px;
+            background: rgba(255,255,255,.07);
+            border-radius: 50%;
+        }
+        .price-preview-box::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; left: 30%;
+            width: 140px; height: 140px;
+            background: rgba(255,255,255,.05);
+            border-radius: 50%;
+        }
+        .price-preview-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:.75; margin-bottom:.4rem; }
+        .price-preview-amount { font-family:'Sora',sans-serif; font-size:2rem; font-weight:800; letter-spacing:-1px; line-height:1; margin-bottom:.6rem; transition: all .3s ease; }
+        .price-preview-amount.updating { opacity:.5; transform:scale(.97); }
+        .price-breakdown { display:flex; flex-wrap:wrap; gap:.5rem; position:relative; z-index:1; }
+        .breakdown-pill {
+            background: rgba(255,255,255,.15);
+            border-radius: 50px;
+            padding: .2rem .75rem;
+            font-size: .75rem;
+            font-weight: 600;
+            display: flex; align-items:center; gap:.3rem;
+            transition: background .3s;
+        }
+        .breakdown-pill.active { background: rgba(255,255,255,.28); }
+        .breakdown-pill.discount { background: rgba(16,185,129,.35); }
+        .price-preview-note { font-size:.78rem; opacity:.6; margin-top:.6rem; }
+
+        /* ── SUBMIT BUTTONS ── */
+        .btn-submit { width:100%; background:var(--primary); color:white; padding:.9rem; border:none; border-radius:50px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:background .3s; box-shadow:0 4px 15px rgba(10,126,164,.3); margin-top:.5rem; }
         .btn-submit:hover { background:var(--primary-dark); }
         .btn-submit.green { background:#059669; box-shadow:0 4px 15px rgba(5,150,105,.3); }
         .btn-submit.green:hover { background:#047857; }
@@ -303,9 +314,7 @@ window.addEventListener('load', function () {
 </script>
 <?php endif; ?>
 
-<!-- ══════════════════════════════════
-     HEADER
-══════════════════════════════════ -->
+<!-- HEADER -->
 <header class="header" id="header">
     <nav class="nav-container">
         <a href="index.php" class="logo">
@@ -333,36 +342,26 @@ window.addEventListener('load', function () {
                 <a href="register.php" class="btn-register">Register</a>
             </div>
         </div>
-        <div class="mobile-toggle" id="mobileToggle">
-            <span></span><span></span><span></span>
-        </div>
+        <div class="mobile-toggle" id="mobileToggle"><span></span><span></span><span></span></div>
     </nav>
 </header>
 
-<!-- ══════════════════════════════════
-     HERO
-══════════════════════════════════ -->
+<!-- HERO -->
 <section class="hero" style="background:none;">
     <video autoplay loop muted playsinline poster="images/colombocitytour.jpeg"
         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;">
         <source src="video.mp4" type="video/mp4">
     </video>
     <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1;"></div>
-    <div class="hero-circle c1" style="z-index:2;"></div>
-    <div class="hero-circle c2" style="z-index:2;"></div>
-    <div class="hero-circle c3" style="z-index:2;"></div>
     <div class="hero-content">
         <h1>Tour Packages</h1>
         <p class="hero-subtitle">Handcrafted itineraries across Sri Lanka — from one-day escapes to full island adventures.</p>
     </div>
 </section>
 
-<!-- ══════════════════════════════════
-     PACKAGES SECTION
-══════════════════════════════════ -->
+<!-- PACKAGES SECTION -->
 <section class="section" id="packages">
     <div class="container">
-
         <div class="section-header fade-in">
             <span class="section-tag">Explore &amp; Book</span>
             <h2 class="section-title">Our Tour Packages</h2>
@@ -396,12 +395,6 @@ window.addEventListener('load', function () {
 
         <div class="packages-grid" id="packagesGrid">
 
-            <!-- ══ PACKAGE CARDS ══
-                 Each card has TWO buttons:
-                 1. Book Now        → openBooking(name, price)
-                 2. Customize & Book → openCustomize(name, price)
-            ══════════════════════ -->
-
             <div class="pkg-card fade-in" data-duration="1" data-price-tier="budget" data-name="colombo city tour">
                 <div class="pkg-img"><img src="images/colombocitytour.jpeg" alt="Colombo City" loading="lazy"><span class="pkg-duration-pill">1 Day</span></div>
                 <div class="pkg-body">
@@ -418,7 +411,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 10,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Colombo City Tour','LKR 10,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Colombo City Tour','LKR 10,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Colombo City Tour',10000,1)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -439,7 +432,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 45,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Cultural Triangle Tour','LKR 45,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Cultural Triangle Tour','LKR 45,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Cultural Triangle Tour',45000,4)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -460,7 +453,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 75,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Southern Beach Escape','LKR 75,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Southern Beach Escape','LKR 75,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Southern Beach Escape',75000,5)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -481,7 +474,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 60,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Hill Country Tour','LKR 60,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Hill Country Tour','LKR 60,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Hill Country Tour',60000,7)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -502,7 +495,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 105,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Northern Heritage Tour','LKR 105,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Northern Heritage Tour','LKR 105,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Northern Heritage Tour',105000,7)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -523,7 +516,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 90,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Wild Life Adventure Tour','LKR 90,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Wild Life Adventure Tour','LKR 90,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Wild Life Adventure Tour',90000,10)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -544,7 +537,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 160,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Luxury Honeymoon Tour','LKR 160,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Luxury Honeymoon Tour','LKR 160,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Luxury Honeymoon Tour',160000,12)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -565,7 +558,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 150,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Northern Explore Culture Combo','LKR 150,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Northern Explore Culture Combo','LKR 150,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Northern Explore Culture Combo',150000,12)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -586,7 +579,7 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 180,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Full Island Highlights Tour','LKR 180,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Full Island Highlights Tour','LKR 180,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Full Island Highlights Tour',180000,14)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
@@ -607,25 +600,22 @@ window.addEventListener('load', function () {
                     <div class="pkg-footer">
                         <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 250,000 <span>/ person</span></p></div>
                         <button class="btn-book"      onclick="openBooking('Ultimate Sri Lanka Explorer','LKR 250,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Ultimate Sri Lanka Explorer','LKR 250,000')">✏️ Customize</button>
+                        <button class="btn-customize" onclick="openCustomize('Ultimate Sri Lanka Explorer',250000,14)">✏️ Customize</button>
                     </div>
                 </div>
             </div>
 
-        </div><!-- /packagesGrid -->
+        </div>
 
         <div class="no-results" id="noResults">
             <div class="nr-icon">🔍</div>
             <h3>No packages found</h3>
             <p>Try adjusting your search or filter criteria.</p>
         </div>
-
     </div>
 </section>
 
-<!-- ══════════════════════════════════
-     WHY STRIP
-══════════════════════════════════ -->
+<!-- WHY STRIP -->
 <div class="why-strip">
     <div class="container">
         <div class="why-item"><div class="wi-icon">🎯</div><h4>Expert Local Guides</h4><p>Seasoned guides with insider knowledge</p></div>
@@ -637,20 +627,18 @@ window.addEventListener('load', function () {
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
-     MODAL 1: STANDARD BOOKING (Book Now)
+     MODAL 1: STANDARD BOOKING
 ══════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="bookingModal">
     <div class="modal-box">
         <button class="modal-close-btn" onclick="closeBooking()">✕</button>
         <h2 class="modal-title" id="modalTitle">Book Package</h2>
         <p class="modal-subtitle" id="modalPrice"></p>
-
         <form method="POST" action="packages.php">
             <input type="hidden" name="book_submit"  value="1">
             <input type="hidden" name="booking_type" value="standard">
             <input type="hidden" name="package_name" id="hiddenPkgName">
             <input type="hidden" name="price"        id="hiddenPrice">
-
             <div class="field-group">
                 <label>Full Name *</label>
                 <input type="text" name="customer_name" placeholder="Your Full Name" required>
@@ -674,12 +662,9 @@ window.addEventListener('load', function () {
                     <label>Guests *</label>
                     <select name="guests" required>
                         <option value="">Select</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6+</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6+</option>
                     </select>
                 </div>
             </div>
@@ -689,7 +674,7 @@ window.addEventListener('load', function () {
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
-     MODAL 2: CUSTOMIZE & BOOK
+     MODAL 2: CUSTOMIZE & BOOK — with Dynamic Price Preview
 ══════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="customizeModal">
     <div class="modal-box">
@@ -697,13 +682,28 @@ window.addEventListener('load', function () {
         <h2 class="modal-title" id="customModalTitle">✏️ Customize Package</h2>
         <p class="modal-subtitle" id="customModalPrice"></p>
 
-        <form method="POST" action="packages.php">
-            <input type="hidden" name="book_submit"  value="1">
-            <input type="hidden" name="booking_type" value="custom">
-            <input type="hidden" name="package_name" id="customHiddenName">
-            <input type="hidden" name="price"        id="customHiddenPrice">
+        <!-- Live Price Preview Box -->
+        <div class="price-preview-box">
+            <div class="price-preview-label">Total Estimated Price (per person)</div>
+            <div class="price-preview-amount" id="previewAmount">LKR 0</div>
+            <div class="price-breakdown" id="priceBreakdown">
+                <span class="breakdown-pill" id="pill-base">Base: —</span>
+                <span class="breakdown-pill" id="pill-hotel">Hotel: —</span>
+                <span class="breakdown-pill" id="pill-vehicle">Vehicle: —</span>
+                <span class="breakdown-pill" id="pill-days">Days: —</span>
+                <span class="breakdown-pill" id="pill-discount" style="display:none;">🎉 10% Group Discount</span>
+            </div>
+            <div class="price-preview-note" id="previewNote">Fill in the options below to see your price</div>
+        </div>
 
-            <!-- Your Details -->
+        <form method="POST" action="packages.php">
+            <input type="hidden" name="book_submit"   value="1">
+            <input type="hidden" name="booking_type"  value="custom">
+            <input type="hidden" name="package_name"  id="customHiddenName">
+            <input type="hidden" name="base_price"    id="customHiddenBase">
+            <input type="hidden" name="price"         id="customHiddenPriceDisplay">
+
+            <!-- Customer Details -->
             <div class="field-group">
                 <label>Full Name *</label>
                 <input type="text" name="customer_name" placeholder="Your Full Name" required>
@@ -727,32 +727,30 @@ window.addEventListener('load', function () {
                     <label>Guests *</label>
                     <select name="guests" required>
                         <option value="">Select</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6+</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6+</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Customization Section -->
+            <!-- Customization Options -->
             <div class="customize-section">
-                <div class="customize-section-title">✏️ Your Customizations</div>
+                <div class="customize-section-title">✏️ Customize Your Package</div>
 
                 <div class="field-row">
                     <div class="field-group">
                         <label>Duration (Days) *</label>
-                        <input type="number" name="custom_duration" placeholder="e.g. 5" min="1" max="30" required>
+                        <input type="number" name="custom_duration" id="c_duration"
+                               placeholder="e.g. 5" min="1" max="30" required oninput="recalcPrice()">
                     </div>
                     <div class="field-group">
                         <label>Hotel Rating *</label>
-                        <select name="custom_hotel" required>
+                        <select name="custom_hotel" id="c_hotel" required onchange="recalcPrice()">
                             <option value="">Select rating</option>
-                            <option value="★★★">★★★ (3 Star)</option>
-                            <option value="★★★★">★★★★ (4 Star)</option>
-                            <option value="★★★★★">★★★★★ (5 Star)</option>
+                            <option value="★★★">★★★ (3 Star) — No extra charge</option>
+                            <option value="★★★★">★★★★ (4 Star) — +LKR 5,000</option>
+                            <option value="★★★★★">★★★★★ (5 Star) — +LKR 10,000</option>
                         </select>
                     </div>
                 </div>
@@ -760,31 +758,27 @@ window.addEventListener('load', function () {
                 <div class="field-row">
                     <div class="field-group">
                         <label>Vehicle *</label>
-                        <select name="custom_vehicle" required>
+                        <select name="custom_vehicle" id="c_vehicle" required onchange="recalcPrice()">
                             <option value="">Select vehicle</option>
-                            <option value="Toyota Prius">Toyota Prius</option>
-                            <option value="Honda Vezel">Honda Vezel</option>
-                            <option value="Toyota Hiace KDH">Toyota Hiace KDH</option>
-                            <option value="Toyota Hiace Mini Bus">Toyota Hiace Mini Bus</option>
-                            <option value="Toyota Alphard">Toyota Alphard</option>
-                            <option value="Toyota Hiace Minibus">Toyota Hiace Minibus</option>
+                            <option value="Car">Car (Toyota Prius / Vezel) — No extra</option>
+                            <option value="Van">Van (Toyota Hiace KDH) — +LKR 3,000</option>
+                            <option value="Luxury Van">Luxury Van (Alphard / Minibus) — +LKR 7,000</option>
                         </select>
                     </div>
                     <div class="field-group">
                         <label>Group Size *</label>
-                        <input type="text" name="custom_group_size" placeholder="e.g. 4 People" required>
+                        <input type="number" name="custom_group_size" id="c_group"
+                               placeholder="e.g. 4" min="1" max="30" required oninput="recalcPrice()">
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit green">✓ Confirm Custom Booking</button>
+            <button type="submit" class="btn-submit green" id="submitCustomBtn" onclick="setFinalPrice()">✓ Confirm Custom Booking</button>
         </form>
     </div>
 </div>
 
-<!-- ══════════════════════════════════
-     FOOTER
-══════════════════════════════════ -->
+<!-- FOOTER -->
 <footer class="footer" id="contact">
     <div class="footer-content">
         <div class="footer-section">
@@ -828,8 +822,6 @@ window.addEventListener('load', function () {
     document.getElementById('mobileToggle').addEventListener('click', () => {
         document.getElementById('navMenu').classList.toggle('active');
     });
-
-    /* ── Header scroll shadow ── */
     window.addEventListener('scroll', () => {
         document.getElementById('header').classList.toggle('scrolled', window.scrollY > 80);
     });
@@ -863,7 +855,6 @@ window.addEventListener('load', function () {
         resultCount.textContent = visible;
         noResults.style.display = visible === 0 ? 'flex' : 'none';
     }
-
     document.querySelectorAll('[data-filter="duration"]').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('[data-filter="duration"]').forEach(b => b.classList.remove('active'));
@@ -902,13 +893,27 @@ window.addEventListener('load', function () {
     });
 
     /* ══════════════════════════════════════════════════════
-       MODAL 2 — Customize & Book
+       MODAL 2 — Customize & Book + Dynamic Price Calculator
     ══════════════════════════════════════════════════════ */
-    function openCustomize(name, price) {
+    let _basePrice = 0;
+    let _baseDays  = 1;
+
+    function openCustomize(name, basePrice, defaultDays) {
+        _basePrice = basePrice;
+        _baseDays  = defaultDays;
+
         document.getElementById('customModalTitle').textContent = '✏️ Customize: ' + name;
-        document.getElementById('customModalPrice').textContent = 'Base price: ' + price + ' per person';
+        document.getElementById('customModalPrice').textContent = 'Base price: LKR ' + basePrice.toLocaleString() + ' per person · ' + defaultDays + ' day(s)';
         document.getElementById('customHiddenName').value       = name;
-        document.getElementById('customHiddenPrice').value      = price;
+        document.getElementById('customHiddenBase').value       = basePrice;
+
+        // Pre-fill defaults
+        document.getElementById('c_duration').value = defaultDays;
+        document.getElementById('c_hotel').value    = '';
+        document.getElementById('c_vehicle').value  = '';
+        document.getElementById('c_group').value    = '';
+
+        recalcPrice();
         document.getElementById('customizeModal').classList.add('open');
         document.body.style.overflow = 'hidden';
     }
@@ -919,6 +924,75 @@ window.addEventListener('load', function () {
     document.getElementById('customizeModal').addEventListener('click', function(e) {
         if (e.target === this) closeCustomize();
     });
+
+    /* ── Price Calculation (mirrors PHP logic exactly) ── */
+    function recalcPrice() {
+        const hotel   = document.getElementById('c_hotel').value;
+        const vehicle = document.getElementById('c_vehicle').value;
+        const days    = parseInt(document.getElementById('c_duration').value) || 0;
+        const group   = parseInt(document.getElementById('c_group').value) || 0;
+
+        const hotelAdd   = hotel === '★★★★★' ? 10000 : hotel === '★★★★' ? 5000 : 0;
+        const vehicleAdd = vehicle === 'Luxury Van' ? 7000 : vehicle === 'Van' ? 3000 : 0;
+
+        let total = (_basePrice + hotelAdd + vehicleAdd) * days;
+        const hasDiscount = group > 5;
+        if (hasDiscount) total *= 0.90;
+        total = Math.round(total);
+
+        // Animate the amount
+        const amountEl = document.getElementById('previewAmount');
+        amountEl.classList.add('updating');
+        setTimeout(() => {
+            amountEl.textContent = 'LKR ' + total.toLocaleString();
+            amountEl.classList.remove('updating');
+        }, 150);
+
+        // Update breakdown pills
+        document.getElementById('pill-base').textContent    = 'Base: LKR ' + _basePrice.toLocaleString();
+        document.getElementById('pill-base').classList.add('active');
+
+        const hotelPill = document.getElementById('pill-hotel');
+        hotelPill.textContent = hotelAdd > 0 ? '🏨 +LKR ' + hotelAdd.toLocaleString() : '🏨 Included';
+        hotelPill.classList.toggle('active', hotelAdd > 0);
+
+        const vehiclePill = document.getElementById('pill-vehicle');
+        vehiclePill.textContent = vehicleAdd > 0 ? '🚗 +LKR ' + vehicleAdd.toLocaleString() : '🚗 Included';
+        vehiclePill.classList.toggle('active', vehicleAdd > 0);
+
+        const dayPill = document.getElementById('pill-days');
+        dayPill.textContent = days > 0 ? '📅 ×' + days + ' days' : '📅 Days: —';
+        dayPill.classList.toggle('active', days > 0);
+
+        const discountPill = document.getElementById('pill-discount');
+        discountPill.style.display = hasDiscount ? 'flex' : 'none';
+        discountPill.classList.toggle('discount', hasDiscount);
+
+        // Note
+        const noteEl = document.getElementById('previewNote');
+        if (!hotel || !vehicle || !days) {
+            noteEl.textContent = 'Fill all options above to finalize your price';
+        } else if (hasDiscount) {
+            noteEl.textContent = '🎉 Group discount of 10% applied for ' + group + '+ people!';
+        } else if (group > 0 && group <= 5) {
+            noteEl.textContent = 'Tip: Groups of 6+ people get a 10% discount!';
+        } else {
+            noteEl.textContent = 'Price updates live as you change options';
+        }
+    }
+
+    /* Set the final computed price into the hidden field before submitting */
+    function setFinalPrice() {
+        const hotel   = document.getElementById('c_hotel').value;
+        const vehicle = document.getElementById('c_vehicle').value;
+        const days    = parseInt(document.getElementById('c_duration').value) || 0;
+        const group   = parseInt(document.getElementById('c_group').value) || 0;
+        const hotelAdd   = hotel === '★★★★★' ? 10000 : hotel === '★★★★' ? 5000 : 0;
+        const vehicleAdd = vehicle === 'Luxury Van' ? 7000 : vehicle === 'Van' ? 3000 : 0;
+        let total = (_basePrice + hotelAdd + vehicleAdd) * days;
+        if (group > 5) total *= 0.90;
+        document.getElementById('customHiddenPriceDisplay').value = 'LKR ' + Math.round(total).toLocaleString();
+    }
 </script>
 </body>
 </html>
