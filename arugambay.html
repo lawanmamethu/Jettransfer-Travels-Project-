@@ -1322,9 +1322,9 @@ async function fetchRealTimeRates() {
         // EVAL: Check if 'rates' property exists in the API response
         // If yes, store it globally and trigger conversion immediately
         if (data.rates) {
-            exchangeRates = data.rates;   // save rates for use in convertCurrency()
-            convertCurrency();            // update the displayed result right away
-            return true;                  // signals success
+            exchangeRates = data.rates;  
+            convertCurrency();            
+            return true;                 
         } else {
             throw new Error('Invalid response');
         }
@@ -1332,9 +1332,9 @@ async function fetchRealTimeRates() {
         // EVAL: catch block - runs if fetch failed OR if any error was thrown above
         // Logs the error silently, uses hardcoded fallback rates instead
         console.error('Error fetching rates:', error);
-        setFallbackRates();   // use hardcoded backup rates
-        convertCurrency();    // still show a result even without live data
-        return false;         // signals failure
+        setFallbackRates();   
+        convertCurrency();    
+        return false;         
     }
 }
 
