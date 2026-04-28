@@ -4,6 +4,59 @@ if (!isset($_SESSION['jt_admin'])) { header('Location: login.php'); exit; }
 
 require_once '../db.php';
 
+// File upload helper function for destination images
+function validateAndUploadDestinationImage($file, $targetDir = '../uploads/destinations/') {
+    // Create directory if not exists
+    if (!file_exists($targetDir)) {
+        mkdir($targetDir, 0777, true);
+    }
+    
+    // Allowed image types only
+    $allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    
+    // Check if file was uploaded
+    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'message' => 'File upload failed or no file selected'];
+    }
+    
+    // Check file size (max 10MB for images)
+    $maxSizeImage = 10 * 1024 * 1024; // 10MB
+    $fileSize = $file['size']; // ← FIX: add this line to get file size
+    
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    
+    // Validate file type - only images allowed
+    $isImage = in_array($mimeType, $allowedImageTypes);
+    
+    if (!$isImage) {
+        return ['success' => false, 'message' => 'Invalid file type. Only images (JPG, PNG, GIF, WEBP) are allowed for destinations.'];
+    }
+    
+    // Check file size
+    if ($fileSize > $maxSizeImage) {
+        return ['success' => false, 'message' => 'Image file too large. Maximum size is 10MB.'];
+    }
+    
+    // Generate unique filename
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($extension, $allowedExtensions)) {
+        return ['success' => false, 'message' => 'Invalid file extension. Allowed: jpg, jpeg, png, gif, webp'];
+    }
+    
+    $filename = time() . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
+    $targetPath = $targetDir . $filename;
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return ['success' => true, 'path' => 'uploads/destinations/' . $filename, 'message' => 'Image uploaded successfully'];
+    } else {
+        return ['success' => false, 'message' => 'Failed to save file'];
+    }
+}
+
 // Fetch admin info (same as index.php)
 $ar  = $conn->query("SELECT name,email FROM admins WHERE id=1 LIMIT 1");
 $adm = $ar ? $ar->fetch_assoc() : ['name'=>'Admin','email'=>'admin@jettransfer.com'];
@@ -19,6 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete') {      //delete
         $id = (int)$_POST['id'];
+        // Also delete the image file if exists
+        $result = $conn->query("SELECT image_path FROM destinations WHERE id=$id");
+        if ($result && $row = $result->fetch_assoc()) {
+            $filePath = '../' . $row['image_path'];
+            if ($row['image_path'] && file_exists($filePath) && is_file($filePath)) {
+                unlink($filePath);
+            }
+        }
         $message = $conn->query("DELETE FROM destinations WHERE id=$id")
             ? '✅ Destination deleted successfully!'
             : '❌ '.$conn->error;
@@ -32,23 +93,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pr  = $conn->real_escape_string(trim($_POST['province']    ?? ''));
         $bl  = $conn->real_escape_string(trim($_POST['badge_label'] ?? ''));
         $sd  = $conn->real_escape_string(trim($_POST['short_desc']  ?? ''));
-        $ip  = $conn->real_escape_string(trim($_POST['image_path']  ?? ''));
         $dp  = $conn->real_escape_string(trim($_POST['detail_page'] ?? ''));
         $cat = $conn->real_escape_string($_POST['category']         ?? 'Other');
         $ia  = isset($_POST['is_active']) ? 1 : 0;
-
-        if ($action === 'add') {    //create
-            $sql = "INSERT INTO destinations(name,slug,district,province,badge_label,short_desc,image_path,detail_page,category,is_active)
-                    VALUES('$n','$sl','$di','$pr','$bl','$sd','$ip','$dp','$cat',$ia)";
-            $message = $conn->query($sql) ? '✅ Destination added!' : '❌ '.$conn->error;
-
-        } else {    //update
-            $sql = "UPDATE destinations SET name='$n',slug='$sl',district='$di',province='$pr',
-                    badge_label='$bl',short_desc='$sd',image_path='$ip',detail_page='$dp',
-                    category='$cat',is_active=$ia WHERE id=$id";
-            $message = $conn->query($sql) ? '✅ Destination updated!' : '❌ '.$conn->error;
+        
+        // Handle file upload for image
+        $uploadResult = null;
+        $ip = $_POST['existing_image_path'] ?? '';
+        
+        if (isset($_FILES['destination_image']) && $_FILES['destination_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = validateAndUploadDestinationImage($_FILES['destination_image']);
+            
+            if (!$uploadResult['success']) {
+                $message = '❌ ' . $uploadResult['message'];
+                $msgType = 'error';
+            } else {
+                $ip = $uploadResult['path'];
+                
+                // Delete old file if editing
+                if ($action === 'edit' && $id > 0 && !empty($_POST['existing_image_path'])) {
+                    $oldFilePath = '../' . $_POST['existing_image_path'];
+                    if (file_exists($oldFilePath) && is_file($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+            }
+        } elseif ($action === 'add' && empty($ip)) {
+            $message = '❌ Please select an image file to upload';
+            $msgType = 'error';
         }
-        if (str_starts_with($message,'❌')) $msgType = 'error';
+        
+        // Proceed only if no upload error
+        if (!isset($message) || strpos($message, '❌') === false) {
+            if ($action === 'add') {    //create
+                $sql = "INSERT INTO destinations(name,slug,district,province,badge_label,short_desc,image_path,detail_page,category,is_active)
+                        VALUES('$n','$sl','$di','$pr','$bl','$sd','$ip','$dp','$cat',$ia)";
+                $message = $conn->query($sql) ? '✅ Destination added!' : '❌ '.$conn->error;
+
+            } else {    //update
+                $sql = "UPDATE destinations SET name='$n',slug='$sl',district='$di',province='$pr',
+                        badge_label='$bl',short_desc='$sd',image_path='$ip',detail_page='$dp',
+                        category='$cat',is_active=$ia WHERE id=$id";
+                $message = $conn->query($sql) ? '✅ Destination updated!' : '❌ '.$conn->error;
+            }
+            if (str_starts_with($message,'❌')) $msgType = 'error';
+        }
     }
 }
 
@@ -140,8 +229,8 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
 .card-title{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;color:var(--text-dark);margin-bottom:1.2rem;display:flex;align-items:center;gap:.4rem}
 .fg{margin-bottom:.9rem}
 .fg label{display:block;font-size:.75rem;font-weight:700;color:#475569;margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.5px}
-.fg input[type=text],.fg select,.fg textarea{width:100%;padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:.88rem;color:var(--text-dark);outline:none;transition:border-color .25s;background:#fff}
-.fg input[type=text]:focus,.fg select:focus,.fg textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(10,126,164,.08)}
+.fg input[type=text],.fg select,.fg textarea,.fg input[type=file]{width:100%;padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:.88rem;color:var(--text-dark);outline:none;transition:border-color .25s;background:#fff}
+.fg input[type=text]:focus,.fg select:focus,.fg textarea:focus,.fg input[type=file]:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(10,126,164,.08)}
 .fg textarea{resize:vertical;min-height:62px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
 .chk-label{display:flex;align-items:center;gap:.45rem;font-size:.87rem;font-weight:600;cursor:pointer;color:var(--text-dark)}
@@ -150,6 +239,11 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
 .btn-save:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,126,164,.3)}
 .btn-cancel-edit{display:block;text-align:center;margin-top:.6rem;color:var(--text-light);font-size:.8rem;text-decoration:none;padding:.35rem;border-radius:8px;transition:background .2s}
 .btn-cancel-edit:hover{background:var(--bg);color:var(--text-dark)}
+
+/* Image preview styles */
+.image-preview-wrap{margin-bottom:.9rem;display:none}
+.image-preview-wrap img{width:100%;max-height:130px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border)}
+.file-info{font-size:.7rem;color:var(--text-light);margin-top:.3rem;padding:.2rem 0}
 
 /* ── TABLE CARD ── */
 .tbl-card{background:#fff;border-radius:18px;box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden}
@@ -298,15 +392,16 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
         <!-- Layout: Form + Table -->
         <div class="dest-layout">
 
-            <!-- ── ADD / EDIT FORM ── -->
+            <!-- ── ADD / EDIT FORM WITH FILE UPLOAD ── -->
             <div class="card">
                 <div class="card-title">
                     <?= $editRow ? '✏️ Edit Destination' : '➕ Add New Destination' ?>
                 </div>
-                <form method="POST" action="destinations.php<?= $editRow ? '?edit='.$editRow['id'] : '' ?>">
+                <form method="POST" action="destinations.php<?= $editRow ? '?edit='.$editRow['id'] : '' ?>" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="<?= $editRow ? 'edit' : 'add' ?>">
                     <?php if ($editRow): ?>
                         <input type="hidden" name="id" value="<?= $editRow['id'] ?>">
+                        <input type="hidden" name="existing_image_path" value="<?= htmlspecialchars($editRow['image_path'] ?? '') ?>">
                     <?php endif; ?>
 
                     <div class="fg">
@@ -356,19 +451,31 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text-dark
                         <textarea name="short_desc" required
                                   placeholder="One-line description shown on card…"><?= htmlspecialchars($editRow['short_desc'] ?? '') ?></textarea>
                     </div>
-                    <div class="row2">
-                        <div class="fg">
-                            <label>Image Path</label>
-                            <input type="text" name="image_path"
-                                   value="<?= htmlspecialchars($editRow['image_path'] ?? '') ?>"
-                                   placeholder="images/ella.webp">
-                        </div>
-                        <div class="fg">
-                            <label>Detail Page</label>
-                            <input type="text" name="detail_page"
-                                   value="<?= htmlspecialchars($editRow['detail_page'] ?? '') ?>"
-                                   placeholder="ella.html">
-                        </div>
+                    
+                    <!-- Image upload field (replaces text input) -->
+                    <div class="fg">
+                        <label>Destination Image *</label>
+                        <input type="file" name="destination_image" id="destinationImage" 
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               <?= $editRow ? '' : 'required' ?>
+                               onchange="previewImage(this)">
+                        <div class="file-info">✅ Allowed: JPG, PNG, GIF, WEBP (max 10MB)</div>
+                    </div>
+                    
+                    <!-- Live image preview -->
+                    <div class="image-preview-wrap" id="imagePreviewWrap" style="<?= ($editRow && $editRow['image_path'])?'display:block':'' ?>">
+                        <?php if($editRow && $editRow['image_path']): ?>
+                            <img id="imagePreview" src="../<?= htmlspecialchars($editRow['image_path']) ?>" onerror="this.style.display='none'">
+                        <?php else: ?>
+                            <img id="imagePreview" src="" onerror="this.style.display='none'">
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="fg">
+                        <label>Detail Page</label>
+                        <input type="text" name="detail_page"
+                               value="<?= htmlspecialchars($editRow['detail_page'] ?? '') ?>"
+                               placeholder="ella.html">
                     </div>
                     <div class="fg">
                         <label class="chk-label">
@@ -507,6 +614,42 @@ document.getElementById('sidebarOverlay').addEventListener('click', () => {
     });
     s.addEventListener('input', function() { this.dataset.manual = '1'; });
 })();
+
+// ── Image preview function
+function previewImage(input) {
+    const wrap = document.getElementById('imagePreviewWrap');
+    const preview = document.getElementById('imagePreview');
+    if (!wrap || !input.files || !input.files[0]) {
+        wrap.style.display = 'none';
+        return;
+    }
+    
+    const file = input.files[0];
+    const fileType = file.type;
+    const fileSize = file.size;
+    
+    // Validate on client side first
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxImageSize = 10 * 1024 * 1024; // 10MB
+    
+    if (!allowedImageTypes.includes(fileType)) {
+        alert('❌ Invalid file type! Only images (JPG, PNG, GIF, WEBP) are allowed for destinations.');
+        input.value = '';
+        wrap.style.display = 'none';
+        return;
+    }
+    
+    if (fileSize > maxImageSize) {
+        alert('❌ Image file too large! Maximum size is 10MB.');
+        input.value = '';
+        wrap.style.display = 'none';
+        return;
+    }
+    
+    const url = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+    preview.src = url;
+}
 
 // ── Table filter
 let activeCat = 'all';
