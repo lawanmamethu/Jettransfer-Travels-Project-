@@ -1,6 +1,7 @@
 <?php
 // ============================================================
 //  packages.php — Tour Packages with Dynamic Price Customizer
+//  DB-driven version (replaces hardcoded cards)
 // ============================================================
 require_once __DIR__ . '/admin/db_packages.php';
 
@@ -74,6 +75,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_submit'])) {
         ]);
         $bookingSuccess = true;
     }
+}
+
+// ── Fetch all active packages from DB ──────────────────────
+$pdo      = getDB();
+$packages = $pdo->query("SELECT * FROM `packages` WHERE `is_active` = 1 ORDER BY `price` ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+// ── Helper: map price (decimal) → price_tier label ─────────
+function priceTier(float $price): string {
+    if ($price < 50000)  return 'budget';
+    if ($price <= 100000) return 'mid';
+    return 'luxury';
+}
+
+// ── Helper: star string → integer count ────────────────────
+function starCount(string $stars): int {
+    return mb_strlen(trim($stars));
 }
 ?>
 <!DOCTYPE html>
@@ -376,11 +393,15 @@ window.addEventListener('load', function () {
             <div class="filter-group">
                 <span class="filter-label">Duration:</span>
                 <button class="filter-btn active" data-filter="duration" data-value="all">All</button>
-                <button class="filter-btn" data-filter="duration" data-value="1">1 Day</button>
-                <button class="filter-btn" data-filter="duration" data-value="4">4 Days</button>
-                <button class="filter-btn" data-filter="duration" data-value="5">5 Days</button>
-                <button class="filter-btn" data-filter="duration" data-value="7">7 Days</button>
-                <button class="filter-btn" data-filter="duration" data-value="14">14 Days</button>
+                <?php
+                // Build unique duration buttons from DB data
+                $durations = array_unique(array_column($packages, 'duration'));
+                sort($durations);
+                foreach ($durations as $d):
+                    $label = $d == 1 ? '1 Day' : $d . ' Days';
+                ?>
+                <button class="filter-btn" data-filter="duration" data-value="<?= $d ?>"><?= $label ?></button>
+                <?php endforeach; ?>
             </div>
             <div class="filter-group">
                 <span class="filter-label">Price:</span>
@@ -391,221 +412,79 @@ window.addEventListener('load', function () {
             </div>
         </div>
 
-        <p class="results-info fade-in">Showing <strong id="resultCount">10</strong> packages</p>
+        <p class="results-info fade-in">Showing <strong id="resultCount"><?= count($packages) ?></strong> packages</p>
 
         <div class="packages-grid" id="packagesGrid">
 
-            <div class="pkg-card fade-in" data-duration="1" data-price-tier="budget" data-name="colombo city tour">
-                <div class="pkg-img"><img src="images/colombocitytour.jpeg" alt="Colombo City" loading="lazy"><span class="pkg-duration-pill">1 Day</span></div>
+            <?php foreach ($packages as $pkg):
+                $tier      = $pkg['price_tier'] ?? priceTier((float)$pkg['price']);
+                $nights    = $pkg['duration'] - 1;
+                $priceFormatted = 'LKR ' . number_format((float)$pkg['price']);
+                $nameLower = strtolower($pkg['name']);
+                // escape for JS single-quoted attribute
+                $nameJS    = addslashes($pkg['name']);
+                $basePrice = (float)$pkg['price'];
+                $duration  = (int)$pkg['duration'];
+            ?>
+            <div class="pkg-card fade-in"
+                 data-duration="<?= $duration ?>"
+                 data-price-tier="<?= htmlspecialchars($tier) ?>"
+                 data-name="<?= htmlspecialchars($nameLower) ?>">
+
+                <div class="pkg-img">
+                    <img src="<?= htmlspecialchars($pkg['image']) ?>"
+                         alt="<?= htmlspecialchars($pkg['name']) ?>" loading="lazy">
+                    <span class="pkg-duration-pill"><?= $duration ?> Day<?= $duration > 1 ? 's' : '' ?></span>
+                </div>
+
                 <div class="pkg-body">
-                    <h3 class="pkg-name">Colombo City Tour</h3>
-                    <p class="pkg-desc">Discover Sri Lanka's vibrant capital — colonial landmarks, Pettah Market, the serene Gangaramaya Temple, and the breezy Galle Face promenade.</p>
+                    <h3 class="pkg-name"><?= htmlspecialchars($pkg['name']) ?></h3>
+                    <p class="pkg-desc"><?= htmlspecialchars($pkg['description']) ?></p>
+
                     <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>1 Day / 0 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Colombo City</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Prius, Honda Shuttle</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>1–3 People</span></div>
+                        <div class="pkg-meta-item">
+                            <span class="mi-icon">⏱</span>
+                            <span><?= $duration ?> Day<?= $duration > 1 ? 's' : '' ?> / <?= $nights ?> Night<?= $nights != 1 ? 's' : '' ?></span>
+                        </div>
+                        <div class="pkg-meta-item">
+                            <span class="mi-icon">📍</span>
+                            <span><?= htmlspecialchars($pkg['locations']) ?></span>
+                        </div>
+                        <div class="pkg-meta-item">
+                            <span class="mi-icon">🚗</span>
+                            <span><?= htmlspecialchars($pkg['vehicle']) ?></span>
+                        </div>
+                        <div class="pkg-meta-item">
+                            <span class="mi-icon">🏨</span>
+                            <span class="stars"><?= htmlspecialchars($pkg['hotel_rating']) ?> Hotel</span>
+                        </div>
+                        <div class="pkg-meta-item">
+                            <span class="mi-icon">👥</span>
+                            <span><?= htmlspecialchars($pkg['group_size']) ?></span>
+                        </div>
                     </div>
+
                     <div class="pkg-divider"></div>
+
                     <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 10,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Colombo City Tour','LKR 10,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Colombo City Tour',10000,1)">✏️ Customize</button>
+                        <div>
+                            <p class="pkg-price-label">Price per person</p>
+                            <p class="pkg-price"><?= $priceFormatted ?> <span>/ person</span></p>
+                        </div>
+                        <button class="btn-book"
+                                onclick="openBooking('<?= $nameJS ?>', '<?= addslashes($priceFormatted) ?>')">
+                            Book Now
+                        </button>
+                        <button class="btn-customize"
+                                onclick="openCustomize('<?= $nameJS ?>', <?= $basePrice ?>, <?= $duration ?>)">
+                            ✏️ Customize
+                        </button>
                     </div>
                 </div>
             </div>
+            <?php endforeach; ?>
 
-            <div class="pkg-card fade-in" data-duration="4" data-price-tier="budget" data-name="cultural triangle tour">
-                <div class="pkg-img"><img src="images/culturaltriangelshorttour.jpeg" alt="Cultural Triangle Tour" loading="lazy"><span class="pkg-duration-pill">4 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Cultural Triangle Tour</h3>
-                    <p class="pkg-desc">Journey through UNESCO World Heritage sites — the Sigiriya rock fortress, Dambulla Cave Temple, ancient Kandy.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>4 Days / 3 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Sigiriya, Dambulla, Kandy</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace KDH</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>2–6 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 45,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Cultural Triangle Tour','LKR 45,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Cultural Triangle Tour',45000,4)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="5" data-price-tier="mid" data-name="southern beach escape">
-                <div class="pkg-img"><img src="images/southernbeachescape.jpeg" alt="Southern Beach Escape" loading="lazy"><span class="pkg-duration-pill">5 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Southern Beach Escape</h3>
-                    <p class="pkg-desc">Golden beaches, the historic Galle Fort, whale watching in Mirissa, and the tranquil shores of Bentota.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>5 Days / 4 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Galle, Mirissa, Bentota</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace Mini Bus</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>5–10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 75,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Southern Beach Escape','LKR 75,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Southern Beach Escape',75000,5)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="7" data-price-tier="mid" data-name="hill country tea country tour">
-                <div class="pkg-img"><img src="images/hillcountryandteacountry.jpeg" alt="Hill Country Tour" loading="lazy"><span class="pkg-duration-pill">7 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Hill Country &amp; Tea Country Tour</h3>
-                    <p class="pkg-desc">Wind through emerald tea plantations, ride the iconic Kandy–Ella scenic train, visit misty waterfalls.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>7 Days / 6 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Kandy, Nuwara Eliya, Ella</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace KDH</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>2–6 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 60,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Hill Country Tour','LKR 60,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Hill Country Tour',60000,7)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="7" data-price-tier="luxury" data-name="northern heritage jaffna tour">
-                <div class="pkg-img"><img src="images/nothernheritageandjaffna.jpeg" alt="Northern Heritage Tour" loading="lazy"><span class="pkg-duration-pill">7 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Northern Heritage Tour</h3>
-                    <p class="pkg-desc">Uncover Sri Lanka's rich Tamil culture — the grand Nallur Kovil, Jaffna Fort, pristine Casuarina Beach.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>7 Days / 6 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Jaffna, Mannar, Nallur Kovil</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace Mini Bus</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>5–10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 105,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Northern Heritage Tour','LKR 105,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Northern Heritage Tour',105000,7)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="14" data-price-tier="luxury" data-name="wild life adventure tour">
-                <div class="pkg-img"><img src="images/wildlifeadventure.jpeg" alt="Wild Life Adventure Tour" loading="lazy"><span class="pkg-duration-pill">10 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Wild Life Adventure Tour</h3>
-                    <p class="pkg-desc">The ultimate Sri Lanka experience — covering Yala, Udawalawe, Sinharaja, Horton Plains, Trincomalee.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>10 Days / 9 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Yala, Udawalawe, Sinharaja</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace KDH</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>6–10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 90,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Wild Life Adventure Tour','LKR 90,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Wild Life Adventure Tour',90000,10)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="12" data-price-tier="luxury" data-name="luxury honeymoon tour">
-                <div class="pkg-img"><img src="images/luxuryhoneymoontour.jpeg" alt="Luxury Honeymoon Tour" loading="lazy"><span class="pkg-duration-pill">12 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Luxury Honeymoon Tour</h3>
-                    <p class="pkg-desc">A romantic getaway featuring 5-star resorts, private beach dinners, scenic hill country views and luxury transport.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>12 Days / 11 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Kandy, Nuwara Eliya, Ella, Bentota</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Alphard</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>2–4 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 160,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Luxury Honeymoon Tour','LKR 160,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Luxury Honeymoon Tour',160000,12)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="12" data-price-tier="luxury" data-name="northern explore culture combo">
-                <div class="pkg-img"><img src="images/nothernexplorecombo.jpeg" alt="Northern Explore Culture Combo" loading="lazy"><span class="pkg-duration-pill">12 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Northern Explore Culture Combo</h3>
-                    <p class="pkg-desc">Discover Jaffna, Mannar, and Trincomalee while exploring historic temples and coastal beauty.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>12 Days / 11 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Jaffna, Mannar, Kilinochchi, Kandy</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace Minibus</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>8–10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 150,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Northern Explore Culture Combo','LKR 150,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Northern Explore Culture Combo',150000,12)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="14" data-price-tier="mid" data-name="full island highlights tour">
-                <div class="pkg-img"><img src="images/fullislandtour.jpeg" alt="Full Island Highlights Tour" loading="lazy"><span class="pkg-duration-pill">14 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Full Island Highlights Tour</h3>
-                    <p class="pkg-desc">Explore the best of Sri Lanka with a complete island journey covering Colombo, the Cultural Triangle, hill country and southern beaches.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>14 Days / 13 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Colombo, Cultural Triangle, Hill Country</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace Minibus</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>Up to 10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 180,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Full Island Highlights Tour','LKR 180,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Full Island Highlights Tour',180000,14)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pkg-card fade-in" data-duration="14" data-price-tier="luxury" data-name="ultimate sri lanka explorer">
-                <div class="pkg-img"><img src="images/ultimatesrilankatour.jpeg" alt="Ultimate Sri Lanka Explorer" loading="lazy"><span class="pkg-duration-pill">14 Days</span></div>
-                <div class="pkg-body">
-                    <h3 class="pkg-name">Ultimate Sri Lanka Explorer</h3>
-                    <p class="pkg-desc">Experience the complete beauty of Sri Lanka — cultural heritage, golden beaches and coastal adventures.</p>
-                    <div class="pkg-meta">
-                        <div class="pkg-meta-item"><span class="mi-icon">⏱</span><span>14 Days / 13 Nights</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">📍</span><span>Colombo, Sigiriya, Kandy, Ella, Galle</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🚗</span><span>Toyota Hiace Minibus</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">🏨</span><span class="stars">★★★★★ Hotel</span></div>
-                        <div class="pkg-meta-item"><span class="mi-icon">👥</span><span>8–10 People</span></div>
-                    </div>
-                    <div class="pkg-divider"></div>
-                    <div class="pkg-footer">
-                        <div><p class="pkg-price-label">Price per person</p><p class="pkg-price">LKR 250,000 <span>/ person</span></p></div>
-                        <button class="btn-book"      onclick="openBooking('Ultimate Sri Lanka Explorer','LKR 250,000')">Book Now</button>
-                        <button class="btn-customize" onclick="openCustomize('Ultimate Sri Lanka Explorer',250000,14)">✏️ Customize</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        </div><!-- /.packages-grid -->
 
         <div class="no-results" id="noResults">
             <div class="nr-icon">🔍</div>
