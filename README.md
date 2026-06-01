@@ -73,7 +73,7 @@ JetTransfer Travels is a full-stack travel booking platform that allows users to
 
 MIT License
 
-Copyright (c) 2024 JetTransfer Travels
+Copyright (c) 2026 JetTransfer Travels
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
